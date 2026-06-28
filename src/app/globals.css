@@ -1,0 +1,196 @@
+/* Premium Porville Ecommerce Global CSS Variables and Styles */
+
+:root {
+  /* Color Palette */
+  --primary-gold: #c5a059;
+  --primary-gold-light: #e6d3a8;
+  --primary-gold-dark: #a27f3c;
+  
+  --bg-dark: #0c0b0a;
+  --bg-dark-sec: #181613;
+  --bg-cream: #f9f6f0;
+  --bg-cream-sec: #f1ebd9;
+  --white: #ffffff;
+  
+  --text-dark: #1f1b18;
+  --text-dark-muted: #6b625c;
+  --text-light: #f9f6f0;
+  --text-light-muted: #bdae9e;
+  --text-gold: #c5a059;
+  
+  --border-cream: #e6dfcb;
+  --border-dark: #2c251e;
+  
+  --success: #2e7d32;
+  --error: #c62828;
+  --warning: #ef6c00;
+  
+  /* Layout */
+  --header-height: 80px;
+  --container-width: 1200px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-gold: 0 4px 20px rgba(197, 160, 89, 0.15);
+  
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset & Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--bg-cream);
+  color: var(--text-dark);
+  font-family: var(--font-outfit), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.25;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+button {
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  border: 1px solid var(--border-cream);
+  border-radius: var(--border-radius-sm);
+  padding: 10px 14px;
+  background-color: var(--white);
+  transition: var(--transition);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
+}
+
+/* Utility Layout Classes */
+.container {
+  width: 100%;
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-padding {
+  padding: 80px 0;
+}
+
+@media (max-width: 768px) {
+  .section-padding {
+    padding: 50px 0;
+  }
+}
+
+/* Premium Layout Components */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Luxury Buttons */
+.btn-primary {
+  background-color: var(--bg-dark);
+  color: var(--text-gold);
+  border: 1px solid var(--primary-gold);
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-gold);
+  color: var(--bg-dark);
+  box-shadow: var(--shadow-gold);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-dark);
+  border: 1px solid var(--text-dark);
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--border-radius-sm);
+}
+
+.btn-secondary:hover {
+  background-color: var(--text-dark);
+  color: var(--white);
+}
+
+.btn-gold {
+  background-color: var(--primary-gold);
+  color: var(--bg-dark);
+  border: 1px solid var(--primary-gold);
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--border-radius-sm);
+}
+
+.btn-gold:hover {
+  background-color: var(--bg-dark);
+  color: var(--text-gold);
+  border-color: var(--primary-gold);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-cream-sec);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-gold-dark);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-gold);
+}

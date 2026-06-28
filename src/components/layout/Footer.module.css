@@ -1,0 +1,148 @@
+.footer {
+  background-color: var(--bg-dark);
+  color: var(--text-light-muted);
+  border-top: 2px solid var(--primary-gold);
+  padding: 60px 0 20px;
+  font-size: 0.85rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr 1.5fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.brandText {
+  font-family: var(--font-playfair);
+  color: var(--primary-gold-light);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}
+
+.tagline {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--text-light);
+  margin-bottom: 15px;
+}
+
+.desc {
+  line-height: 1.6;
+  color: var(--text-light-muted);
+}
+
+.heading {
+  font-family: var(--font-playfair);
+  color: var(--white);
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--primary-gold-dark);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link {
+  color: var(--text-light-muted);
+  transition: var(--transition);
+}
+
+.link:hover {
+  color: var(--primary-gold);
+  padding-left: 5px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.contactItem svg {
+  color: var(--primary-gold);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.contactLink {
+  color: inherit;
+}
+
+.contactLink:hover {
+  color: var(--primary-gold);
+}
+
+.bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.bottomLinks {
+  display: flex;
+  gap: 15px;
+}
+
+.socials {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.socialIcon {
+  color: var(--text-light-muted);
+  background-color: var(--bg-dark-sec);
+  border: 1px solid var(--border-dark);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.socialIcon:hover {
+  color: var(--bg-dark);
+  background-color: var(--primary-gold);
+  border-color: var(--primary-gold);
+}
+
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .bottom {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+}

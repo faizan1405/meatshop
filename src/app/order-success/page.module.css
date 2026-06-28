@@ -1,0 +1,82 @@
+.container {
+  padding: 80px 0;
+  background-color: var(--bg-cream);
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background-color: var(--white);
+  border: 1px solid var(--border-cream);
+  border-radius: var(--border-radius-md);
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.iconWrapper {
+  color: var(--success);
+  background-color: rgba(46, 125, 50, 0.1);
+  padding: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.title {
+  font-family: var(--font-playfair);
+  font-size: 2.2rem;
+  color: var(--text-dark);
+}
+
+.message {
+  font-size: 0.95rem;
+  color: var(--text-dark-muted);
+  line-height: 1.6;
+}
+
+.details {
+  width: 100%;
+  border-top: 1px solid var(--border-cream);
+  border-bottom: 1px solid var(--border-cream);
+  padding: 20px 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.detailLabel {
+  font-weight: 600;
+  color: var(--text-dark-muted);
+}
+
+.detailValue {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.buttons a, .buttons button {
+  flex: 1;
+  text-align: center;
+}

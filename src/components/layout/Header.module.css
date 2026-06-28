@@ -1,0 +1,139 @@
+.header {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  height: var(--header-height);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--primary-gold-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.topBar {
+  background-color: var(--bg-dark-sec);
+  border-bottom: 1px solid #1a1815;
+  padding: 6px 0;
+  font-size: 0.75rem;
+  color: var(--text-light-muted);
+  letter-spacing: 0.05em;
+}
+
+.topBarContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topBarItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topBarItem svg {
+  color: var(--primary-gold);
+}
+
+.mainHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoText {
+  font-family: var(--font-playfair);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--primary-gold-light);
+  line-height: 1.1;
+}
+
+.tagline {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-light-muted);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.navLink {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-light-muted);
+}
+
+.navLink:hover, .activeNavLink {
+  color: var(--primary-gold);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.iconBtn {
+  position: relative;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.iconBtn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--primary-gold);
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: var(--primary-gold);
+  color: var(--bg-dark);
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--bg-dark);
+}
+
+.mobileMenuBtn {
+  display: none;
+}
+
+/* Mobile responsive navigation drawer */
+@media (max-width: 768px) {
+  .nav {
+    display: none;
+  }
+  
+  .mobileMenuBtn {
+    display: block;
+  }
+
+  .logoText {
+    font-size: 1.5rem;
+  }
+}
