@@ -14,6 +14,7 @@ export default function AdminCategoriesPage() {
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
   const [displayOrder, setDisplayOrder] = useState('0');
+  const [isActive, setIsActive] = useState(true);
   
   const [editingId, setEditingId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -83,6 +84,7 @@ export default function AdminCategoriesPage() {
     setDescription(cat.description || '');
     setImage(cat.image || '');
     setDisplayOrder(cat.displayOrder?.toString() || '0');
+    setIsActive(cat.isActive !== false);
     setMessage(null);
   };
 
@@ -93,6 +95,7 @@ export default function AdminCategoriesPage() {
     setDescription('');
     setImage('');
     setDisplayOrder('0');
+    setIsActive(true);
   };
 
   const handleSubmit = async (e) => {
@@ -111,6 +114,7 @@ export default function AdminCategoriesPage() {
           description,
           image,
           displayOrder,
+          isActive,
         }),
       });
 
@@ -180,6 +184,23 @@ export default function AdminCategoriesPage() {
               value={displayOrder}
               onChange={(e) => setDisplayOrder(e.target.value)}
             />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Status</label>
+            <select
+              value={isActive ? 'true' : 'false'}
+              onChange={(e) => setIsActive(e.target.value === 'true')}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '4px',
+                border: '1px solid var(--border-cream)',
+                backgroundColor: 'var(--white)'
+              }}
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -254,6 +275,7 @@ export default function AdminCategoriesPage() {
                 <th>Name</th>
                 <th>Slug</th>
                 <th>Order</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -270,6 +292,22 @@ export default function AdminCategoriesPage() {
                   <td><strong>{cat.name}</strong></td>
                   <td>{cat.slug}</td>
                   <td>{cat.displayOrder}</td>
+                  <td>
+                    <span 
+                      style={{
+                        display: 'inline-block',
+                        padding: '3px 8px',
+                        borderRadius: '12px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        backgroundColor: cat.isActive !== false ? 'rgba(46, 125, 50, 0.1)' : 'rgba(198, 40, 40, 0.1)',
+                        color: cat.isActive !== false ? 'var(--success)' : 'var(--error)',
+                        border: `1px solid ${cat.isActive !== false ? 'rgba(46, 125, 50, 0.2)' : 'rgba(198, 40, 40, 0.2)'}`
+                      }}
+                    >
+                      {cat.isActive !== false ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
                   <td>
                     <button 
                       onClick={() => handleEditClick(cat)}

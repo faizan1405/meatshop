@@ -14,11 +14,15 @@ import styles from './page.module.css';
 
 // Pre-seeded fallback data to prevent build failure if database is empty/not loaded yet.
 const fallbackCategories = [
-  { name: 'Chicken', slug: 'chicken', image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=200&q=80' },
-  { name: 'Mutton', slug: 'mutton', image: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=200&q=80' },
-  { name: 'Pork', slug: 'pork', image: 'https://images.unsplash.com/photo-1602484944111-a8b2512a8327?auto=format&fit=crop&w=200&q=80' },
-  { name: 'Eggs', slug: 'eggs', image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=200&q=80' },
-  { name: 'Ready To Eat', slug: 'ready-to-eat', image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=200&q=80' },
+  { name: 'Chicken', slug: 'chicken', image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80', subtitle: 'Tender & Fresh Cuts' },
+  { name: 'Mutton', slug: 'mutton', image: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=400&q=80', subtitle: 'Juicy Curry Cuts' },
+  { name: 'Pork', slug: 'pork', image: 'https://images.unsplash.com/photo-1602484944111-a8b2512a8327?auto=format&fit=crop&w=400&q=80', subtitle: 'Premium Pork Cuts' },
+  { name: 'Quail', slug: 'quail', image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?auto=format&fit=crop&w=400&q=80', subtitle: 'Pasture-Raised Batair' },
+  { name: 'Duck', slug: 'duck', image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=400&q=80', subtitle: 'Rich Dressed Duck' },
+  { name: 'Eggs', slug: 'eggs', image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=400&q=80', subtitle: 'Farm-Fresh Organic' },
+  { name: 'Special', slug: 'special', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80', subtitle: 'Gourmet Selection' },
+  { name: 'Live Stock', slug: 'live-stock', image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=400&q=80', subtitle: 'Healthy Live Birds' },
+  { name: 'Ready To Eat', slug: 'ready-to-eat', image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=400&q=80', subtitle: 'Smoked & Cooked Salami' },
 ];
 
 const fallbackReviews = [
@@ -31,8 +35,19 @@ async function getData() {
   try {
     await connectDB();
 
-    // Query categories
-    let categories = await Category.find({}).sort({ displayOrder: 1 }).lean();
+    // Query active categories only
+    let categories = await Category.find({ isActive: { $ne: false } }).sort({ displayOrder: 1 }).lean();
+
+    // Query product counts per category
+    const productCounts = await Product.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]);
+    const countMap = {};
+    productCounts.forEach(pc => {
+      if (pc._id) {
+        countMap[pc._id.toString()] = pc.count;
+      }
+    });
     
     // Query featured products
     let featuredProducts = await Product.find({ featured: true })
@@ -60,8 +75,14 @@ async function getData() {
       variants: item.variants ? item.variants.map(v => ({ ...v, _id: v._id?.toString() })) : []
     }));
 
+    const stringifiedCategories = categories.map(cat => ({
+      ...cat,
+      _id: cat._id.toString(),
+      productCount: countMap[cat._id.toString()] || 0
+    }));
+
     return {
-      categories: categories.length ? stringify(categories) : fallbackCategories,
+      categories: stringifiedCategories.length ? stringifiedCategories : fallbackCategories,
       featuredProducts: stringify(featuredProducts),
       bestSellers: stringify(bestSellers),
       banners: stringify(banners),
@@ -120,22 +141,43 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 2. Category Grid/Cards */}
-        <section id="categories" className="section-padding" style={{ backgroundColor: 'var(--bg-cream)' }}>
+        {/* 2. Category Section: Shop by Category */}
+        <section id="categories" className="section-padding" style={{ backgroundColor: 'var(--bg-cream)', borderBottom: '1px solid var(--border-cream)' }}>
           <div className="container">
-            <h2 className={styles.sectionTitle}>Shop by Category</h2>
+            <span className={styles.sectionTagline}>Curated Selection</span>
+            <h2 className={styles.sectionTitle}>Explore Fresh Categories</h2>
             <p className={styles.sectionSubtitle}>
-              Select from our wide range of premium cuts, farm-fresh eggs, or ready-to-cook delicacies.
+              Browse through our range of farm-fresh, premium meats and gourmet items. Select a category to see available cuts.
             </p>
             <div className={styles.categoryGrid}>
-              {categories.map((cat) => (
-                <Link key={cat.slug} href={`/category/${cat.slug}`} className={styles.categoryCard}>
-                  <div className={styles.categoryImage}>
-                    <img src={cat.image} alt={cat.name} />
-                  </div>
-                  <span className={styles.categoryName}>{cat.name}</span>
-                </Link>
-              ))}
+              {categories.map((cat) => {
+                const count = cat.productCount;
+                const subtitle = count !== undefined ? (count > 0 ? `${count} Fresh Cuts` : 'Premium Cuts') : (cat.subtitle || 'Premium Cuts');
+                
+                // Fallback clean placeholder image if category image is missing
+                const imageSrc = cat.image || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80';
+
+                return (
+                  <Link key={cat.slug} href={`/category/${cat.slug}`} className={styles.categoryCard}>
+                    <div className={styles.categoryImageContainer}>
+                      <img src={imageSrc} alt={cat.name} className={styles.categoryImage} />
+                      <div className={styles.categoryOverlay}>
+                        <span className={styles.shopNowText}>Shop Now</span>
+                      </div>
+                    </div>
+                    <div className={styles.categoryDetails}>
+                      <h3 className={styles.categoryName}>{cat.name}</h3>
+                      <p className={styles.categoryCount}>{subtitle}</p>
+                      <div className={styles.categoryBtn}>
+                        <span>Shop Now</span>
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: '4px' }}>
+                          <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

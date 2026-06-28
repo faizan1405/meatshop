@@ -30,7 +30,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { categoryId, name, slug, description, image, displayOrder } = body;
+    const { categoryId, name, slug, description, image, displayOrder, isActive } = body;
 
     if (!name || !slug) {
       return NextResponse.json({ success: false, message: 'Name and slug are required' }, { status: 400 });
@@ -44,7 +44,14 @@ export async function POST(request) {
       // Edit mode
       const updated = await Category.findByIdAndUpdate(
         categoryId,
-        { name, slug: formattedSlug, description, image, displayOrder: parseInt(displayOrder || '0', 10) },
+        { 
+          name, 
+          slug: formattedSlug, 
+          description, 
+          image, 
+          displayOrder: parseInt(displayOrder || '0', 10),
+          isActive: isActive !== undefined ? isActive : true
+        },
         { new: true }
       );
       if (!updated) {
@@ -64,6 +71,7 @@ export async function POST(request) {
         description,
         image: image || '',
         displayOrder: parseInt(displayOrder || '0', 10),
+        isActive: isActive !== undefined ? isActive : true,
       });
 
       return NextResponse.json({ success: true, message: 'Category created successfully' });
