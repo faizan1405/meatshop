@@ -61,11 +61,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/category/pork" className={styles.link}>
-                  Premium Pork
-                </Link>
-              </li>
-              <li>
                 <Link href="/category/eggs" className={styles.link}>
                   Farm Fresh Eggs
                 </Link>

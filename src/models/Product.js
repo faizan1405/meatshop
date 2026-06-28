@@ -55,13 +55,39 @@ const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     bestSeller: {
+      type: Boolean,
+      default: false,
+    },
+    isBestSeller: {
       type: Boolean,
       default: false,
     },
     newArrival: {
       type: Boolean,
       default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    placeholderImage: {
+      type: String,
+      default: '',
+    },
+    priceType: {
+      type: String,
+      enum: ['fixed', 'on_call'],
+      default: 'fixed',
+    },
+    purchaseMode: {
+      type: String,
+      enum: ['cart', 'on_call'],
+      default: 'cart',
     },
     productType: {
       type: String,
@@ -78,5 +104,20 @@ const ProductSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Pre-save hook to synchronize deprecated/alias fields
+ProductSchema.pre('save', function(next) {
+  if (this.isModified('isFeatured')) {
+    this.featured = this.isFeatured;
+  } else if (this.isModified('featured')) {
+    this.isFeatured = this.featured;
+  }
+  if (this.isModified('isBestSeller')) {
+    this.bestSeller = this.isBestSeller;
+  } else if (this.isModified('bestSeller')) {
+    this.isBestSeller = this.bestSeller;
+  }
+  next();
+});
 
 export default mongoose.models.Product || mongoose.model('Product', ProductSchema);

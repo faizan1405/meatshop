@@ -5,6 +5,8 @@ import Order from '@/models/Order';
 import User from '@/models/User';
 import Product from '@/models/Product';
 import Address from '@/models/Address';
+import Coupon from '@/models/Coupon';
+import SiteSettings from '@/models/SiteSettings';
 
 export async function POST(request) {
   try {
@@ -78,15 +80,61 @@ export async function POST(request) {
       }
     }
 
-    // Map cart items to order items schema format
-    const orderItems = cartItems.map((item) => ({
-      product: item.product._id,
-      productName: item.product.name,
-      variantName: item.variant.name,
-      price: item.variant.salePrice || item.variant.price,
-      quantity: item.quantity,
-      image: item.product.images?.[0] || '',
-    }));
+    // Recalculate everything server-side using MongoDB to prevent client-side tampering
+    let serverItemsSubtotal = 0;
+    const orderItems = [];
+
+    for (const item of cartItems) {
+      const dbProduct = await Product.findById(item.product._id);
+      if (!dbProduct) {
+        return NextResponse.json({ success: false, message: `Product ${item.product.name} not found` }, { status: 400 });
+      }
+
+      if (dbProduct.priceType === 'on_call' || dbProduct.purchaseMode === 'on_call') {
+        return NextResponse.json({ success: false, message: `Product ${dbProduct.name} is 'On call' and cannot be ordered online.` }, { status: 400 });
+      }
+
+      const variant = dbProduct.variants.find((v) => v.name === item.variant.name);
+      if (!variant) {
+        return NextResponse.json({ success: false, message: `Variant ${item.variant.name} not found for product ${dbProduct.name}` }, { status: 400 });
+      }
+
+      const activePrice = variant.salePrice || variant.price;
+      serverItemsSubtotal += activePrice * item.quantity;
+
+      orderItems.push({
+        product: dbProduct._id,
+        productName: dbProduct.name,
+        variantName: variant.name,
+        price: activePrice,
+        quantity: item.quantity,
+        image: dbProduct.images?.[0] || '',
+      });
+    }
+
+    let serverDiscountAmount = 0;
+    if (couponCode) {
+      const dbCoupon = await Coupon.findOne({ code: couponCode.toUpperCase(), active: true });
+      if (dbCoupon && new Date() < new Date(dbCoupon.expiryDate)) {
+        if (serverItemsSubtotal >= dbCoupon.minOrderValue) {
+          if (dbCoupon.discountType === 'percentage') {
+            serverDiscountAmount = (serverItemsSubtotal * dbCoupon.discountValue) / 100;
+            if (dbCoupon.maxDiscountValue) {
+              serverDiscountAmount = Math.min(serverDiscountAmount, dbCoupon.maxDiscountValue);
+            }
+          } else if (dbCoupon.discountType === 'flat') {
+            serverDiscountAmount = dbCoupon.discountValue;
+          }
+        }
+      }
+    }
+
+    const settings = await SiteSettings.findOne({});
+    const deliveryThreshold = settings?.freeDeliveryThreshold !== undefined ? settings.freeDeliveryThreshold : 500;
+    const deliveryChargeValue = settings?.deliveryCharge !== undefined ? settings.deliveryCharge : 50;
+
+    const serverDeliveryCharge = serverItemsSubtotal >= deliveryThreshold || serverItemsSubtotal === 0 ? 0 : deliveryChargeValue;
+    const serverOrderTotal = Math.max(serverItemsSubtotal - serverDiscountAmount + serverDeliveryCharge, 0);
 
     // Create the order document
     const newOrder = await Order.create({
@@ -103,10 +151,10 @@ export async function POST(request) {
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country || 'India',
       },
-      itemsPrice: itemsSubtotal,
-      deliveryCharge,
-      discountAmount,
-      totalPrice: orderTotal,
+      itemsPrice: serverItemsSubtotal,
+      deliveryCharge: serverDeliveryCharge,
+      discountAmount: serverDiscountAmount,
+      totalPrice: serverOrderTotal,
       couponUsed: couponCode || null,
       paymentStatus: 'paid',
       paymentDetails: {

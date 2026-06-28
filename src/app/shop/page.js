@@ -257,5 +257,5 @@ export default async function ShopPage({ searchParams }) {
 }
 export const metadata = {
   title: "Premium Meat Shop & Cuts Online",
-  description: "Browse our premium range of fresh chicken, mutton, pork, quail, duck, ready-to-eat salami, and organic farm-fresh eggs.",
+  description: "Browse our premium range of fresh chicken, mutton, quail, duck, ready-to-eat salami, and organic farm-fresh eggs.",
 };

@@ -14,7 +14,6 @@ import styles from './page.module.css';
 const fallbackCategories = [
   { name: 'Chicken', slug: 'chicken', image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=600&q=80', description: 'Fresh, tender, and hygienically cut chicken parts and whole birds.' },
   { name: 'Mutton', slug: 'mutton', image: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=600&q=80', description: 'Premium quality goat and lamb cuts, rich in flavor and nutrition.' },
-  { name: 'Pork', slug: 'pork', image: 'https://images.unsplash.com/photo-1602484944111-a8b2512a8327?auto=format&fit=crop&w=600&q=80', description: 'Lean and juicy pork cuts, bacon, ribs, and minced pork.' },
   { name: 'Quail', slug: 'quail', image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?auto=format&fit=crop&w=600&q=80', description: 'Nutritious and flavor-packed quail meat, sourced from selected farms.' },
   { name: 'Duck', slug: 'duck', image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=600&q=80', description: 'Plump and juicy duck meat, ideal for roasting and gourmet dishes.' },
   { name: 'Eggs', slug: 'eggs', image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=600&q=80', description: 'Organic, farm-fresh eggs loaded with proteins and nutrients.' },

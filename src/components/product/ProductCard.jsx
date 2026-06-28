@@ -44,9 +44,35 @@ export default function ProductCard({ product }) {
   const hasDiscount = salePrice && salePrice < price;
   const discountPercent = hasDiscount ? Math.round(((price - salePrice) / price) * 100) : 0;
 
+  const isOnCall = product.priceType === 'on_call' || product.purchaseMode === 'on_call';
+
+  // Calculate starting price display or show "On call"
+  const renderPrice = () => {
+    if (isOnCall) {
+      return <span className={styles.price}>On call</span>;
+    }
+
+    if (product.variants?.length > 1) {
+      const activePrices = product.variants.map((v) => v.salePrice || v.price);
+      const minPrice = Math.min(...activePrices);
+      return <span className={styles.price}>From ₹{minPrice}</span>;
+    }
+
+    if (hasDiscount) {
+      return (
+        <>
+          <span className={`${styles.price} ${styles.salePrice}`}>₹{salePrice}</span>
+          <span className={styles.oldPrice}>₹{price}</span>
+        </>
+      );
+    }
+
+    return <span className={styles.price}>₹{price}</span>;
+  };
+
   return (
     <div className={styles.card}>
-      {hasDiscount && (
+      {hasDiscount && !isOnCall && (
         <span className={styles.badge}>
           Save {discountPercent}%
         </span>
@@ -55,7 +81,7 @@ export default function ProductCard({ product }) {
       {/* Product Image Wrapper */}
       <Link href={`/product/${product.slug}`} className={styles.imageWrapper}>
         <img 
-          src={product.images?.[0] || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80'} 
+          src={product.images?.[0] || product.placeholderImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80'} 
           alt={product.name}
           className={styles.image}
           loading="lazy"
@@ -72,8 +98,15 @@ export default function ProductCard({ product }) {
           <h3 className={styles.title}>{product.name}</h3>
         </Link>
 
+        {/* Variant Preview */}
+        {product.variants?.length > 0 && (
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', marginBottom: '8px' }}>
+            Pack sizes: {product.variants.map(v => v.name).join(' / ')}
+          </div>
+        )}
+
         {/* Variant Dropdown */}
-        {product.variants?.length > 1 && (
+        {product.variants?.length > 1 && !isOnCall && (
           <div className={styles.variantSelector}>
             <label className={styles.selectLabel}>Select weight/pack</label>
             <select 
@@ -90,7 +123,7 @@ export default function ProductCard({ product }) {
           </div>
         )}
         
-        {product.variants?.length === 1 && (
+        {product.variants?.length === 1 && !isOnCall && (
           <div style={{ fontSize: '0.8rem', color: 'var(--text-dark-muted)', marginBottom: '15px' }}>
             Pack: <strong>{product.variants[0].name}</strong>
           </div>
@@ -98,19 +131,16 @@ export default function ProductCard({ product }) {
 
         {/* Price display */}
         <div className={styles.priceRow}>
-          {hasDiscount ? (
-            <>
-              <span className={`${styles.price} styles.salePrice`}>₹{salePrice}</span>
-              <span className={styles.oldPrice}>₹{price}</span>
-            </>
-          ) : (
-            <span className={styles.price}>₹{price}</span>
-          )}
+          {renderPrice()}
         </div>
 
         {/* Button Wrapper */}
         <div className={styles.buttonWrapper}>
-          {isOutOfStock ? (
+          {isOnCall ? (
+            <a href="tel:9217577006" className={styles.addBtn} style={{ textDecoration: 'none' }}>
+              <span>Call to Order</span>
+            </a>
+          ) : isOutOfStock ? (
             <button className={styles.outOfStockBtn} disabled>
               Out of stock
             </button>

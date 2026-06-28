@@ -20,6 +20,7 @@ export default function AdminProductForm({ productId }) {
   const [featured, setFeatured] = useState(false);
   const [bestSeller, setBestSeller] = useState(false);
   const [newArrival, setNewArrival] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   
   // SEO Details
   const [seoTitle, setSeoTitle] = useState('');
@@ -75,6 +76,7 @@ export default function AdminProductForm({ productId }) {
             setFeatured(p.featured);
             setBestSeller(p.bestSeller);
             setNewArrival(p.newArrival);
+            setIsActive(p.isActive !== false);
             setSeoTitle(p.seoTitle || '');
             setSeoDescription(p.seoDescription || '');
             setImages(p.images || []);
@@ -204,6 +206,7 @@ export default function AdminProductForm({ productId }) {
           featured,
           bestSeller,
           newArrival,
+          isActive,
           seoTitle,
           seoDescription,
           images,
@@ -346,6 +349,14 @@ export default function AdminProductForm({ productId }) {
             onChange={(e) => setNewArrival(e.target.checked)}
           />
           <span>New Arrival</span>
+        </label>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+          />
+          <span style={{ fontWeight: 'bold', color: 'var(--primary-gold-dark)' }}>Active on Site</span>
         </label>
       </div>
 

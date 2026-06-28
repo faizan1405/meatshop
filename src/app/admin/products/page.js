@@ -174,6 +174,7 @@ export default function AdminProductsPage() {
                   <td><strong>{priceDisplay}</strong></td>
                   <td>
                     <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {p.isActive === false && <span style={{ fontSize: '0.65rem', backgroundColor: '#ffebee', color: '#c62828', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Inactive</span>}
                       {p.featured && <span style={{ fontSize: '0.65rem', backgroundColor: '#e1f5fe', color: '#0277bd', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Featured</span>}
                       {p.bestSeller && <span style={{ fontSize: '0.65rem', backgroundColor: '#e8f5e9', color: '#1b5e20', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Best Seller</span>}
                       {p.newArrival && <span style={{ fontSize: '0.65rem', backgroundColor: '#f3e5f5', color: '#6a1b9a', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>New</span>}

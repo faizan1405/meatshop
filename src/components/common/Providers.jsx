@@ -59,6 +59,10 @@ export function CartProvider({ children }) {
   }, [coupon, isMounted]);
 
   const addToCart = (product, variant, quantity = 1) => {
+    if (product.priceType === 'on_call' || product.purchaseMode === 'on_call') {
+      alert('This product can only be ordered by phone. Call 9217577006 to place an order.');
+      return;
+    }
     setCartItems((prev) => {
       // Find if item with same variant already exists
       const existingIndex = prev.findIndex(

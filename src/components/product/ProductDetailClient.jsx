@@ -158,7 +158,9 @@ export default function ProductDetailClient({ product, initialReviews }) {
 
           {/* Price display */}
           <div className={styles.priceRow}>
-            {hasDiscount ? (
+            {product.priceType === 'on_call' || product.purchaseMode === 'on_call' ? (
+              <span className={styles.price}>On call</span>
+            ) : hasDiscount ? (
               <>
                 <span className={styles.price} style={{ color: 'var(--primary-gold-dark)' }}>₹{salePrice}</span>
                 <span className={styles.oldPrice}>₹{price}</span>
@@ -198,36 +200,65 @@ export default function ProductDetailClient({ product, initialReviews }) {
           )}
 
           {/* Purchase details */}
-          <div className={styles.purchaseSection}>
-            <div className={styles.qtySelector}>
-              <button 
-                className={styles.qtyBtn} 
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={isOutOfStock}
-              >
-                -
-              </button>
-              <span className={styles.qtyValue}>{quantity}</span>
-              <button 
-                className={styles.qtyBtn} 
-                onClick={() => setQuantity(quantity + 1)}
-                disabled={isOutOfStock}
-              >
-                +
-              </button>
+          {product.priceType === 'on_call' || product.purchaseMode === 'on_call' ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div className={styles.purchaseSection}>
+                <a 
+                  href="tel:9217577006" 
+                  className="btn-gold btn-primary" 
+                  style={{ 
+                    flex: 1, 
+                    display: 'flex', 
+                    gap: '8px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    textDecoration: 'none', 
+                    padding: '14px', 
+                    borderRadius: '4px',
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    textAlign: 'center'
+                  }}
+                >
+                  Call to Order (9217577006)
+                </a>
+              </div>
+              <div style={{ fontSize: '0.9rem', color: 'var(--primary-gold-dark)', fontWeight: 600 }}>
+                This product is available for order by phone only. Please contact us directly to place your order.
+              </div>
             </div>
+          ) : (
+            <div className={styles.purchaseSection}>
+              <div className={styles.qtySelector}>
+                <button 
+                  className={styles.qtyBtn} 
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={isOutOfStock}
+                >
+                  -
+                </button>
+                <span className={styles.qtyValue}>{quantity}</span>
+                <button 
+                  className={styles.qtyBtn} 
+                  onClick={() => setQuantity(quantity + 1)}
+                  disabled={isOutOfStock}
+                >
+                  +
+                </button>
+              </div>
 
-            {isOutOfStock ? (
-              <button className="btn-primary" style={{ flex: 1, cursor: 'not-allowed' }} disabled>
-                Out of Stock
-              </button>
-            ) : (
-              <button onClick={handleAddToCart} className="btn-gold btn-primary styles.addBtn" style={{ flex: 1, display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                <ShoppingCart size={18} />
-                <span>Add to Cart</span>
-              </button>
-            )}
-          </div>
+              {isOutOfStock ? (
+                <button className="btn-primary" style={{ flex: 1, cursor: 'not-allowed' }} disabled>
+                  Out of Stock
+                </button>
+              ) : (
+                <button onClick={handleAddToCart} className="btn-gold btn-primary styles.addBtn" style={{ flex: 1, display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                  <ShoppingCart size={18} />
+                  <span>Add to Cart</span>
+                </button>
+              )}
+            </div>
+          )}
 
           <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8rem', color: 'var(--text-dark-muted)' }}>
             <div>Availability: <strong style={{ color: isOutOfStock ? 'var(--error)' : 'var(--success)' }}>{isOutOfStock ? 'Out of stock' : 'In Stock'}</strong></div>

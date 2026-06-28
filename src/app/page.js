@@ -16,7 +16,6 @@ import styles from './page.module.css';
 const fallbackCategories = [
   { name: 'Chicken', slug: 'chicken', image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80', subtitle: 'Tender & Fresh Cuts' },
   { name: 'Mutton', slug: 'mutton', image: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=400&q=80', subtitle: 'Juicy Curry Cuts' },
-  { name: 'Pork', slug: 'pork', image: 'https://images.unsplash.com/photo-1602484944111-a8b2512a8327?auto=format&fit=crop&w=400&q=80', subtitle: 'Premium Pork Cuts' },
   { name: 'Quail', slug: 'quail', image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?auto=format&fit=crop&w=400&q=80', subtitle: 'Pasture-Raised Batair' },
   { name: 'Duck', slug: 'duck', image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=400&q=80', subtitle: 'Rich Dressed Duck' },
   { name: 'Eggs', slug: 'eggs', image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=400&q=80', subtitle: 'Farm-Fresh Organic' },
