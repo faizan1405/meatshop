@@ -114,5 +114,18 @@ export const authOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development-purposes',
+  // Never fall back to a hardcoded secret in production: a predictable secret
+  // lets anyone forge session JWTs (including admin sessions). In production we
+  // require NEXTAUTH_SECRET to be set; only local dev gets a throwaway default.
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    (process.env.NODE_ENV !== 'production'
+      ? 'dev-only-insecure-secret-do-not-use-in-prod'
+      : undefined),
 };
+
+if (process.env.NODE_ENV === 'production' && !process.env.NEXTAUTH_SECRET) {
+  console.error(
+    '[auth] NEXTAUTH_SECRET is not set in production. Authentication is insecure and may fail. Set NEXTAUTH_SECRET in your environment.'
+  );
+}

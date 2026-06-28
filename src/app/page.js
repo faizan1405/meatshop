@@ -89,6 +89,9 @@ async function getData() {
     };
   } catch (error) {
     console.error('Failed to load DB data for Home Page:', error.message);
+    console.warn(
+      '[home] ⚠️  Serving hardcoded FALLBACK content because the database is unavailable. This is NOT real data — fix the MongoDB connection before going live.'
+    );
     return {
       categories: fallbackCategories,
       featuredProducts: [],

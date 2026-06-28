@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/db';
 import Category from '@/models/Category';
@@ -9,8 +10,52 @@ import Banner from '@/models/Banner';
 import Coupon from '@/models/Coupon';
 import { seedCategories, seedProducts } from '@/data/seedProducts';
 
-export async function GET(request) {
-  try {
+// Force dynamic so this handler is never statically cached and always reads the
+// incoming secret. (Reading request.headers already opts out of caching.)
+export const dynamic = 'force-dynamic';
+
+/**
+ * Constant-time comparison to avoid leaking the secret via timing.
+ */
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+/**
+ * The seed route is destructive and writes admin credentials, so it MUST be
+ * protected. Provide the secret as either:
+ *   - Header: `Authorization: Bearer <SEED_SECRET>`
+ *   - Header: `x-seed-secret: <SEED_SECRET>`
+ *   - Query:  `/api/seed?secret=<SEED_SECRET>`
+ */
+function isAuthorized(request) {
+  const expected = process.env.SEED_SECRET;
+
+  // If no secret is configured on the server, refuse to run. This prevents an
+  // accidentally-public seed endpoint in production.
+  if (!expected) {
+    return { ok: false, reason: 'SEED_SECRET is not configured on the server. Seeding is disabled.' };
+  }
+
+  const authHeader = request.headers.get('authorization') || '';
+  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+  const headerSecret = request.headers.get('x-seed-secret') || '';
+  const querySecret = request.nextUrl.searchParams.get('secret') || '';
+
+  const provided = bearer || headerSecret || querySecret;
+
+  if (!provided || !safeEqual(provided, expected)) {
+    return { ok: false, reason: 'Invalid or missing seed secret.' };
+  }
+
+  return { ok: true };
+}
+
+async function runSeed() {
     await connectDB();
 
     // 1. Seed/Upsert Categories
@@ -65,11 +110,15 @@ export async function GET(request) {
     const deletedProductsRes = await Product.deleteMany({ slug: { $nin: productSlugs } });
     const deletedCategoriesRes = await Category.deleteMany({ slug: { $nin: categorySlugs } });
 
-    // 4. Seed Admin User if not exists
-    const adminEmail = process.env.ADMIN_EMAIL || 'porville1986@gmail.com';
+    // 4. Seed Admin User if not exists (only created once; never overwrites an
+    //    existing admin password).
+    const adminEmail = (process.env.ADMIN_EMAIL || 'porville1986@gmail.com').toLowerCase();
     let admin = await AdminUser.findOne({ email: adminEmail });
     if (!admin) {
-      const adminPassword = process.env.ADMIN_PASSWORD || 'Porville@1986';
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      if (!adminPassword) {
+        throw new Error('ADMIN_PASSWORD env variable is required to create the initial admin user.');
+      }
       const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
       admin = await AdminUser.create({
         name: 'Porville Admin',
@@ -124,7 +173,7 @@ export async function GET(request) {
     const totalCategoriesCount = await Category.countDocuments({});
     const totalProductsCount = await Product.countDocuments({});
 
-    return NextResponse.json({
+    return {
       success: true,
       message: 'Database upserted successfully',
       seeded: {
@@ -135,9 +184,22 @@ export async function GET(request) {
         admin: admin.email,
         settings: 1,
         banners: 1,
-        coupons: 1
-      }
-    });
+        coupons: 1,
+      },
+    };
+}
+
+async function handleSeed(request) {
+  const auth = isAuthorized(request);
+  if (!auth.ok) {
+    // 401 for missing/invalid secret, 403 when seeding is disabled entirely.
+    const status = auth.reason.includes('disabled') ? 403 : 401;
+    return NextResponse.json({ success: false, error: auth.reason }, { status });
+  }
+
+  try {
+    const result = await runSeed();
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Seeding error:', error);
     return NextResponse.json(
@@ -145,4 +207,12 @@ export async function GET(request) {
       { status: 500 }
     );
   }
+}
+
+export async function GET(request) {
+  return handleSeed(request);
+}
+
+export async function POST(request) {
+  return handleSeed(request);
 }
