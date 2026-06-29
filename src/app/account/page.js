@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { User, MapPin, LogOut, Trash2, ShieldCheck, AlertCircle } from 'lucide-react';
 import Header from '@/components/layout/Header';
