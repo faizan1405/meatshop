@@ -48,14 +48,15 @@ async function getData() {
       }
     });
     
-    // Query featured products
-    let featuredProducts = await Product.find({ featured: true })
+    // Query featured products (support both `featured` and the `isFeatured`
+    // alias, since seeded docs set the alias and admin-created docs set `featured`).
+    let featuredProducts = await Product.find({ $or: [{ featured: true }, { isFeatured: true }] })
       .populate('category')
       .limit(4)
       .lean();
 
-    // Query best seller products
-    let bestSellers = await Product.find({ bestSeller: true })
+    // Query best seller products (same dual-field handling as above).
+    let bestSellers = await Product.find({ $or: [{ bestSeller: true }, { isBestSeller: true }] })
       .populate('category')
       .limit(4)
       .lean();

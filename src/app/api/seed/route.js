@@ -94,6 +94,10 @@ async function runSeed() {
             isActive: prod.isActive !== undefined ? prod.isActive : true,
             isFeatured: prod.isFeatured !== undefined ? prod.isFeatured : false,
             isBestSeller: prod.isBestSeller !== undefined ? prod.isBestSeller : false,
+            // Mirror the canonical fields too — findOneAndUpdate skips the
+            // pre('save') hook that normally keeps these in sync.
+            featured: prod.isFeatured !== undefined ? prod.isFeatured : false,
+            bestSeller: prod.isBestSeller !== undefined ? prod.isBestSeller : false,
             placeholderImage: prod.placeholderImage || '',
             priceType: prod.priceType || 'fixed',
             purchaseMode: prod.purchaseMode || 'cart',
