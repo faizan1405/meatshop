@@ -8,6 +8,7 @@
   font-family: var(--font-playfair);
   font-size: 2.2rem;
   margin-bottom: 30px;
+  animation: fadeUp 0.7s var(--ease-premium) both;
 }
 
 .shopLayout {
@@ -30,7 +31,7 @@
 .filterBox {
   background-color: var(--white);
   border: 1px solid var(--border-cream);
-  border-radius: var(--border-radius-md);
+  border-radius: 14px;
   padding: 20px;
   box-shadow: var(--shadow-sm);
 }
@@ -68,6 +69,13 @@
 .filterLink {
   color: var(--text-dark-muted);
   cursor: pointer;
+  transition: var(--transition);
+  display: inline-block;
+}
+
+.filterLink:hover {
+  color: var(--primary-gold-dark);
+  transform: translateX(4px);
 }
 
 .filterLinkActive {

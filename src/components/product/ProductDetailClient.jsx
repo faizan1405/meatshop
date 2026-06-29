@@ -252,7 +252,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
                   Out of Stock
                 </button>
               ) : (
-                <button onClick={handleAddToCart} className="btn-gold btn-primary styles.addBtn" style={{ flex: 1, display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                <button onClick={handleAddToCart} className="btn-gold btn-primary" style={{ flex: 1, display: 'flex', gap: '8px', justifyContent: 'center' }}>
                   <ShoppingCart size={18} />
                   <span>Add to Cart</span>
                 </button>

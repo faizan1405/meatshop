@@ -70,6 +70,7 @@
 }
 
 .navLink {
+  position: relative;
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -77,8 +78,25 @@
   color: var(--text-light-muted);
 }
 
+.navLink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 2px;
+  background: var(--primary-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s var(--ease-premium);
+}
+
 .navLink:hover, .activeNavLink {
   color: var(--primary-gold);
+}
+
+.navLink:hover::after, .activeNavLink::after {
+  transform: scaleX(1);
 }
 
 .actions {

@@ -31,12 +31,21 @@
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 16px;
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
-  --shadow-gold: 0 4px 20px rgba(197, 160, 89, 0.15);
-  
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 2px 6px rgba(31, 27, 24, 0.05);
+  --shadow-md: 0 6px 18px rgba(31, 27, 24, 0.08);
+  --shadow-lg: 0 16px 38px -10px rgba(31, 27, 24, 0.18);
+  --shadow-hover: 0 22px 46px -14px rgba(31, 27, 24, 0.24);
+  --shadow-gold: 0 10px 30px -8px rgba(197, 160, 89, 0.28);
+  --shadow-gold-hover: 0 20px 44px -12px rgba(197, 160, 89, 0.38);
+
+  --transition: all 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-premium: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Smooth in-page anchor scrolling (e.g. Explore Categories) */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 20px);
 }
 
 /* Reset & Base Styles */
@@ -142,6 +151,7 @@ input:focus, select:focus, textarea:focus {
   background-color: var(--primary-gold);
   color: var(--bg-dark);
   box-shadow: var(--shadow-gold);
+  transform: translateY(-2px);
 }
 
 .btn-secondary {
@@ -159,6 +169,7 @@ input:focus, select:focus, textarea:focus {
 .btn-secondary:hover {
   background-color: var(--text-dark);
   color: var(--white);
+  transform: translateY(-2px);
 }
 
 .btn-gold {
@@ -177,6 +188,14 @@ input:focus, select:focus, textarea:focus {
   background-color: var(--bg-dark);
   color: var(--text-gold);
   border-color: var(--primary-gold);
+  box-shadow: var(--shadow-gold-hover);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.btn-gold:active {
+  transform: translateY(0);
 }
 
 /* Custom Scrollbar */
@@ -193,4 +212,125 @@ input:focus, select:focus, textarea:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary-gold);
+}
+
+/* Premium text selection */
+::selection {
+  background-color: var(--primary-gold);
+  color: var(--bg-dark);
+}
+
+/* Accessible focus ring */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary-gold);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   PREMIUM MOTION SYSTEM
+   Subtle, luxury-grade entrances. GPU-only
+   (opacity/transform) so layout never shifts.
+   ============================================ */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(36px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Slow Ken Burns zoom for hero / banner imagery */
+@keyframes kenBurns {
+  from { transform: scale(1.02); }
+  to   { transform: scale(1.16); }
+}
+
+/* On-load entrances (run once) */
+.animate-fade-up { animation: fadeUp 0.9s var(--ease-premium) both; }
+.animate-fade-in { animation: fadeIn 1.1s ease both; }
+.animate-scale-in { animation: fadeInScale 0.8s var(--ease-premium) both; }
+
+/* Stagger helpers */
+.delay-1 { animation-delay: 0.08s; }
+.delay-2 { animation-delay: 0.18s; }
+.delay-3 { animation-delay: 0.30s; }
+.delay-4 { animation-delay: 0.42s; }
+.delay-5 { animation-delay: 0.54s; }
+
+/* Scroll-triggered reveal — progressive enhancement.
+   Where animation-timeline is unsupported, the element
+   simply stays visible (no opacity:0), so nothing breaks. */
+@supports (animation-timeline: view()) {
+  .reveal-on-scroll {
+    opacity: 0;
+    animation: fadeUp 0.9s var(--ease-premium) both;
+    animation-timeline: view();
+    animation-range: entry 2% cover 20%;
+  }
+}
+
+/* Reusable image zoom-on-hover frame for showcase imagery */
+.zoom-frame {
+  overflow: hidden;
+}
+.zoom-frame img {
+  transition: transform 0.8s var(--ease-premium);
+  will-change: transform;
+}
+.zoom-frame:hover img {
+  transform: scale(1.06);
+}
+
+/* Reusable soft hover lift for premium cards */
+.lift-card {
+  transition: var(--transition);
+}
+.lift-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-gold);
+}
+
+/* Opacity-only scroll reveal (pair with hover-lift cards) */
+@supports (animation-timeline: view()) {
+  .reveal-fade {
+    opacity: 0;
+    animation: fadeIn 0.85s var(--ease-premium) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 18%;
+  }
+}
+
+/* Honour user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-on-scroll,
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-scale-in {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

@@ -100,7 +100,8 @@ export default async function CategoryPage({ params }) {
             </div>
             {/* Ambient image background */}
             {category.image && (
-              <div 
+              <div
+                className={styles.ambient}
                 style={{
                   position: 'absolute',
                   top: 0,

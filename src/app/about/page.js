@@ -10,13 +10,13 @@ export default function AboutPage() {
       <CartDrawer />
       <main style={{ backgroundColor: 'var(--bg-cream)', padding: '80px 0', minHeight: 'calc(100vh - var(--header-height))' }}>
         <div className="container" style={{ maxWidth: '800px' }}>
-          <h1 style={{ fontFamily: 'var(--font-playfair)', fontSize: '2.5rem', marginBottom: '20px', color: 'var(--text-dark)' }}>
+          <h1 className="animate-fade-up" style={{ fontFamily: 'var(--font-playfair)', fontSize: '2.5rem', marginBottom: '20px', color: 'var(--text-dark)' }}>
             About Porville
           </h1>
-          <h3 style={{ color: 'var(--primary-gold-dark)', textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.9rem', fontWeight: 700, marginBottom: '20px' }}>
+          <h3 className="animate-fade-up delay-1" style={{ color: 'var(--primary-gold-dark)', textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.9rem', fontWeight: 700, marginBottom: '20px' }}>
             Fresh Cut. Pure Standards. Since 1986.
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontSize: '0.95rem', lineHeight: '1.8', color: 'var(--text-dark)' }}>
+          <div className="animate-fade-up delay-2" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontSize: '0.95rem', lineHeight: '1.8', color: 'var(--text-dark)' }}>
             <p>
               Porville was founded on a simple promise: to elevate the quality of meat available to families in Delhi. Sourced under strict quality guidelines, prepared in advanced temperature-controlled clean facilities, and custom-sliced fresh for every order, we have redefined freshness standards.
             </p>

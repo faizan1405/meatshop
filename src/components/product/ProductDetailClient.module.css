@@ -9,21 +9,29 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  animation: fadeUp 0.8s var(--ease-premium) both;
 }
 
 .mainImage {
   aspect-ratio: 4/3;
   width: 100%;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-cream);
   background-color: var(--white);
+  box-shadow: var(--shadow-md);
 }
 
 .mainImage img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.7s var(--ease-premium);
+  will-change: transform;
+}
+
+.mainImage:hover img {
+  transform: scale(1.05);
 }
 
 .thumbnails {
@@ -39,10 +47,17 @@
   border: 1px solid var(--border-cream);
   cursor: pointer;
   background-color: var(--white);
+  transition: var(--transition);
+}
+
+.thumbnail:hover {
+  border-color: var(--primary-gold);
+  transform: translateY(-2px);
 }
 
 .thumbnailActive {
   border-color: var(--primary-gold);
+  box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.35);
 }
 
 .thumbnail img {
@@ -56,6 +71,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  animation: fadeUp 0.8s var(--ease-premium) 0.12s both;
 }
 
 .categoryTag {
@@ -144,6 +160,12 @@
   border-radius: var(--border-radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
+  transition: var(--transition);
+}
+
+.variantPill:hover:not(.variantPillOutOfStock) {
+  border-color: var(--primary-gold);
+  transform: translateY(-2px);
 }
 
 .variantPillActive {
@@ -223,6 +245,22 @@
   border-radius: var(--border-radius-md);
   padding: 20px;
   box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.reviewCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-gold);
+}
+
+@supports (animation-timeline: view()) {
+  .reviewCard {
+    opacity: 0;
+    animation: fadeIn 0.8s var(--ease-premium) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 16%;
+  }
 }
 
 .reviewHeader {

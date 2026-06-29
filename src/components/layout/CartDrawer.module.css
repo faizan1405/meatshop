@@ -8,7 +8,7 @@
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: opacity 0.4s var(--ease-premium), visibility 0.4s var(--ease-premium);
   backdrop-filter: blur(4px);
 }
 
@@ -27,7 +27,7 @@
   background-color: var(--bg-cream);
   z-index: 1001;
   box-shadow: var(--shadow-lg);
-  transition: right 0.3s ease;
+  transition: right 0.45s var(--ease-premium);
   display: flex;
   flex-direction: column;
   border-left: 1px solid var(--border-cream);
@@ -79,6 +79,20 @@
   gap: 12px;
   padding-bottom: 15px;
   border-bottom: 1px solid var(--border-cream);
+}
+
+/* Items gently fade-up each time the drawer opens */
+.drawerOpen .cartItem {
+  animation: fadeUp 0.5s var(--ease-premium) both;
+}
+.drawerOpen .cartItem:nth-child(1) { animation-delay: 0.08s; }
+.drawerOpen .cartItem:nth-child(2) { animation-delay: 0.14s; }
+.drawerOpen .cartItem:nth-child(3) { animation-delay: 0.20s; }
+.drawerOpen .cartItem:nth-child(4) { animation-delay: 0.26s; }
+.drawerOpen .cartItem:nth-child(5) { animation-delay: 0.32s; }
+
+.qtyBtn {
+  transition: var(--transition);
 }
 
 .itemImg {

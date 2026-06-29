@@ -16,6 +16,15 @@
   gap: 20px;
 }
 
+/* Staggered fade-up entrance for hero copy on load */
+.heroContent > * {
+  animation: fadeUp 0.9s var(--ease-premium) both;
+}
+.heroContent > *:nth-child(1) { animation-delay: 0.10s; }
+.heroContent > *:nth-child(2) { animation-delay: 0.22s; }
+.heroContent > *:nth-child(3) { animation-delay: 0.34s; }
+.heroContent > *:nth-child(4) { animation-delay: 0.46s; }
+
 .tagline {
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -50,7 +59,14 @@
   width: 50%;
   height: 100%;
   z-index: 1;
-  opacity: 0.75;
+  opacity: 0.78;
+  overflow: hidden;
+}
+
+/* Slow cinematic Ken Burns zoom on the hero image */
+.heroBg img {
+  animation: kenBurns 22s ease-out forwards;
+  transform-origin: center;
 }
 
 .heroBg::after {
@@ -60,7 +76,9 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to right, var(--bg-dark) 0%, transparent 100%);
+  background:
+    linear-gradient(to right, var(--bg-dark) 0%, rgba(12, 11, 10, 0.2) 60%, transparent 100%),
+    linear-gradient(to top, var(--bg-dark) 0%, transparent 45%);
 }
 
 @media (max-width: 992px) {
@@ -93,6 +111,17 @@
   font-weight: 700;
   margin-bottom: 12px;
   color: var(--text-dark);
+}
+
+/* Gold flourish underline beneath section headings */
+.sectionTitle::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 3px;
+  margin: 16px auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
 }
 
 .sectionSubtitle {
@@ -134,7 +163,7 @@
 .categoryCard {
   background: var(--white);
   border: 1px solid var(--border-cream);
-  border-radius: var(--border-radius-md);
+  border-radius: 14px;
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -147,7 +176,17 @@
 .categoryCard:hover {
   border-color: var(--primary-gold);
   box-shadow: var(--shadow-gold);
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+}
+
+/* Opacity-only reveal so the hover lift transform stays free */
+@supports (animation-timeline: view()) {
+  .categoryCard {
+    opacity: 0;
+    animation: fadeIn 0.85s var(--ease-premium) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 16%;
+  }
 }
 
 .categoryImageContainer {
@@ -277,6 +316,14 @@
   gap: 15px;
 }
 
+@supports (animation-timeline: view()) {
+  .featureCard {
+    animation: fadeUp 0.85s var(--ease-premium) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 18%;
+  }
+}
+
 .featureIcon {
   color: var(--primary-gold);
   display: flex;
@@ -286,6 +333,15 @@
   border-radius: 50%;
   background-color: rgba(197, 160, 89, 0.1);
   border: 1px solid rgba(197, 160, 89, 0.3);
+  transition: var(--transition);
+}
+
+/* Gentle gold glow on the trust badge icons */
+.featureCard:hover .featureIcon {
+  background-color: rgba(197, 160, 89, 0.18);
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 0 6px rgba(197, 160, 89, 0.08);
+  transform: translateY(-3px);
 }
 
 .featureTitle {
@@ -310,13 +366,29 @@
 .reviewCard {
   background-color: var(--white);
   border: 1px solid var(--border-cream);
-  border-radius: var(--border-radius-md);
+  border-radius: 14px;
   padding: 25px;
   display: flex;
   flex-direction: column;
   gap: 15px;
   position: relative;
   box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.reviewCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-gold);
+}
+
+@supports (animation-timeline: view()) {
+  .reviewCard {
+    opacity: 0;
+    animation: fadeIn 0.85s var(--ease-premium) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 18%;
+  }
 }
 
 .stars {
@@ -359,6 +431,14 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+}
+
+@supports (animation-timeline: view()) {
+  .ctaBox {
+    animation: fadeUp 0.9s var(--ease-premium) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
 }
 
 .ctaTitle {

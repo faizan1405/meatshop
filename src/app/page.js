@@ -206,7 +206,7 @@ export default async function Home() {
         <section className="section-padding" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-light)', borderTop: '2px solid var(--primary-gold)' }}>
           <div className="container">
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '40px' }}>
-              <div style={{ flex: '1 1 450px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="reveal-on-scroll" style={{ flex: '1 1 450px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <span style={{ color: 'var(--primary-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: '0.85rem' }}>
                   Our Promise
                 </span>
@@ -220,9 +220,9 @@ export default async function Home() {
                   We seal each cut vacuum-tight and deliver it using insulated cold-chain boxes to maintain complete freshness and avoid any contamination. That is the Porville standard.
                 </p>
               </div>
-              <div style={{ flex: '1 1 400px', overflow: 'hidden', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--primary-gold)' }}>
-                <img 
-                  src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" 
+              <div className="reveal-on-scroll zoom-frame" style={{ flex: '1 1 400px', overflow: 'hidden', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--primary-gold)' }}>
+                <img
+                  src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80"
                   alt="Pure Standards butchery"
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                 />
