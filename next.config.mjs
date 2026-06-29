@@ -10,6 +10,13 @@ const nextConfig = {
         destination: '/terms-and-conditions',
         permanent: true,
       },
+      // The login page lives at /login. Redirect common alternate auth paths
+      // so they resolve instead of 404ing. These paths are not real routes and
+      // do not collide with NextAuth's /api/auth/* endpoints.
+      { source: '/signin', destination: '/login', permanent: false },
+      { source: '/auth/signin', destination: '/login', permanent: false },
+      { source: '/auth/login', destination: '/login', permanent: false },
+      { source: '/account/login', destination: '/login', permanent: false },
     ];
   },
 };
