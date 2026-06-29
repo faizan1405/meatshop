@@ -51,6 +51,7 @@
   border-radius: var(--border-radius-md);
   padding: 25px;
   box-shadow: var(--shadow-sm);
+  overflow-x: auto;
 }
 
 .cardTitle {
@@ -64,6 +65,7 @@
 
 .table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.85rem;

@@ -20,7 +20,16 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'User profile not found' }, { status: 404 });
     }
 
-    const orders = await Order.find({ user: user._id }).sort({ createdAt: -1 }).lean();
+    // Match orders owned by this account, plus any prior guest orders placed
+    // with the same email so they surface in history after the user logs in.
+    const orders = await Order.find({
+      $or: [
+        { user: user._id },
+        { isGuest: true, 'guestInfo.email': session.user.email },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
     return NextResponse.json({
       success: true,
