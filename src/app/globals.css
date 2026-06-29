@@ -274,15 +274,13 @@ textarea:focus-visible {
 .delay-4 { animation-delay: 0.42s; }
 .delay-5 { animation-delay: 0.54s; }
 
-/* Scroll-triggered reveal — progressive enhancement.
-   Where animation-timeline is unsupported, the element
-   simply stays visible (no opacity:0), so nothing breaks. */
-@supports (animation-timeline: view()) {
+/* Reveal entrance — SAFE BY DESIGN.
+   Content is visible by default (no base opacity:0, no scroll timeline).
+   The time-based fade always runs to completion (opacity:1), so an element
+   can never be left hidden if the animation doesn't fire. */
+@media (prefers-reduced-motion: no-preference) {
   .reveal-on-scroll {
-    opacity: 0;
-    animation: fadeUp 0.9s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 2% cover 20%;
+    animation: fadeUp 0.8s var(--ease-premium) both;
   }
 }
 
@@ -308,13 +306,10 @@ textarea:focus-visible {
   border-color: var(--primary-gold);
 }
 
-/* Opacity-only scroll reveal (pair with hover-lift cards) */
-@supports (animation-timeline: view()) {
+/* Opacity-only entrance for hover-lift cards (safe, time-based). */
+@media (prefers-reduced-motion: no-preference) {
   .reveal-fade {
-    opacity: 0;
-    animation: fadeIn 0.85s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 18%;
+    animation: fadeIn 0.7s var(--ease-premium) both;
   }
 }
 

@@ -16,13 +16,12 @@
   border-color: var(--primary-gold);
 }
 
-/* Opacity-only reveal keeps the hover lift transform free */
-@supports (animation-timeline: view()) {
+/* Safe on-load entrance. Product cards are visible by default; this
+   time-based fade always finishes at opacity:1 and never gates
+   visibility on scroll-timeline support, so products can't go missing. */
+@media (prefers-reduced-motion: no-preference) {
   .card {
-    opacity: 0;
-    animation: fadeIn 0.85s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 16%;
+    animation: fadeIn 0.6s var(--ease-premium) both;
   }
 }
 

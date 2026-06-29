@@ -254,12 +254,9 @@
   border-color: var(--primary-gold);
 }
 
-@supports (animation-timeline: view()) {
+@media (prefers-reduced-motion: no-preference) {
   .reviewCard {
-    opacity: 0;
-    animation: fadeIn 0.8s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 16%;
+    animation: fadeIn 0.6s var(--ease-premium) both;
   }
 }
 

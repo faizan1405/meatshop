@@ -179,13 +179,11 @@
   transform: translateY(-6px);
 }
 
-/* Opacity-only reveal so the hover lift transform stays free */
-@supports (animation-timeline: view()) {
+/* Safe on-load entrance. Visible by default; the time-based animation
+   always completes to opacity:1, so cards can never stay hidden. */
+@media (prefers-reduced-motion: no-preference) {
   .categoryCard {
-    opacity: 0;
-    animation: fadeIn 0.85s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 16%;
+    animation: fadeIn 0.6s var(--ease-premium) both;
   }
 }
 
@@ -316,11 +314,9 @@
   gap: 15px;
 }
 
-@supports (animation-timeline: view()) {
+@media (prefers-reduced-motion: no-preference) {
   .featureCard {
-    animation: fadeUp 0.85s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 18%;
+    animation: fadeUp 0.7s var(--ease-premium) both;
   }
 }
 
@@ -382,12 +378,9 @@
   border-color: var(--primary-gold);
 }
 
-@supports (animation-timeline: view()) {
+@media (prefers-reduced-motion: no-preference) {
   .reviewCard {
-    opacity: 0;
-    animation: fadeIn 0.85s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 18%;
+    animation: fadeIn 0.7s var(--ease-premium) both;
   }
 }
 
@@ -433,11 +426,9 @@
   gap: 20px;
 }
 
-@supports (animation-timeline: view()) {
+@media (prefers-reduced-motion: no-preference) {
   .ctaBox {
-    animation: fadeUp 0.9s var(--ease-premium) both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 22%;
+    animation: fadeUp 0.8s var(--ease-premium) both;
   }
 }
 
