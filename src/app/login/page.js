@@ -11,6 +11,17 @@ import styles from './page.module.css';
 function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const [config, setConfig] = useState({ isGoogleConfigured: true, isLoading: true });
+
+  React.useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => setConfig({ isGoogleConfigured: data.isGoogleConfigured, isLoading: false }))
+      .catch(err => {
+        console.error('Failed to fetch config', err);
+        setConfig({ isGoogleConfigured: false, isLoading: false });
+      });
+  }, []);
 
   const handleGoogleLogin = () => {
     signIn('google', { callbackUrl });
@@ -32,29 +43,44 @@ function LoginForm() {
         Create an account or sign in to save your delivery addresses, track orders, and unlock exclusive discounts.
       </p>
 
-      {/* Google Login button */}
-      <button onClick={handleGoogleLogin} className={styles.socialBtn}>
-        {/* Simple Google SVG icon */}
-        <svg width="18" height="18" viewBox="0 0 18 18">
-          <path
-            fill="#4285F4"
-            d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.78 2.16c1.63-1.5 2.81-3.72 2.81-6.49z"
-          />
-          <path
-            fill="#34A853"
-            d="M9 18c2.43 0 4.47-.8 5.96-2.2l-2.78-2.16c-.77.52-1.77.83-3.18.83-2.44 0-4.51-1.65-5.25-3.87L1 12.77C2.49 15.77 5.6 18 9 18z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M3.75 10.6A5.4 5.4 0 0 1 3.5 9c0-.56.1-1.1.25-1.6L1 5.03A8.99 8.99 0 0 0 0 9c0 1.45.35 2.82.97 4.03l2.78-2.16z"
-          />
-          <path
-            fill="#EA4335"
-            d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3C13.46.89 11.43 0 9 0 5.6 0 2.49 2.23 1 5.03l2.75 2.13C4.49 4.93 6.56 3.58 9 3.58z"
-          />
-        </svg>
-        <span>Sign in with Google</span>
-      </button>
+      {config.isLoading ? (
+        <div style={{ padding: '10px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-dark-muted)' }}>Loading...</div>
+      ) : config.isGoogleConfigured ? (
+        <button onClick={handleGoogleLogin} className={styles.socialBtn}>
+          {/* Simple Google SVG icon */}
+          <svg width="18" height="18" viewBox="0 0 18 18">
+            <path
+              fill="#4285F4"
+              d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.78 2.16c1.63-1.5 2.81-3.72 2.81-6.49z"
+            />
+            <path
+              fill="#34A853"
+              d="M9 18c2.43 0 4.47-.8 5.96-2.2l-2.78-2.16c-.77.52-1.77.83-3.18.83-2.44 0-4.51-1.65-5.25-3.87L1 12.77C2.49 15.77 5.6 18 9 18z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M3.75 10.6A5.4 5.4 0 0 1 3.5 9c0-.56.1-1.1.25-1.6L1 5.03A8.99 8.99 0 0 0 0 9c0 1.45.35 2.82.97 4.03l2.78-2.16z"
+            />
+            <path
+              fill="#EA4335"
+              d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3C13.46.89 11.43 0 9 0 5.6 0 2.49 2.23 1 5.03l2.75 2.13C4.49 4.93 6.56 3.58 9 3.58z"
+            />
+          </svg>
+          <span>Sign in with Google</span>
+        </button>
+      ) : (
+        <div style={{ 
+          padding: '12px', 
+          backgroundColor: '#f8f9fa', 
+          border: '1px solid #e9ecef', 
+          borderRadius: '8px', 
+          textAlign: 'center',
+          color: 'var(--text-dark-muted)',
+          fontSize: '0.9rem'
+        }}>
+          Google login will be available soon.
+        </div>
+      )}
 
       <div className={styles.divider} />
 

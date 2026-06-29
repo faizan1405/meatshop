@@ -45,7 +45,29 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // 1. Dynamically Load Razorpay SDK
+  // Configuration check state
+  const [config, setConfig] = useState({ 
+    isGoogleConfigured: true, 
+    isRazorpayConfigured: true, 
+    isLoading: true 
+  });
+
+  // 1. Fetch Config
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => setConfig({ 
+        isGoogleConfigured: data.isGoogleConfigured,
+        isRazorpayConfigured: data.isRazorpayConfigured,
+        isLoading: false
+      }))
+      .catch(err => {
+        console.error('Failed to fetch config', err);
+        setConfig({ isGoogleConfigured: false, isRazorpayConfigured: false, isLoading: false });
+      });
+  }, []);
+
+  // 2. Dynamically Load Razorpay SDK
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -267,7 +289,7 @@ export default function CheckoutPage() {
               <div className={styles.formSection}>
                 
                 {/* Auth / Guest Selection */}
-                {!session && authStatus !== 'loading' && (
+                {!session && authStatus !== 'loading' && config.isGoogleConfigured && !config.isLoading && (
                   <div className={styles.card} style={{ borderLeft: '3px solid var(--primary-gold)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
                       <div>
@@ -472,14 +494,25 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  <button 
-                    onClick={handlePayment} 
-                    className={`${styles.paymentBtn} btn-gold`}
-                    disabled={isSubmitting}
-                  >
-                    <CreditCard size={18} />
-                    <span>{isSubmitting ? 'Processing Payment...' : `Verify & Pay ₹${orderTotal}`}</span>
-                  </button>
+                  {config.isLoading ? (
+                    <button className={`${styles.paymentBtn} btn-gold`} disabled>
+                      <span>Loading...</span>
+                    </button>
+                  ) : config.isRazorpayConfigured ? (
+                    <button 
+                      onClick={handlePayment} 
+                      className={`${styles.paymentBtn} btn-gold`}
+                      disabled={isSubmitting}
+                    >
+                      <CreditCard size={18} />
+                      <span>{isSubmitting ? 'Processing Payment...' : `Verify & Pay ₹${orderTotal}`}</span>
+                    </button>
+                  ) : (
+                    <button className={`${styles.paymentBtn}`} disabled style={{ backgroundColor: '#e9ecef', color: 'var(--text-dark-muted)', cursor: 'not-allowed' }}>
+                      <AlertCircle size={18} />
+                      <span>Online payment is not configured yet.</span>
+                    </button>
+                  )}
 
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', color: 'var(--text-dark-muted)', fontSize: '0.7rem', marginTop: '15px' }}>
                     <ShieldCheck size={14} style={{ color: 'var(--success)' }} />
