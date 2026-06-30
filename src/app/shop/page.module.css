@@ -52,6 +52,26 @@
   border: 1px solid var(--border-cream);
 }
 
+.resetButton {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  background-color: var(--bg-cream, #f5f0e6);
+  border: 1px solid var(--border-cream);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.resetButton:hover {
+  background-color: var(--primary-gold);
+  color: var(--white);
+}
+
 .list {
   list-style: none;
   display: flex;

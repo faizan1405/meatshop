@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Search, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowUpDown, X } from 'lucide-react';
 import connectDB from '@/lib/db';
 import Category from '@/models/Category';
 import Product from '@/models/Product';
@@ -141,6 +141,12 @@ export default async function ShopPage({ searchParams }) {
                   {activeType && <input type="hidden" name="type" value={activeType} />}
                   {activeSort && <input type="hidden" name="sort" value={activeSort} />}
                 </form>
+                {(activeSearch || activeCategory || activeType || activeSort) && (
+                  <Link href="/shop" className={styles.resetButton}>
+                    <X size={14} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+                    Reset Filters
+                  </Link>
+                )}
               </div>
 
               {/* Category Filter */}
