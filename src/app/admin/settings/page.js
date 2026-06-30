@@ -31,7 +31,10 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch('/api/admin/settings')
+    // scope=admin returns the private FSSAI fields (license name, address,
+    // kind of business) needed to populate the admin form. The public site
+    // never uses this scope.
+    fetch('/api/admin/settings?scope=admin')
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {

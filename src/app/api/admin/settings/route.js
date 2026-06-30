@@ -35,6 +35,11 @@ export async function GET(request) {
     // GET is public (customer site needs business info). Whitelist only
     // public-safe fields — never spread the raw doc, which would leak
     // internal _id / __v / timestamps.
+    //
+    // Privacy: private FSSAI certificate fields (license holder name,
+    // certificate address, kind-of-business metadata) must NOT reach the
+    // public client. Only the registration reference number, registration
+    // date, and an admin-authored display note are public-safe.
     const publicSettings = {
       contactNumber: settings.contactNumber,
       email: settings.email,
@@ -47,12 +52,32 @@ export async function GET(request) {
       instagramUrl: settings.instagramUrl,
       logoUrl: settings.logoUrl,
       fssaiRefNo: settings.fssaiRefNo,
-      fssaiLicenseName: settings.fssaiLicenseName,
-      fssaiAddress: settings.fssaiAddress,
-      fssaiKindOfBusiness: settings.fssaiKindOfBusiness,
       fssaiAppDate: settings.fssaiAppDate,
       fssaiNote: settings.fssaiNote,
     };
+
+    // Private FSSAI certificate fields are returned ONLY when an admin
+    // explicitly requests the admin scope (?scope=admin) — i.e. the admin
+    // settings form. The default response is fully sanitized for EVERYONE,
+    // including a logged-in admin who is browsing the public site, so public
+    // components (Header/Footer/About) never receive private certificate data.
+    const scope = new URL(request.url).searchParams.get('scope');
+
+    if (scope === 'admin') {
+      const session = await getServerSession(authOptions);
+      if (!session || session.user?.role !== 'admin') {
+        return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+      }
+      return NextResponse.json({
+        success: true,
+        settings: {
+          ...publicSettings,
+          fssaiLicenseName: settings.fssaiLicenseName,
+          fssaiAddress: settings.fssaiAddress,
+          fssaiKindOfBusiness: settings.fssaiKindOfBusiness,
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

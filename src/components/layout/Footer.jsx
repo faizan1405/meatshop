@@ -129,6 +129,7 @@ export default function Footer() {
             <h3 className={styles.heading}>Information</h3>
             <ul className={styles.list}>
               <li><Link href="/about" className={styles.link}>About Porville</Link></li>
+              <li><Link href="/faq" className={styles.link}>FAQs</Link></li>
               <li><Link href="/contact" className={styles.link}>Contact Us</Link></li>
               <li><Link href="/shop" className={styles.link}>Browse Shop</Link></li>
               <li><Link href="/privacy-policy" className={styles.link}>Privacy Policy</Link></li>
@@ -202,7 +203,7 @@ export default function Footer() {
 
         {/* Footer Bottom info */}
         <div className={styles.bottom}>
-          <p>© {currentYear} Porville. All Rights Reserved. Branding: "Fresh Cut Pure Standards".</p>
+          <p>© {currentYear} Porville. All Rights Reserved. Branding: &quot;Fresh Cut Pure Standards&quot;.</p>
           <div className={styles.bottomLinks}>
             <Link href="/shipping-policy" className={styles.link} style={{ fontSize: '0.75rem' }}>
               Shipping Policy

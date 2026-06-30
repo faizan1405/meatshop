@@ -10,6 +10,7 @@ export default async function sitemap() {
     '',
     '/shop',
     '/about',
+    '/faq',
     '/contact',
     '/privacy-policy',
     '/terms-and-conditions',

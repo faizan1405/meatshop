@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ShieldCheck } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -53,10 +54,12 @@ export default function AboutPage() {
                 <ul style={{ fontSize: '0.82rem', color: 'var(--text-dark)', lineHeight: '1.8', marginTop: '10px', paddingLeft: '18px' }}>
                   <li><strong>FoSCoS Reference No:</strong> 30260223123490898</li>
                   <li><strong>Registration Date:</strong> 23-02-2026</li>
-                  <li><strong>Registered Under:</strong> Vishal Kumar</li>
-                  <li><strong>Premises:</strong> Sangam Vihar, New Delhi, South Delhi – 110080</li>
-                  <li><strong>Kind of Business:</strong> Trade/Retail – Wholesaler, Distributor, Retailer; Manufacturer – Meat processing units, Fish and Fish Products</li>
                 </ul>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-dark-muted)', lineHeight: '1.7', marginTop: '8px', margin: '8px 0 0' }}>
+                  For food-safety and ordering questions, see our{' '}
+                  <Link href="/faq" style={{ color: 'var(--primary-gold-dark)', fontWeight: 600 }}>FAQs</Link>.
+                  Private certificate details are not displayed online.
+                </p>
               </div>
             </div>
           </div>
