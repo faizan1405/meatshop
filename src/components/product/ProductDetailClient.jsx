@@ -12,6 +12,8 @@ export default function ProductDetailClient({ product, initialReviews }) {
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeImage, setActiveImage] = useState('');
+  const [activeMediaType, setActiveMediaType] = useState('image'); // 'image' | 'video'
+  const [activeVideoUrl, setActiveVideoUrl] = useState('');
   const [quantity, setQuantity] = useState(1);
 
   // Review Form States
@@ -114,21 +116,47 @@ export default function ProductDetailClient({ product, initialReviews }) {
         
         {/* Gallery Panel */}
         <div className={styles.gallery}>
+          {/* Main viewer */}
           <div className={styles.mainImage}>
-            <img 
-              src={activeImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=800&q=80'} 
-              alt={product.name} 
-            />
+            {activeMediaType === 'video' ? (
+              <video
+                key={activeVideoUrl}
+                controls
+                style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
+              >
+                <source src={activeVideoUrl} />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <img
+                src={activeImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=800&q=80'}
+                alt={product.name}
+              />
+            )}
           </div>
-          {product.images?.length > 1 && (
+
+          {/* Thumbnails row: images + video thumbnails */}
+          {(product.images?.length > 1 || product.media?.length > 0) && (
             <div className={styles.thumbnails}>
-              {product.images.map((img, idx) => (
+              {product.images?.map((img, idx) => (
                 <button
-                  key={idx}
-                  onClick={() => setActiveImage(img)}
-                  className={`${styles.thumbnail} ${activeImage === img ? styles.thumbnailActive : ''}`}
+                  key={`img-${idx}`}
+                  onClick={() => { setActiveImage(img); setActiveMediaType('image'); }}
+                  className={`${styles.thumbnail} ${activeMediaType === 'image' && activeImage === img ? styles.thumbnailActive : ''}`}
                 >
                   <img src={img} alt={`thumbnail-${idx}`} />
+                </button>
+              ))}
+              {product.media?.filter((m) => m.type === 'video').map((m, idx) => (
+                <button
+                  key={`vid-${idx}`}
+                  onClick={() => { setActiveVideoUrl(m.url); setActiveMediaType('video'); }}
+                  className={`${styles.thumbnail} ${activeMediaType === 'video' && activeVideoUrl === m.url ? styles.thumbnailActive : ''}`}
+                  title="Play video"
+                  style={{ position: 'relative' }}
+                >
+                  <video src={m.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted />
+                  <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '18px', color: '#fff', textShadow: '0 0 4px #000' }}>▶</span>
                 </button>
               ))}
             </div>

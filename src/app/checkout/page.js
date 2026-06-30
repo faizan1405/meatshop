@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle } from 'lucide-react';
+import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle, Award } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -517,6 +517,20 @@ export default function CheckoutPage() {
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', color: 'var(--text-dark-muted)', fontSize: '0.7rem', marginTop: '15px' }}>
                     <ShieldCheck size={14} style={{ color: 'var(--success)' }} />
                     <span>Secure Payment processed via Razorpay</span>
+                  </div>
+
+                  {/* Delivery note */}
+                  <div style={{ marginTop: '12px', padding: '10px 12px', background: '#f0faf0', borderRadius: '6px', fontSize: '0.75rem', color: '#2e7d32', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ShieldCheck size={13} />
+                    <span>Free delivery on orders above ₹770. Otherwise ₹40 delivery charge applies.</span>
+                  </div>
+
+                  {/* FSSAI Trust Badge */}
+                  <div style={{ marginTop: '10px', padding: '10px 12px', background: '#f9f9f9', border: '1px solid #e0e0e0', borderRadius: '6px', fontSize: '0.72rem', color: '#555', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Award size={14} style={{ color: '#2e7d32', flexShrink: 0 }} />
+                    <span>
+                      <strong>FSSAI Registered</strong> — FoSCoS Ref: 30260223123490898 | Registered under Govt. of Delhi, Dept. of Food Safety
+                    </span>
                   </div>
                 </div>
               </div>

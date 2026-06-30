@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash, Image as ImageIcon, UploadCloud, AlertCircle, CheckCircle } from 'lucide-react';
+import { Plus, Trash, Image as ImageIcon, UploadCloud, AlertCircle, CheckCircle, Film, Link as LinkIcon } from 'lucide-react';
 import styles from './AdminProductForm.module.css';
 
 export default function AdminProductForm({ productId }) {
@@ -33,6 +33,10 @@ export default function AdminProductForm({ productId }) {
 
   // Images URLs List State
   const [images, setImages] = useState([]);
+  // Rich media (images + videos)
+  const [media, setMedia] = useState([]);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [videoUrlInput, setVideoUrlInput] = useState('');
 
   // UI Status
   const [isSaving, setIsSaving] = useState(false);
@@ -80,6 +84,7 @@ export default function AdminProductForm({ productId }) {
             setSeoTitle(p.seoTitle || '');
             setSeoDescription(p.seoDescription || '');
             setImages(p.images || []);
+            setMedia(p.media || []);
             setVariants(p.variants.map(v => ({
               ...v,
               price: v.price.toString(),
@@ -139,6 +144,52 @@ export default function AdminProductForm({ productId }) {
 
   const handleRemoveImage = (indexToRemove) => {
     setImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingVideo(true);
+    setStatusMessage(null);
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file: reader.result, folder: 'porville/videos', resourceType: 'video' }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setMedia((prev) => [...prev, { type: 'video', url: data.url, publicId: data.publicId || '', alt: file.name }]);
+          setStatusMessage({ type: 'success', text: 'Video uploaded successfully!' });
+        } else {
+          setStatusMessage({ type: 'error', text: data.message || 'Video upload failed.' });
+        }
+      } catch (err) {
+        setStatusMessage({ type: 'error', text: err.message || 'Video upload error.' });
+      } finally {
+        setIsUploadingVideo(false);
+      }
+    };
+    reader.onerror = () => {
+      setStatusMessage({ type: 'error', text: 'Failed to read video file.' });
+      setIsUploadingVideo(false);
+    };
+  };
+
+  const handleAddVideoUrl = () => {
+    const url = videoUrlInput.trim();
+    if (!url) return;
+    setMedia((prev) => [...prev, { type: 'video', url, publicId: '', alt: 'Product video' }]);
+    setVideoUrlInput('');
+  };
+
+  const handleRemoveMedia = (indexToRemove) => {
+    setMedia((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   // Variants state management
@@ -210,6 +261,7 @@ export default function AdminProductForm({ productId }) {
           seoTitle,
           seoDescription,
           images,
+          media,
           variants: formattedVariants,
         }),
       });
@@ -482,6 +534,63 @@ export default function AdminProductForm({ productId }) {
               disabled={isUploading}
             />
           </label>
+        </div>
+      </div>
+
+      {/* Video / Media Section */}
+      <div className={styles.imagesSection}>
+        <span className={styles.sectionLabel} style={{ display: 'block', marginBottom: '10px' }}>
+          Product Videos
+        </span>
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-dark-muted)', marginBottom: '12px' }}>
+          Upload a video file (MP4/MOV) to Cloudinary, or paste a video URL (YouTube, Cloudinary, etc.).
+        </p>
+
+        {/* Existing media list */}
+        {media.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
+            {media.map((m, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px', border: '1px solid var(--border-cream)', borderRadius: '6px', background: '#fafafa' }}>
+                <Film size={16} style={{ color: 'var(--primary-gold)', flexShrink: 0 }} />
+                <span style={{ flex: 1, fontSize: '0.8rem', wordBreak: 'break-all' }}>{m.url}</span>
+                {m.type === 'video' && (
+                  <video src={m.url} style={{ height: '50px', width: '80px', objectFit: 'cover', borderRadius: '4px' }} muted />
+                )}
+                <button type="button" onClick={() => handleRemoveMedia(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--error)' }}>
+                  <Trash size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Upload video file */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '8px 14px', border: '1px solid var(--border-cream)', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, width: 'fit-content' }}>
+            <UploadCloud size={16} />
+            {isUploadingVideo ? 'Uploading Video...' : 'Upload Video File (MP4/MOV)'}
+            <input type="file" accept="video/*" onChange={handleVideoUpload} style={{ display: 'none' }} disabled={isUploadingVideo} />
+          </label>
+
+          {/* Or paste URL */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <LinkIcon size={14} style={{ color: 'var(--text-dark-muted)', flexShrink: 0 }} />
+            <input
+              type="url"
+              value={videoUrlInput}
+              onChange={(e) => setVideoUrlInput(e.target.value)}
+              placeholder="Or paste a video URL (YouTube embed, Cloudinary, etc.)"
+              style={{ flex: 1, padding: '8px 10px', border: '1px solid var(--border-cream)', borderRadius: '4px', fontSize: '0.8rem' }}
+            />
+            <button
+              type="button"
+              onClick={handleAddVideoUrl}
+              className="btn-secondary"
+              style={{ padding: '8px 14px', fontSize: '0.75rem', flexShrink: 0 }}
+            >
+              Add URL
+            </button>
+          </div>
         </div>
       </div>
 

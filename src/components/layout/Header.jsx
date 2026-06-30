@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -13,6 +13,14 @@ export default function Header() {
   const { data: session } = useSession();
   const { itemsCount, setIsCartOpen } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState('');
+
+  useEffect(() => {
+    fetch('/api/admin/settings')
+      .then((r) => r.json())
+      .then((d) => { if (d.success && d.settings?.logoUrl) setLogoUrl(d.settings.logoUrl); })
+      .catch(() => {});
+  }, []);
 
   // Check if current route is admin
   const isAdminRoute = pathname?.startsWith('/admin');
@@ -57,8 +65,18 @@ export default function Header() {
               
               {/* Logo / Branding */}
               <Link href="/" className={styles.brand}>
-                <span className={styles.logoText}>PORVILLE</span>
-                <span className={styles.tagline}>Fresh Cut Pure Standards</span>
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt="Porville Logo"
+                    style={{ height: '44px', maxWidth: '140px', objectFit: 'contain' }}
+                  />
+                ) : (
+                  <>
+                    <span className={styles.logoText}>PORVILLE</span>
+                    <span className={styles.tagline}>Fresh Cut Pure Standards</span>
+                  </>
+                )}
               </Link>
 
               {/* Desktop Nav */}

@@ -217,9 +217,13 @@ export default function CartDrawer() {
               <span>₹{orderTotal}</span>
             </div>
 
-            <Link 
-              href="/checkout" 
-              className="btn-gold" 
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', textAlign: 'center', padding: '6px 0 2px' }}>
+              Free delivery on orders above ₹770. Otherwise ₹40 applies.
+            </div>
+
+            <Link
+              href="/checkout"
+              className="btn-gold"
               style={{
                 textAlign: 'center',
                 display: 'flex',

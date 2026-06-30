@@ -230,9 +230,9 @@ export function CartProvider({ children }) {
       : coupon.discountValue
     : 0;
 
-  // site settings fallback charges (delivery note can override these via state later)
-  const deliveryThreshold = 500;
-  const deliveryChargeValue = 50;
+  // Delivery: free above ₹770, otherwise ₹40
+  const deliveryThreshold = 770;
+  const deliveryChargeValue = 40;
   const deliveryCharge = itemsSubtotal >= deliveryThreshold || itemsSubtotal === 0 ? 0 : deliveryChargeValue;
 
   const orderTotal = Math.max(itemsSubtotal - discountAmount + deliveryCharge, 0);

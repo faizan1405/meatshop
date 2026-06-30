@@ -50,6 +50,15 @@ const ProductSchema = new mongoose.Schema(
       type: [String], // Array of Cloudinary image URLs
       default: [],
     },
+    media: {
+      type: [{
+        type: { type: String, enum: ['image', 'video'], required: true },
+        url: { type: String, required: true },
+        publicId: { type: String, default: '' },
+        alt: { type: String, default: '' },
+      }],
+      default: [],
+    },
     variants: [VariantSchema],
     featured: {
       type: Boolean,

@@ -16,12 +16,19 @@ export async function GET(request) {
         contactNumber: '9217577006',
         email: 'porville1986@gmail.com',
         address: 'D-1b/1028, Sangam Vihar-110080',
-        deliveryNote: 'Express delivery within 2 hours. Minimum order value may apply.',
-        deliveryCharge: 50,
-        freeDeliveryThreshold: 500,
+        deliveryNote: 'Free delivery on orders above ₹770. Otherwise ₹40 delivery charge applies.',
+        deliveryCharge: 40,
+        freeDeliveryThreshold: 770,
         whatsappNumber: '9217577006',
         facebookUrl: '',
         instagramUrl: '',
+        logoUrl: '',
+        fssaiRefNo: '30260223123490898',
+        fssaiLicenseName: 'Vishal Kumar',
+        fssaiAddress: 'Sangam Vihar, New Delhi, TIGRI, SAKET, South, Delhi, 110080',
+        fssaiKindOfBusiness: 'Trade/Retail - Wholesaler, Distributor, Retailer; Manufacturer - Meat processing units, Fish and Fish Products',
+        fssaiAppDate: '23-02-2026',
+        fssaiNote: 'FSSAI FoSCoS Application Reference No. Registration certificate issuance pending.',
       });
     }
 
@@ -57,6 +64,13 @@ export async function POST(request) {
       whatsappNumber,
       facebookUrl,
       instagramUrl,
+      logoUrl,
+      fssaiRefNo,
+      fssaiLicenseName,
+      fssaiAddress,
+      fssaiKindOfBusiness,
+      fssaiAppDate,
+      fssaiNote,
     } = body;
 
     await connectDB();
@@ -73,6 +87,13 @@ export async function POST(request) {
       whatsappNumber,
       facebookUrl,
       instagramUrl,
+      logoUrl,
+      fssaiRefNo,
+      fssaiLicenseName,
+      fssaiAddress,
+      fssaiKindOfBusiness,
+      fssaiAppDate,
+      fssaiNote,
     };
 
     if (settings) {

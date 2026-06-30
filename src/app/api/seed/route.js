@@ -139,12 +139,19 @@ async function runSeed() {
         contactNumber: '9217577006',
         email: 'porville1986@gmail.com',
         address: 'D-1b/1028, Sangam Vihar-110080',
-        deliveryNote: 'Express delivery within 2 hours. Minimum order value may apply.',
-        deliveryCharge: 50,
-        freeDeliveryThreshold: 500,
+        deliveryNote: 'Free delivery on orders above ₹770. Otherwise ₹40 delivery charge applies.',
+        deliveryCharge: 40,
+        freeDeliveryThreshold: 770,
         whatsappNumber: '9217577006',
         facebookUrl: 'https://facebook.com/porville',
         instagramUrl: 'https://instagram.com/porville',
+        logoUrl: '',
+        fssaiRefNo: '30260223123490898',
+        fssaiLicenseName: 'Vishal Kumar',
+        fssaiAddress: 'Sangam Vihar, New Delhi, TIGRI, SAKET, South, Delhi, 110080',
+        fssaiKindOfBusiness: 'Trade/Retail - Wholesaler, Distributor, Retailer; Manufacturer - Meat processing units, Fish and Fish Products',
+        fssaiAppDate: '23-02-2026',
+        fssaiNote: 'FSSAI FoSCoS Application Reference No. Registration certificate issuance pending.',
       });
     }
 
@@ -160,19 +167,23 @@ async function runSeed() {
       });
     }
 
-    // 7. Seed a default Coupon if not exists
-    let coupon = await Coupon.findOne({ code: 'WELCOME10' });
-    if (!coupon) {
-      coupon = await Coupon.create({
-        code: 'WELCOME10',
-        discountType: 'percentage',
-        discountValue: 10,
-        minOrderValue: 400,
-        maxDiscountValue: 100,
-        active: true,
-        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      });
+    // 7. Seed coupons
+    const oneYear = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+    const couponDefs = [
+      { code: 'WELCOME10', discountType: 'percentage', discountValue: 10, minOrderValue: 400, maxDiscountValue: 100 },
+      { code: 'PORVILLE10', discountType: 'percentage', discountValue: 10, minOrderValue: 770, maxDiscountValue: 200 },
+      { code: 'FRESH10', discountType: 'percentage', discountValue: 10, minOrderValue: 770, maxDiscountValue: 200 },
+      { code: 'CHICKEN10', discountType: 'percentage', discountValue: 10, minOrderValue: 770, maxDiscountValue: 200 },
+      { code: 'MEAT10', discountType: 'percentage', discountValue: 10, minOrderValue: 770, maxDiscountValue: 200 },
+    ];
+    for (const def of couponDefs) {
+      await Coupon.findOneAndUpdate(
+        { code: def.code },
+        { $setOnInsert: { ...def, active: true, expiryDate: oneYear } },
+        { upsert: true }
+      );
     }
+    const coupon = await Coupon.findOne({ code: 'PORVILLE10' });
 
     const totalCategoriesCount = await Category.countDocuments({});
     const totalProductsCount = await Product.countDocuments({});

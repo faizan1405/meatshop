@@ -9,9 +9,9 @@ cloudinary.config({
 
 export const uploadImage = async (fileStr, folder = 'porville') => {
   try {
-    // fileStr can be a local path, web URL, or base64 data URL
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
       folder: folder,
+      resource_type: 'image',
     });
     return {
       url: uploadResponse.secure_url,
@@ -19,6 +19,23 @@ export const uploadImage = async (fileStr, folder = 'porville') => {
     };
   } catch (error) {
     console.error('Cloudinary upload error:', error);
+    throw error;
+  }
+};
+
+export const uploadMedia = async (fileStr, folder = 'porville', resourceType = 'auto') => {
+  try {
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+      folder: folder,
+      resource_type: resourceType,
+    });
+    return {
+      url: uploadResponse.secure_url,
+      publicId: uploadResponse.public_id,
+      resourceType: uploadResponse.resource_type,
+    };
+  } catch (error) {
+    console.error('Cloudinary media upload error:', error);
     throw error;
   }
 };
