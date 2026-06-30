@@ -66,7 +66,7 @@ export default function Header() {
                   <img
                     src={logoUrl}
                     alt="Porville Logo"
-                    style={{ height: '44px', maxWidth: '140px', objectFit: 'contain' }}
+                    style={{ height: '52px', maxWidth: '170px', objectFit: 'contain' }}
                   />
                 ) : (
                   <>
