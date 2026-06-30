@@ -7,9 +7,14 @@ import styles from './ProductCarousel.module.css';
 export default function ProductCarousel({ products, autoplayInterval = 3000 }) {
   const carouselRef = useRef(null);
 
+  // Duplicate products if there are few, to ensure it can scroll on large screens
+  const displayProducts = products && products.length > 1 && products.length <= 4
+    ? [...products, ...products.map(p => ({ ...p, _id: (p._id || '') + '-clone', slug: (p.slug || '') + '-clone' }))]
+    : products;
+
   // Autoplay functionality
   useEffect(() => {
-    if (!products || products.length <= 1) return;
+    if (!displayProducts || displayProducts.length <= 1) return;
 
     let interval;
     const startInterval = () => {
@@ -53,12 +58,12 @@ export default function ProductCarousel({ products, autoplayInterval = 3000 }) {
     };
   }, [products, autoplayInterval]);
 
-  if (!products || products.length === 0) return null;
+  if (!displayProducts || displayProducts.length === 0) return null;
 
   return (
     <div className={styles.carouselContainer}>
       <div className={styles.carouselTrack} ref={carouselRef}>
-        {products.map((product) => (
+        {displayProducts.map((product) => (
           <div key={product._id || product.slug} className={styles.slide}>
             <ProductCard product={product} />
           </div>
