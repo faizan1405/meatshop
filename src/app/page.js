@@ -129,7 +129,7 @@ export default async function Home() {
                 <Link href="/shop" className="btn-gold">
                   Shop Fresh Cuts
                 </Link>
-                <Link href="/shop#categories" className="btn-primary">
+                <Link href="#categories" className="btn-primary">
                   Explore Categories
                 </Link>
               </div>

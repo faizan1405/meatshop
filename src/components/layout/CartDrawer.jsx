@@ -75,7 +75,7 @@ export default function CartDrawer() {
             <ShoppingBag size={20} style={{ color: 'var(--primary-gold)' }} />
             <h2 className={styles.title}>Your Cart ({cartItems.length})</h2>
           </div>
-          <button onClick={() => setIsCartOpen(false)} className={styles.closeBtn}>
+          <button onClick={() => setIsCartOpen(false)} className={styles.closeBtn} aria-label="Close cart">
             <X size={24} />
           </button>
         </div>
@@ -116,9 +116,10 @@ export default function CartDrawer() {
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <h4 className={styles.itemName}>{item.product.name}</h4>
-                          <button 
+                          <button
                             onClick={() => removeFromCart(item.product._id, item.variant.name)}
                             className={styles.removeBtn}
+                            aria-label={`Remove ${item.product.name} from cart`}
                           >
                             <Trash2 size={16} />
                           </button>

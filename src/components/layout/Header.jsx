@@ -110,9 +110,11 @@ export default function Header() {
                 </button>
 
                 {/* Mobile Menu Button */}
-                <button 
+                <button
                   className={`${styles.iconBtn} ${styles.mobileMenuBtn}`}
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                  aria-expanded={isMobileMenuOpen}
                 >
                   {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>

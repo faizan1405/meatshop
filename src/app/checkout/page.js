@@ -346,7 +346,7 @@ export default function CheckoutPage() {
 
                   {/* Address input fields */}
                   {(isAddingNewAddress || !session) && (
-                    <form className={styles.formGrid}>
+                    <form className={styles.formGrid} onSubmit={(e) => e.preventDefault()}>
                       {!session && (
                         <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                           <label>Email Address (For Order Tracking)</label>
