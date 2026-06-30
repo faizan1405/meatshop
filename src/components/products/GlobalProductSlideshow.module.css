@@ -1,0 +1,247 @@
+.container {
+  width: 100%;
+  padding: 40px 0;
+  background-color: var(--bg-dark, #121212);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  color: var(--primary-gold, #d4af37);
+  font-family: var(--font-playfair, serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.navButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.navBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light, #fff);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: var(--primary-gold, #d4af37);
+  color: #121212;
+  border-color: var(--primary-gold, #d4af37);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  padding-bottom: 10px;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  flex: 0 0 calc(100% - 20px);
+  scroll-snap-align: start;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 600px) {
+  .card {
+    flex: 0 0 calc(50% - 20px);
+  }
+}
+
+@media (min-width: 900px) {
+  .card {
+    flex: 0 0 calc(33.333% - 20px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .card {
+    flex: 0 0 calc(25% - 20px);
+  }
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(212, 175, 55, 0.3); /* Gold tint */
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: #2a2a2a;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.05);
+}
+
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.categoryName {
+  color: var(--primary-gold, #d4af37);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.productName {
+  color: var(--text-light, #fff);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+.priceRow {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.price {
+  color: var(--text-light, #fff);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.salePrice {
+  color: var(--primary-gold, #d4af37);
+  margin-right: 8px;
+}
+
+.oldPrice {
+  color: var(--text-light-muted, #999);
+  text-decoration: line-through;
+  font-size: 0.9rem;
+}
+
+.viewBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  background: transparent;
+  color: var(--primary-gold, #d4af37);
+  border: 1px solid var(--primary-gold, #d4af37);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.card:hover .viewBtn {
+  background: var(--primary-gold, #d4af37);
+  color: #121212;
+}
+
+/* Skeleton Loading */
+.skeletonCard {
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.skeletonImg {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #2a2a2a;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonContent {
+  padding: 16px;
+}
+
+.skeletonLine {
+  height: 12px;
+  background: #2a2a2a;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonLine.short {
+  width: 60%;
+}
+
+.skeletonBtn {
+  height: 40px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  margin-top: 16px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Phone, Mail, MapPin, MessageSquare, ShieldCheck } from 'lucide-react';
 import styles from './Footer.module.css';
+import GlobalProductSlideshow from '../products/GlobalProductSlideshow';
 
 // lucide-react v1 dropped brand icons — inline minimal SVG marks instead
 function FacebookIcon({ size = 18 }) {
@@ -51,7 +52,9 @@ export default function Footer() {
   const fssaiNote = settings?.fssaiNote || '';
 
   return (
-    <footer className={styles.footer}>
+    <>
+      <GlobalProductSlideshow />
+      <footer className={styles.footer}>
       <div className="container">
 
         {/* Footer Top Grid */}
@@ -216,5 +219,6 @@ export default function Footer() {
 
       </div>
     </footer>
+    </>
   );
 }
