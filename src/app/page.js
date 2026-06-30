@@ -11,6 +11,7 @@ import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import ProductCard from '@/components/product/ProductCard';
 import ProductCarousel from '@/components/products/ProductCarousel';
+import CategoryCarousel from '@/components/products/CategoryCarousel';
 import styles from './page.module.css';
 
 // Pre-seeded fallback data to prevent build failure if database is empty/not loaded yet.
@@ -144,7 +145,7 @@ export default async function Home() {
             <p className={styles.sectionSubtitle}>
               Browse through our range of farm-fresh, premium meats and gourmet items. Select a category to see available cuts.
             </p>
-            <div className={styles.categoryGrid}>
+            <CategoryCarousel autoplayInterval={3500}>
               {categories.map((cat) => {
                 const count = cat.productCount;
                 const subtitle = count !== undefined ? (count > 0 ? `${count} Fresh Cuts` : 'Premium Cuts') : (cat.subtitle || 'Premium Cuts');
@@ -173,7 +174,7 @@ export default async function Home() {
                   </Link>
                 );
               })}
-            </div>
+            </CategoryCarousel>
           </div>
         </section>
 

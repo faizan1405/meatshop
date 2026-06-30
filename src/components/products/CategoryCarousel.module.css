@@ -1,0 +1,46 @@
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 10px 0; /* space for box shadows */
+}
+
+.carouselTrack {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  padding-bottom: 10px;
+}
+
+.carouselTrack::-webkit-scrollbar {
+  display: none;
+}
+
+/* 2 cards per view on mobile, scaling up to 5 on desktop — matches the
+   former category grid breakpoints. */
+.slide {
+  flex: 0 0 calc(50% - 12px);
+  scroll-snap-align: start;
+}
+
+@media (min-width: 600px) {
+  .slide {
+    flex: 0 0 calc(33.333% - 16px);
+  }
+}
+
+@media (min-width: 900px) {
+  .slide {
+    flex: 0 0 calc(25% - 18px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .slide {
+    flex: 0 0 calc(20% - 20px);
+  }
+}
