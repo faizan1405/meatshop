@@ -7,9 +7,14 @@ import { useCart } from './Providers';
 import { matchFaq } from '@/lib/faqMatcher';
 import { getWhatsAppLink } from '@/lib/whatsapp';
 
-// Shown when the local matcher can't confidently answer the question.
+// Shown when the local matcher can't confidently answer the question and a
+// WhatsApp number is available.
 const FALLBACK_TEXT =
   "I couldn’t find an exact answer for that. You can reach Porville support on WhatsApp for help with your question or complaint.";
+
+// Shown when no WhatsApp/contact number is configured.
+const NO_CONTACT_TEXT =
+  "I couldn’t find an exact answer for that. Please visit the Contact page for support.";
 
 function Message({ msg }) {
   const isBot = msg.role === 'assistant';
@@ -82,15 +87,13 @@ const INITIAL_MESSAGE = {
 
 const QUICK_QUESTIONS = ['Delivery charges?', 'How fresh is the meat?', 'Coupon codes', 'Payment methods'];
 
-const DEFAULT_WHATSAPP = '9217577006';
-
 export default function FloatingChatbot() {
   const pathname = usePathname();
   const { isCartOpen } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
-  const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_WHATSAPP);
+  const [whatsappNumber, setWhatsappNumber] = useState(''); // empty until loaded from public settings
   const bottomRef = useRef(null);
 
   // Pull the public WhatsApp/contact number from public-safe settings so the
@@ -124,16 +127,21 @@ export default function FloatingChatbot() {
 
     // Fully local lookup — no network, no external AI.
     const match = matchFaq(userText);
-    const botMsg = match
-      ? { role: 'assistant', content: match.answer }
-      : {
-          role: 'assistant',
-          content: FALLBACK_TEXT,
-          wa: getWhatsAppLink(
-            whatsappNumber,
-            `Hi Porville, I need help with this question/complaint: ${userText}`
-          ),
-        };
+    let botMsg;
+    if (match) {
+      botMsg = { role: 'assistant', content: match.answer };
+    } else if (whatsappNumber) {
+      botMsg = {
+        role: 'assistant',
+        content: FALLBACK_TEXT,
+        wa: getWhatsAppLink(
+          whatsappNumber,
+          `Hi Porville, I need help with this question/complaint: ${userText}`
+        ),
+      };
+    } else {
+      botMsg = { role: 'assistant', content: NO_CONTACT_TEXT };
+    }
 
     setMessages((prev) => [...prev, userMsg, botMsg]);
     setInput('');

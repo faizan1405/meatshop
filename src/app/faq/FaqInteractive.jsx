@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { ChevronDown, MessageCircleQuestion, Search } from 'lucide-react';
 import { faqs } from '@/data/faqs';
 import { matchFaq } from '@/lib/faqMatcher';
@@ -13,7 +14,7 @@ export default function FaqInteractive() {
   const [searchResult, setSearchResult] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [openAccordion, setOpenAccordion] = useState(null);
-  const [whatsappNumber, setWhatsappNumber] = useState('9217577006'); // Fallback default
+  const [whatsappNumber, setWhatsappNumber] = useState(''); // empty until loaded from public settings
 
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -82,17 +83,23 @@ export default function FaqInteractive() {
         {hasSearched && !searchResult && (
           <div className={styles.fallbackBox}>
             <div className={styles.fallbackText}>
-              I couldn’t find an exact answer for that. You can contact Porville support on WhatsApp for help with your question or complaint.
+              I couldn’t find an exact answer for that. You can contact Porville support for help with your question or complaint.
             </div>
-            <a 
-              href={getWhatsAppLink(whatsappNumber, `Hi Porville, I need help with this question/complaint: ${searchQuery}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.whatsappButton}
-              aria-label="Ask this question on WhatsApp"
-            >
-              Ask on WhatsApp
-            </a>
+            {whatsappNumber ? (
+              <a
+                href={getWhatsAppLink(whatsappNumber, `Hi Porville, I need help with this question/complaint: ${searchQuery}`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.whatsappButton}
+                aria-label="Ask this question on WhatsApp"
+              >
+                Ask on WhatsApp
+              </a>
+            ) : (
+              <div className={styles.fallbackText}>
+                Please visit the <Link href="/contact" style={{ fontWeight: 600, textDecoration: 'underline' }}>Contact page</Link> for support.
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -144,17 +151,25 @@ export default function FaqInteractive() {
       {/* Bottom CTA */}
       <div className={styles.supportCta}>
         <h3 className={styles.supportTitle}>Still need help?</h3>
-        <p className={styles.supportText}>
-          Send your question or complaint to us on WhatsApp and our team will help you.
-        </p>
-        <a 
-          href={getWhatsAppLink(whatsappNumber, "Hi Porville, I need help with a question or complaint.")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.whatsappButton}
-        >
-          Contact on WhatsApp
-        </a>
+        {whatsappNumber ? (
+          <>
+            <p className={styles.supportText}>
+              Send your question or complaint to us on WhatsApp and our team will help you.
+            </p>
+            <a
+              href={getWhatsAppLink(whatsappNumber, "Hi Porville, I need help with a question or complaint.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.whatsappButton}
+            >
+              Contact on WhatsApp
+            </a>
+          </>
+        ) : (
+          <p className={styles.supportText}>
+            Please visit the <Link href="/contact" style={{ fontWeight: 600, textDecoration: 'underline' }}>Contact page</Link> for support.
+          </p>
+        )}
       </div>
     </>
   );
