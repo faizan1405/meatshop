@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ShoppingBag, User, Phone, Menu, X, ShieldAlert } from 'lucide-react';
 import { useCart } from '../common/Providers';
@@ -10,6 +10,7 @@ import styles from './Header.module.css';
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const { itemsCount, setIsCartOpen } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -79,11 +80,22 @@ export default function Header() {
               <nav className={styles.nav}>
                 {navLinks.map((link) => {
                   const isActive = pathname === link.path;
+                  const isShop = link.name === 'Shop Cuts';
+                  const prefetchRoute = () => {
+                    if (isShop) {
+                      router.prefetch(link.path);
+                    }
+                  };
+
                   return (
                     <Link
                       key={link.path}
                       href={link.path}
                       className={`${styles.navLink} ${isActive ? styles.activeNavLink : ''}`}
+                      onMouseEnter={isShop ? prefetchRoute : undefined}
+                      onFocus={isShop ? prefetchRoute : undefined}
+                      onTouchStart={isShop ? prefetchRoute : undefined}
+                      prefetch={isShop ? true : undefined}
                     >
                       {link.name}
                     </Link>
