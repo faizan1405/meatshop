@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, AlertCircle, Zap } from 'lucide-react';
 import styles from '../page.module.css';
 
 export default function AdminCouponsPage() {
@@ -19,6 +19,7 @@ export default function AdminCouponsPage() {
 
   const [editingId, setEditingId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [message, setMessage] = useState(null);
 
   const fetchCoupons = () => {
@@ -48,6 +49,32 @@ export default function AdminCouponsPage() {
     setActive(c.active);
     setExpiryDate(c.expiryDate.split('T')[0]); // YYYY-MM-DD
     setMessage(null);
+  };
+
+  const handleSeedDefaults = async () => {
+    setIsSeeding(true);
+    setMessage(null);
+    try {
+      const res = await fetch('/api/admin/coupons/seed', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        const created = data.results.filter((r) => r.action === 'created').map((r) => r.code).join(', ');
+        const skipped = data.results.filter((r) => r.action !== 'created').length;
+        setMessage({
+          type: 'success',
+          text: created
+            ? `Created: ${created}${skipped ? ` | ${skipped} already existed.` : ''}`
+            : 'All default coupons already exist.',
+        });
+        fetchCoupons();
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Failed to seed coupons.' });
+      }
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Error seeding default coupons.' });
+    } finally {
+      setIsSeeding(false);
+    }
   };
 
   const handleReset = () => {
@@ -211,8 +238,20 @@ export default function AdminCouponsPage() {
 
       {/* Right List Table */}
       <div style={{ flex: '2 1 500px' }} className={styles.card}>
-        <h2 className={styles.cardTitle}>Promo Coupons List</h2>
-        
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', borderBottom: '1px solid var(--border-cream)', paddingBottom: '12px', marginBottom: '16px' }}>
+          <h2 className={styles.cardTitle} style={{ margin: 0, padding: 0, border: 'none' }}>Promo Coupons List</h2>
+          <button
+            type="button"
+            onClick={handleSeedDefaults}
+            disabled={isSeeding}
+            title="Insert PORVILLE10, FRESH10, CHICKEN10, MEAT10 into the database"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', fontSize: '0.78rem', fontWeight: 700, background: 'transparent', border: '1px solid var(--primary-gold)', color: 'var(--primary-gold)', borderRadius: '4px', cursor: isSeeding ? 'not-allowed' : 'pointer', opacity: isSeeding ? 0.6 : 1 }}
+          >
+            <Zap size={14} />
+            {isSeeding ? 'Seeding...' : 'Add Default Coupons'}
+          </button>
+        </div>
+
         {isLoading ? (
           <div>Loading coupons...</div>
         ) : coupons.length === 0 ? (

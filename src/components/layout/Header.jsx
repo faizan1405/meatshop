@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ShoppingBag, User, Phone, MapPin, Menu, X, ShieldAlert } from 'lucide-react';
+import { ShoppingBag, User, Phone, Menu, X, ShieldAlert } from 'lucide-react';
 import { useCart } from '../common/Providers';
 import styles from './Header.module.css';
 
@@ -44,10 +44,6 @@ export default function Header() {
         <div className={styles.topBar}>
           <div className="container">
             <div className={styles.topBarContent}>
-              <div className={styles.topBarItem}>
-                <MapPin size={13} />
-                <span>D-1b/1028, Sangam Vihar, New Delhi - 110080</span>
-              </div>
               <div className={styles.topBarItem} style={{ gap: '15px' }}>
                 <a href="tel:9217577006" className={styles.topBarItem}>
                   <Phone size={13} />

@@ -28,7 +28,7 @@ export async function GET(request) {
         fssaiAddress: 'Sangam Vihar, New Delhi, TIGRI, SAKET, South, Delhi, 110080',
         fssaiKindOfBusiness: 'Trade/Retail - Wholesaler, Distributor, Retailer; Manufacturer - Meat processing units, Fish and Fish Products',
         fssaiAppDate: '23-02-2026',
-        fssaiNote: 'FSSAI FoSCoS Application Reference No. Registration certificate issuance pending.',
+        fssaiNote: '',
       });
     }
 

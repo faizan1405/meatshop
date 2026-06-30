@@ -57,9 +57,6 @@ export default function AboutPage() {
                   <li><strong>Premises:</strong> Sangam Vihar, New Delhi, South Delhi – 110080</li>
                   <li><strong>Kind of Business:</strong> Trade/Retail – Wholesaler, Distributor, Retailer; Manufacturer – Meat processing units, Fish and Fish Products</li>
                 </ul>
-                <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '10px', fontStyle: 'italic' }}>
-                  Note: The above is a FoSCoS receipt / application reference number. Final registration certificate issuance is pending from FSSAI.
-                </p>
               </div>
             </div>
           </div>

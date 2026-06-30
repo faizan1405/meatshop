@@ -64,7 +64,7 @@ const SiteSettingsSchema = new mongoose.Schema(
     },
     fssaiNote: {
       type: String,
-      default: 'FSSAI FoSCoS Application Reference No. Registration certificate issuance pending.',
+      default: '',
     },
   },
   { timestamps: true }

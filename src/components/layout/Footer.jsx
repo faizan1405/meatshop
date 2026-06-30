@@ -29,7 +29,7 @@ export default function Footer() {
   const logoUrl = settings?.logoUrl || '';
   const fssaiRefNo = settings?.fssaiRefNo || '30260223123490898';
   const fssaiAppDate = settings?.fssaiAppDate || '23-02-2026';
-  const fssaiNote = settings?.fssaiNote || 'FSSAI FoSCoS Application Reference No. Registration pending.';
+  const fssaiNote = settings?.fssaiNote || '';
 
   return (
     <footer className={styles.footer}>
@@ -145,8 +145,13 @@ export default function Footer() {
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-light-muted)', lineHeight: '1.5' }}>
               <strong style={{ color: 'var(--text-light)' }}>FoSCoS Ref No:</strong> {fssaiRefNo} &nbsp;|&nbsp;
-              <strong style={{ color: 'var(--text-light)' }}>Date:</strong> {fssaiAppDate} &nbsp;|&nbsp;
-              <span style={{ fontStyle: 'italic' }}>{fssaiNote}</span>
+              <strong style={{ color: 'var(--text-light)' }}>Date:</strong> {fssaiAppDate}
+              {fssaiNote && (
+                <>
+                  &nbsp;|&nbsp;
+                  <span style={{ fontStyle: 'italic' }}>{fssaiNote}</span>
+                </>
+              )}
             </div>
           </div>
         </div>

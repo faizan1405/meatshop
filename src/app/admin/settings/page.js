@@ -260,7 +260,7 @@ export default function AdminSettingsPage() {
         </div>
         <div className={styles.formGroup}>
           <label>Display Note (shown to customers)</label>
-          <input type="text" value={fssaiNote} onChange={(e) => setFssaiNote(e.target.value)} placeholder="FSSAI FoSCoS Application Reference No. Registration pending." />
+          <input type="text" value={fssaiNote} onChange={(e) => setFssaiNote(e.target.value)} placeholder="Optional note shown beside FSSAI details (leave blank to hide)" />
         </div>
       </div>
 
