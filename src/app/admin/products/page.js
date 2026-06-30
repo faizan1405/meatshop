@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Edit, Trash2, Search, AlertCircle, CheckCircle } from 'lucide-react';
+import { getPricingInfo } from '@/lib/pricing';
 import styles from '../page.module.css';
 
 export default function AdminProductsPage() {
@@ -148,11 +149,13 @@ export default function AdminProductsPage() {
           </thead>
           <tbody>
             {filteredProducts.map((p) => {
-              // Find min and max price
-              const prices = p.variants.map((v) => v.salePrice || v.price);
-              const minPrice = Math.min(...prices);
-              const maxPrice = Math.max(...prices);
-              const priceDisplay = minPrice === maxPrice ? `₹${minPrice}` : `₹${minPrice} - ₹${maxPrice}`;
+              // Show "On call" for products with no real price, otherwise the range.
+              const pricing = getPricingInfo(p);
+              const priceDisplay = pricing.isOnCall
+                ? 'On call'
+                : pricing.minPrice === pricing.maxPrice
+                  ? `₹${pricing.minPrice}`
+                  : `₹${pricing.minPrice} - ₹${pricing.maxPrice}`;
 
               return (
                 <tr key={p._id}>

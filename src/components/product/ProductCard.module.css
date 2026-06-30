@@ -101,8 +101,31 @@
   min-height: 44px;
 }
 
-.variantSelector {
+/* Fixed-height pack/weight slot keeps the price row and Add-to-Cart
+   button on the same baseline across every card in a grid. */
+.variantArea {
+  min-height: 58px;
   margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.packPill {
+  align-self: flex-start;
+  font-size: 0.78rem;
+  color: var(--text-dark-muted);
+  background-color: var(--bg-cream);
+  border: 1px solid var(--border-cream);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.packPill strong {
+  color: var(--text-dark);
+}
+
+.variantSelector {
   display: flex;
   flex-direction: column;
   gap: 5px;

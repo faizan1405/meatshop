@@ -61,12 +61,27 @@ export async function POST(request, { params }) {
       newArrival,
       isActive,
       productType,
+      unitType,
       seoTitle,
       seoDescription,
     } = body;
 
     if (!name || !slug || !category || !description || !variants || variants.length === 0) {
       return NextResponse.json({ success: false, message: 'Missing product details' }, { status: 400 });
+    }
+
+    const isOnCall = unitType === 'on_call';
+
+    // Price safeguard: fixed-price products must never be saved with a 0/empty
+    // price. Only "on call" products are allowed to omit prices.
+    if (!isOnCall) {
+      const invalid = variants.some((v) => !(Number(v.price) > 0));
+      if (invalid) {
+        return NextResponse.json(
+          { success: false, message: 'Every variant needs a price greater than 0, or set the unit type to "On call".' },
+          { status: 400 }
+        );
+      }
     }
 
     await connectDB();
@@ -92,6 +107,9 @@ export async function POST(request, { params }) {
         newArrival: !!newArrival,
         isActive: isActive !== undefined ? !!isActive : true,
         productType: productType || 'fresh meat',
+        unitType: unitType || 'pack_weight',
+        priceType: isOnCall ? 'on_call' : 'fixed',
+        purchaseMode: isOnCall ? 'on_call' : 'cart',
         seoTitle: seoTitle || `${name} Fresh Cuts | Porville`,
         seoDescription: seoDescription || description,
       },

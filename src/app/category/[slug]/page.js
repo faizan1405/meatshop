@@ -17,7 +17,6 @@ const fallbackCategories = [
   { name: 'Quail', slug: 'quail', image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?auto=format&fit=crop&w=600&q=80', description: 'Nutritious and flavor-packed quail meat, sourced from selected farms.' },
   { name: 'Duck', slug: 'duck', image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=600&q=80', description: 'Plump and juicy duck meat, ideal for roasting and gourmet dishes.' },
   { name: 'Eggs', slug: 'eggs', image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=600&q=80', description: 'Organic, farm-fresh eggs loaded with proteins and nutrients.' },
-  { name: 'Special', slug: 'special', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80', description: 'Porville specialty cuts, exotic meats, and limited-time offers.' },
   { name: 'Live Stock', slug: 'live-stock', image: 'https://images.unsplash.com/photo-1548550022-cbfaf1eb6449?auto=format&fit=crop&w=600&q=80', description: 'Healthy live farm birds and livestock raised under premium guidelines.' },
   { name: 'Ready To Eat', slug: 'ready-to-eat', image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=600&q=80', description: 'Pre-marinated, smoked, and fully cooked premium meat delicacies.' }
 ];

@@ -6,8 +6,11 @@ const VariantSchema = new mongoose.Schema({
     required: true,
   },
   price: {
+    // Not required at the schema level: "on call" products legitimately carry
+    // no price. Real validation (price > 0 unless on_call) is enforced in the
+    // admin API so invalid fixed-price products can never be saved.
     type: Number,
-    required: true,
+    default: 0,
     min: 0,
   },
   salePrice: {
@@ -93,6 +96,13 @@ const ProductSchema = new mongoose.Schema(
       enum: ['fixed', 'on_call'],
       default: 'fixed',
     },
+    // How this product is priced/sold. Drives the admin pricing UI and the
+    // variant label shown to customers. 'on_call' means no fixed price.
+    unitType: {
+      type: String,
+      enum: ['pack_weight', 'per_piece', 'per_kg', 'per_tray', 'on_call'],
+      default: 'pack_weight',
+    },
     purchaseMode: {
       type: String,
       enum: ['cart', 'on_call'],
@@ -100,7 +110,7 @@ const ProductSchema = new mongoose.Schema(
     },
     productType: {
       type: String,
-      enum: ['fresh meat', 'ready to eat', 'live stock', 'eggs', 'special'],
+      enum: ['fresh meat', 'ready to eat', 'live stock', 'eggs'],
       required: true,
       default: 'fresh meat',
     },

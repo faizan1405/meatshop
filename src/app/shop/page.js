@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Search, SlidersHorizontal, ArrowUpDown, X } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import connectDB from '@/lib/db';
 import Category from '@/models/Category';
 import Product from '@/models/Product';
@@ -8,6 +8,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import ProductCard from '@/components/product/ProductCard';
+import ShopFilters from './ShopFilters';
 import styles from './page.module.css';
 
 async function getShopData(searchParamsResolved) {
@@ -89,26 +90,29 @@ export default async function ShopPage({ searchParams }) {
   const activeSearch = resolvedSearchParams.search || '';
 
   // Product Types array
-  const productTypes = ['fresh meat', 'ready to eat', 'live stock', 'eggs', 'special'];
+  const productTypes = ['fresh meat', 'ready to eat', 'live stock', 'eggs'];
 
-  // Helper function to build dynamic filter URLs
-  const getFilterUrl = (newParams) => {
+  const activeCategoryName = categories.find((c) => c.slug === activeCategory)?.name || activeCategory;
+  const sortLabels = { price_asc: 'Price: Low to High', price_desc: 'Price: High to Low' };
+
+  // Build a /shop URL that drops a single filter (for the removable chips).
+  const urlwithout = (keyToRemove) => {
     const params = new URLSearchParams();
-    if (activeSearch) params.set('search', activeSearch);
-    if (activeCategory) params.set('category', activeCategory);
-    if (activeType) params.set('type', activeType);
-    if (activeSort) params.set('sort', activeSort);
-
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value === null || value === '') {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
+    const current = { search: activeSearch, category: activeCategory, type: activeType, sort: activeSort };
+    Object.entries(current).forEach(([key, value]) => {
+      if (value && key !== keyToRemove) params.set(key, value);
     });
-
-    return `/shop?${params.toString()}`;
+    const qs = params.toString();
+    return qs ? `/shop?${qs}` : '/shop';
   };
+
+  // Active-filter chips so shoppers can see and clear what's applied.
+  const activeChips = [
+    activeSearch && { key: 'search', label: `“${activeSearch}”` },
+    activeCategory && { key: 'category', label: activeCategoryName },
+    activeType && { key: 'type', label: activeType },
+    activeSort && { key: 'sort', label: sortLabels[activeSort] },
+  ].filter(Boolean);
 
   return (
     <>
@@ -120,124 +124,34 @@ export default async function ShopPage({ searchParams }) {
           <h1 className={styles.title}>Browse Porville Cuts</h1>
 
           <div className={styles.shopLayout}>
-            {/* Sidebar Filters */}
-            <aside className={styles.sidebar}>
-              
-              {/* Search Bar */}
-              <div className={styles.filterBox}>
-                <h3 className={styles.filterTitle}>
-                  <Search size={16} style={{ marginRight: '8px', verticalAlign: 'middle', color: 'var(--primary-gold)' }} />
-                  Search
-                </h3>
-                <form action="/shop" method="GET">
-                  <input
-                    type="text"
-                    name="search"
-                    placeholder="Search Cuts..."
-                    defaultValue={activeSearch}
-                    className={styles.searchInput}
-                  />
-                  {activeCategory && <input type="hidden" name="category" value={activeCategory} />}
-                  {activeType && <input type="hidden" name="type" value={activeType} />}
-                  {activeSort && <input type="hidden" name="sort" value={activeSort} />}
-                </form>
-                {(activeSearch || activeCategory || activeType || activeSort) && (
-                  <Link href="/shop" className={styles.resetButton}>
-                    <X size={14} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
-                    Reset Filters
-                  </Link>
-                )}
-              </div>
-
-              {/* Category Filter */}
-              <div className={styles.filterBox}>
-                <h3 className={styles.filterTitle}>Categories</h3>
-                <ul className={styles.list}>
-                  <li>
-                    <Link 
-                      href={getFilterUrl({ category: '' })}
-                      className={`${styles.filterLink} ${!activeCategory ? styles.filterLinkActive : ''}`}
-                    >
-                      All Categories
-                    </Link>
-                  </li>
-                  {categories.map((cat) => (
-                    <li key={cat.slug}>
-                      <Link
-                        href={getFilterUrl({ category: cat.slug })}
-                        className={`${styles.filterLink} ${activeCategory === cat.slug ? styles.filterLinkActive : ''}`}
-                      >
-                        {cat.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Product Type Filter */}
-              <div className={styles.filterBox}>
-                <h3 className={styles.filterTitle}>Product Types</h3>
-                <ul className={styles.list}>
-                  <li>
-                    <Link 
-                      href={getFilterUrl({ type: '' })}
-                      className={`${styles.filterLink} ${!activeType ? styles.filterLinkActive : ''}`}
-                    >
-                      All Types
-                    </Link>
-                  </li>
-                  {productTypes.map((type) => (
-                    <li key={type}>
-                      <Link
-                        href={getFilterUrl({ type })}
-                        className={`${styles.filterLink} ${activeType === type ? styles.filterLinkActive : ''}`}
-                        style={{ textTransform: 'capitalize' }}
-                      >
-                        {type}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Sorting */}
-              <div className={styles.filterBox}>
-                <h3 className={styles.filterTitle}>
-                  <ArrowUpDown size={16} style={{ marginRight: '8px', verticalAlign: 'middle', color: 'var(--primary-gold)' }} />
-                  Sort By
-                </h3>
-                <ul className={styles.list}>
-                  <li>
-                    <Link
-                      href={getFilterUrl({ sort: '' })}
-                      className={`${styles.filterLink} ${!activeSort ? styles.filterLinkActive : ''}`}
-                    >
-                      Newest Arrivals
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={getFilterUrl({ sort: 'price_asc' })}
-                      className={`${styles.filterLink} ${activeSort === 'price_asc' ? styles.filterLinkActive : ''}`}
-                    >
-                      Price: Low to High
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={getFilterUrl({ sort: 'price_desc' })}
-                      className={`${styles.filterLink} ${activeSort === 'price_desc' ? styles.filterLinkActive : ''}`}
-                    >
-                      Price: High to Low
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-            </aside>
+            {/* Filters: static sidebar on desktop, slide-in drawer on mobile */}
+            <ShopFilters
+              categories={categories}
+              productTypes={productTypes}
+              active={{ search: activeSearch, category: activeCategory, type: activeType, sort: activeSort }}
+            />
 
             {/* Main Products Grid */}
             <div className={styles.mainContent}>
+
+              {/* Toolbar: result count + active-filter chips */}
+              <div className={styles.toolbar}>
+                <p className={styles.resultCount}>
+                  Showing <strong>{products.length}</strong> {products.length === 1 ? 'product' : 'products'}
+                </p>
+                {activeChips.length > 0 && (
+                  <div className={styles.activeFilters}>
+                    {activeChips.map((chip) => (
+                      <Link key={chip.key} href={urlwithout(chip.key)} className={styles.filterChip}>
+                        <span style={{ textTransform: chip.key === 'type' ? 'capitalize' : 'none' }}>{chip.label}</span>
+                        <X size={13} />
+                      </Link>
+                    ))}
+                    <Link href="/shop" className={styles.clearAll}>Clear all</Link>
+                  </div>
+                )}
+              </div>
+
               {products.length === 0 ? (
                 <div className={styles.emptyState}>
                   <SlidersHorizontal size={48} strokeWidth={1} style={{ color: 'var(--text-dark-muted)' }} />

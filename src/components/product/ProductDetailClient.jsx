@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Star, ShoppingCart, CheckCircle, ShieldAlert } from 'lucide-react';
 import { useCart } from '../common/Providers';
+import { getPricingInfo, variantPrice } from '@/lib/pricing';
 import styles from './ProductDetailClient.module.css';
 
 export default function ProductDetailClient({ product, initialReviews }) {
@@ -97,11 +98,16 @@ export default function ProductDetailClient({ product, initialReviews }) {
   };
 
   const isOutOfStock = selectedVariant?.stockStatus === 'out_of_stock';
-  const price = selectedVariant?.price || 0;
-  const salePrice = selectedVariant?.salePrice;
-  const activePrice = salePrice || price;
-  const hasDiscount = salePrice && salePrice < price;
+  const price = Number(selectedVariant?.price) || 0;
+  const salePrice = Number(selectedVariant?.salePrice) || 0;
+  const hasDiscount = salePrice > 0 && salePrice < price;
   const discountPercent = hasDiscount ? Math.round(((price - salePrice) / price) * 100) : 0;
+
+  // Single source of truth for on-call vs. priced. Falls back to "On call"
+  // whenever there is no real price, so ₹0 never reaches the customer.
+  const pricing = getPricingInfo(product);
+  const isOnCall = pricing.isOnCall;
+  const displayPrice = variantPrice(selectedVariant) > 0 ? variantPrice(selectedVariant) : pricing.minPrice;
 
   // Calculate average rating
   const averageRating = reviews.length
@@ -186,7 +192,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
 
           {/* Price display */}
           <div className={styles.priceRow}>
-            {product.priceType === 'on_call' || product.purchaseMode === 'on_call' ? (
+            {isOnCall ? (
               <span className={styles.price}>On call</span>
             ) : hasDiscount ? (
               <>
@@ -195,7 +201,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
                 <span className={styles.saveBadge}>SAVE {discountPercent}%</span>
               </>
             ) : (
-              <span className={styles.price}>₹{price}</span>
+              <span className={styles.price}>₹{displayPrice}</span>
             )}
           </div>
 
@@ -228,7 +234,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
           )}
 
           {/* Purchase details */}
-          {product.priceType === 'on_call' || product.purchaseMode === 'on_call' ? (
+          {isOnCall ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div className={styles.purchaseSection}>
                 <a 

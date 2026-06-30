@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getPricingInfo } from '@/lib/pricing';
 import styles from './GlobalProductSlideshow.module.css';
 
 export default function GlobalProductSlideshow() {
@@ -87,36 +88,18 @@ export default function GlobalProductSlideshow() {
   };
 
   const renderPrice = (product) => {
-    const isOnCall = product.priceType === 'on_call' || product.purchaseMode === 'on_call';
-    if (isOnCall) {
+    const pricing = getPricingInfo(product);
+
+    // No real price → never show ₹0; degrade to a phone-order label.
+    if (pricing.isOnCall) {
       return <span className={styles.price}>On call</span>;
     }
 
-    if (!product.variants || product.variants.length === 0) {
-      return <span className={styles.price}>View Price</span>;
+    if (pricing.pricedVariants.length > 1) {
+      return <span className={styles.price}>From ₹{pricing.minPrice}</span>;
     }
 
-    if (product.variants.length > 1) {
-      const activePrices = product.variants.map((v) => v.salePrice || v.price).filter(p => p !== undefined && p !== null);
-      if (activePrices.length > 0) {
-        const minPrice = Math.min(...activePrices);
-        return <span className={styles.price}>From ₹{minPrice}</span>;
-      }
-    }
-
-    const firstVariant = product.variants[0];
-    const price = firstVariant?.price || 0;
-    const salePrice = firstVariant?.salePrice;
-    
-    if (salePrice && salePrice < price) {
-      return (
-        <>
-          <span className={`${styles.price} ${styles.salePrice}`}>₹{salePrice}</span>
-          <span className={styles.oldPrice}>₹{price}</span>
-        </>
-      );
-    }
-    return <span className={styles.price}>₹{price}</span>;
+    return <span className={styles.price}>₹{pricing.minPrice}</span>;
   };
 
   if (!loading && products.length === 0) {

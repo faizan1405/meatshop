@@ -17,6 +17,7 @@ export default function AdminProductForm({ productId }) {
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [productType, setProductType] = useState('fresh meat');
+  const [unitType, setUnitType] = useState('pack_weight');
   const [featured, setFeatured] = useState(false);
   const [bestSeller, setBestSeller] = useState(false);
   const [newArrival, setNewArrival] = useState(false);
@@ -42,6 +43,17 @@ export default function AdminProductForm({ productId }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
+
+  const isOnCall = unitType === 'on_call';
+
+  // Placeholder hint for the variant name input, by unit type.
+  const variantNamePlaceholder = {
+    pack_weight: '450gm / 900gm',
+    per_piece: '1 piece / 2 pieces',
+    per_kg: '1kg',
+    per_tray: '1 tray / 25 pieces',
+    on_call: 'Per bird / Per kg',
+  }[unitType] || '450gm / 900gm';
 
   // Auto-generate slug from name
   useEffect(() => {
@@ -77,6 +89,9 @@ export default function AdminProductForm({ productId }) {
             setCategory(p.category?._id || p.category || '');
             setDescription(p.description);
             setProductType(p.productType);
+            // Derive unit type: prefer stored value, fall back to on_call when
+            // the product is phone-order only (legacy docs had no unitType).
+            setUnitType(p.unitType || ((p.priceType === 'on_call' || p.purchaseMode === 'on_call') ? 'on_call' : 'pack_weight'));
             setFeatured(p.featured);
             setBestSeller(p.bestSeller);
             setNewArrival(p.newArrival);
@@ -230,18 +245,24 @@ export default function AdminProductForm({ productId }) {
     }
 
     try {
-      // Validate and format variants — inside try so any error shows to the user
+      // Validate and format variants — inside try so any error shows to the user.
+      // "On call" products may omit prices; everything else needs price > 0.
       for (const v of variants) {
-        if (!v.name || !v.price) {
-          setStatusMessage({ type: 'error', text: 'All variants must have a weight/name and price.' });
+        if (!v.name) {
+          setStatusMessage({ type: 'error', text: 'All variants must have a weight/name.' });
+          setIsSaving(false);
+          return;
+        }
+        if (!isOnCall && !(parseFloat(v.price) > 0)) {
+          setStatusMessage({ type: 'error', text: 'Every variant needs a price greater than 0, or set the unit type to "On call".' });
           setIsSaving(false);
           return;
         }
       }
       const formattedVariants = variants.map((v) => ({
         name: v.name,
-        price: parseFloat(v.price),
-        salePrice: v.salePrice ? parseFloat(v.salePrice) : undefined,
+        price: isOnCall ? 0 : parseFloat(v.price),
+        salePrice: !isOnCall && v.salePrice ? parseFloat(v.salePrice) : undefined,
         stockStatus: v.stockStatus,
         stockQty: parseInt(v.stockQty || '0', 10),
       }));
@@ -255,6 +276,7 @@ export default function AdminProductForm({ productId }) {
           category,
           description,
           productType,
+          unitType,
           featured,
           bestSeller,
           newArrival,
@@ -361,7 +383,21 @@ export default function AdminProductForm({ productId }) {
             <option value="ready to eat">Ready To Eat</option>
             <option value="live stock">Live Stock</option>
             <option value="eggs">Eggs</option>
-            <option value="special">Special</option>
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>Pricing / Unit Type</label>
+          <select
+            value={unitType}
+            onChange={(e) => setUnitType(e.target.value)}
+            required
+          >
+            <option value="pack_weight">Pack weight (450gm / 900gm)</option>
+            <option value="per_piece">Per piece</option>
+            <option value="per_kg">Per kg</option>
+            <option value="per_tray">Per tray</option>
+            <option value="on_call">On call (no price — Call to Order)</option>
           </select>
         </div>
 
@@ -417,15 +453,22 @@ export default function AdminProductForm({ productId }) {
       <div className={styles.variantsSection}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
           <span className={styles.sectionLabel}>Product Variants & Stock</span>
-          <button 
-            type="button" 
-            onClick={handleAddVariant} 
-            className="btn-secondary" 
+          <button
+            type="button"
+            onClick={handleAddVariant}
+            className="btn-secondary"
             style={{ padding: '6px 12px', fontSize: '0.75rem' }}
           >
             + Add Variant
           </button>
         </div>
+
+        {isOnCall && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#fff8e1', color: 'var(--primary-gold-dark)', padding: '10px 12px', borderRadius: '4px', fontSize: '0.8rem', marginBottom: '12px' }}>
+            <AlertCircle size={16} />
+            <span>This product is set to <strong>On call</strong>. Prices are optional and a “Call to Order” button is shown to customers instead of a price.</span>
+          </div>
+        )}
 
         <div className={styles.variantHeader}>
           <span>Weight/Pills</span>
@@ -443,7 +486,7 @@ export default function AdminProductForm({ productId }) {
                 type="text"
                 value={v.name}
                 onChange={(e) => handleVariantChange(index, 'name', e.target.value)}
-                placeholder="450g / 1kg / Pieces"
+                placeholder={variantNamePlaceholder}
                 required
               />
             </div>
@@ -453,8 +496,10 @@ export default function AdminProductForm({ productId }) {
                 type="number"
                 value={v.price}
                 onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
-                placeholder="Price"
-                required
+                placeholder={isOnCall ? 'On call' : 'Price'}
+                required={!isOnCall}
+                disabled={isOnCall}
+                min="0"
               />
             </div>
 

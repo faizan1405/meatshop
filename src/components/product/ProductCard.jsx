@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../common/Providers';
+import { getPricingInfo, variantPrice } from '@/lib/pricing';
 import styles from './ProductCard.module.css';
 
 export default function ProductCard({ product }) {
@@ -37,14 +38,16 @@ export default function ProductCard({ product }) {
   };
 
   const isOutOfStock = selectedVariant?.stockStatus === 'out_of_stock';
-  const price = selectedVariant?.price || 0;
-  const salePrice = selectedVariant?.salePrice;
-  const activePrice = salePrice || price;
+  const price = Number(selectedVariant?.price) || 0;
+  const salePrice = Number(selectedVariant?.salePrice) || 0;
 
-  const hasDiscount = salePrice && salePrice < price;
+  const hasDiscount = salePrice > 0 && salePrice < price;
   const discountPercent = hasDiscount ? Math.round(((price - salePrice) / price) * 100) : 0;
 
-  const isOnCall = product.priceType === 'on_call' || product.purchaseMode === 'on_call';
+  // Single source of truth — falls back to "On call" whenever there is no real
+  // price, so a ₹0 product can never reach the customer.
+  const pricing = getPricingInfo(product);
+  const isOnCall = pricing.isOnCall;
 
   // Calculate starting price display or show "On call"
   const renderPrice = () => {
@@ -52,10 +55,8 @@ export default function ProductCard({ product }) {
       return <span className={styles.price}>On call</span>;
     }
 
-    if (product.variants?.length > 1) {
-      const activePrices = product.variants.map((v) => v.salePrice || v.price);
-      const minPrice = Math.min(...activePrices);
-      return <span className={styles.price}>From ₹{minPrice}</span>;
+    if (pricing.pricedVariants.length > 1) {
+      return <span className={styles.price}>From ₹{pricing.minPrice}</span>;
     }
 
     if (hasDiscount) {
@@ -67,7 +68,10 @@ export default function ProductCard({ product }) {
       );
     }
 
-    return <span className={styles.price}>₹{price}</span>;
+    // Guard: if the selected variant somehow has no price, show the lowest real
+    // price for the product rather than ₹0.
+    const displayPrice = variantPrice(selectedVariant) > 0 ? variantPrice(selectedVariant) : pricing.minPrice;
+    return <span className={styles.price}>₹{displayPrice}</span>;
   };
 
   return (
@@ -98,36 +102,37 @@ export default function ProductCard({ product }) {
           <h3 className={styles.title}>{product.name}</h3>
         </Link>
 
-        {/* Variant Preview */}
-        {product.variants?.length > 0 && (
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', marginBottom: '8px' }}>
-            Pack sizes: {product.variants.map(v => v.name).join(' / ')}
-          </div>
-        )}
+        {/* Pack / weight area — fixed slot so prices & buttons stay aligned
+            across cards regardless of how many variants a product has. */}
+        <div className={styles.variantArea}>
+          {product.variants?.length > 1 && !isOnCall && (
+            <div className={styles.variantSelector}>
+              <label className={styles.selectLabel}>Pack size / weight</label>
+              <select
+                value={selectedVariant?.name || ''}
+                onChange={handleVariantChange}
+                className={styles.selectDropdown}
+                aria-label="Select pack size or weight"
+              >
+                {product.variants.map((v) => (
+                  <option key={v._id || v.name} value={v.name}>
+                    {v.name} {v.stockStatus === 'out_of_stock' ? '(Out of stock)' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-        {/* Variant Dropdown */}
-        {product.variants?.length > 1 && !isOnCall && (
-          <div className={styles.variantSelector}>
-            <label className={styles.selectLabel}>Select weight/pack</label>
-            <select 
-              value={selectedVariant?.name || ''} 
-              onChange={handleVariantChange}
-              className={styles.selectDropdown}
-            >
-              {product.variants.map((v) => (
-                <option key={v._id || v.name} value={v.name}>
-                  {v.name} {v.stockStatus === 'out_of_stock' ? '(Out of stock)' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-        
-        {product.variants?.length === 1 && !isOnCall && (
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-dark-muted)', marginBottom: '15px' }}>
-            Pack: <strong>{product.variants[0].name}</strong>
-          </div>
-        )}
+          {product.variants?.length === 1 && !isOnCall && (
+            <span className={styles.packPill}>
+              Pack: <strong>{product.variants[0].name}</strong>
+            </span>
+          )}
+
+          {isOnCall && (
+            <span className={styles.packPill}>Custom cut · enquire</span>
+          )}
+        </div>
 
         {/* Price display */}
         <div className={styles.priceRow}>

@@ -21,7 +21,6 @@ const fallbackCategories = [
   { name: 'Quail', slug: 'quail', image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?auto=format&fit=crop&w=400&q=80', subtitle: 'Pasture-Raised Batair' },
   { name: 'Duck', slug: 'duck', image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=400&q=80', subtitle: 'Rich Dressed Duck' },
   { name: 'Eggs', slug: 'eggs', image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=400&q=80', subtitle: 'Farm-Fresh Organic' },
-  { name: 'Special', slug: 'special', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80', subtitle: 'Gourmet Selection' },
   { name: 'Live Stock', slug: 'live-stock', image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=400&q=80', subtitle: 'Healthy Live Birds' },
   { name: 'Ready To Eat', slug: 'ready-to-eat', image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=400&q=80', subtitle: 'Smoked & Cooked Salami' },
 ];
@@ -57,12 +56,6 @@ async function getData() {
       .limit(12)
       .lean();
 
-    // Query best seller products (same dual-field handling as above).
-    let bestSellers = await Product.find({ $or: [{ bestSeller: true }, { isBestSeller: true }] })
-      .populate('category')
-      .limit(12)
-      .lean();
-
     // Query active banners
     let banners = await Banner.find({ active: true }).sort({ displayOrder: 1 }).lean();
 
@@ -86,7 +79,6 @@ async function getData() {
     return {
       categories: stringifiedCategories.length ? stringifiedCategories : fallbackCategories,
       featuredProducts: stringify(featuredProducts),
-      bestSellers: stringify(bestSellers),
       banners: stringify(banners),
       reviews: reviews.length ? stringify(reviews) : fallbackReviews,
     };
@@ -98,7 +90,6 @@ async function getData() {
     return {
       categories: fallbackCategories,
       featuredProducts: [],
-      bestSellers: [],
       banners: [],
       reviews: fallbackReviews,
     };
@@ -106,9 +97,15 @@ async function getData() {
 }
 
 export default async function Home() {
-  const { categories, featuredProducts, bestSellers, banners, reviews } = await getData();
+  const { categories, featuredProducts, banners, reviews } = await getData();
 
   const heroTitle = banners?.[0]?.title || 'Premium Fresh Meat & Cuts';
+
+  // Lead the hero with our actual catalogue: pick the first four categories
+  // that have imagery so visitors see real butcher cuts, not a stock banner.
+  const heroCategories = categories
+    .filter((c) => c.image)
+    .slice(0, 4);
 
   return (
     <>
@@ -116,23 +113,47 @@ export default async function Home() {
       <CartDrawer />
 
       <main style={{ minHeight: '100vh' }}>
-        
-        {/* 1. Slim Hero Banner */}
+
+        {/* 1. Product-led Hero — copy on the left, a live category showcase on the right */}
         <section className={styles.hero}>
           <div className="container">
-            <div className={styles.heroContent}>
-              <h1 className={styles.title}>{heroTitle}</h1>
-              <p className={styles.subtitle}>
-                Fresh-cut, pasture-raised meats and organic eggs delivered to your door within 2 hours.
-              </p>
-              <div className={styles.heroBtns}>
-                <Link href="/shop" className="btn-gold">
-                  Shop Fresh Cuts
-                </Link>
-                <Link href="#categories" className="btn-primary">
-                  Explore Categories
-                </Link>
+            <div className={styles.heroGrid}>
+              <div className={styles.heroContent}>
+                <span className={styles.tagline}>Sangam Vihar&apos;s Premium Butcher</span>
+                <h1 className={styles.title}>{heroTitle}</h1>
+                <p className={styles.subtitle}>
+                  Custom-cut to order, vacuum-sealed and delivered chilled within 2 hours.
+                  Pasture-raised meats and farm-fresh eggs — never frozen, never pre-packaged.
+                </p>
+                <div className={styles.heroBtns}>
+                  <Link href="/shop" className="btn-gold">
+                    Shop Fresh Cuts
+                  </Link>
+                  <Link href="#categories" className="btn-primary">
+                    Explore Categories
+                  </Link>
+                </div>
+                <ul className={styles.heroTrust}>
+                  <li><Sparkles size={16} /> Cut after you order</li>
+                  <li><Truck size={16} /> 2-hour delivery</li>
+                  <li><ShieldCheck size={16} /> FSSAI registered</li>
+                </ul>
               </div>
+
+              {heroCategories.length >= 4 && (
+                <div className={styles.heroShowcase} aria-label="Shop by category">
+                  {heroCategories.map((cat) => (
+                    <Link
+                      key={cat.slug}
+                      href={`/category/${cat.slug}`}
+                      className={styles.heroTile}
+                    >
+                      <img src={cat.image} alt={cat.name} loading="eager" />
+                      <span className={styles.heroTileLabel}>{cat.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -177,19 +198,6 @@ export default async function Home() {
             </CategoryCarousel>
           </div>
         </section>
-
-        {/* 3. Best Selling Products */}
-        {bestSellers.length > 0 && (
-          <section className="section-padding" style={{ backgroundColor: 'var(--white)' }}>
-            <div className="container">
-              <h2 className={styles.sectionTitle}>Porville Best Sellers</h2>
-              <p className={styles.sectionSubtitle}>
-                Our customer favourites, cut fresh and delivered chilled.
-              </p>
-              <ProductCarousel products={bestSellers} autoplayInterval={3000} />
-            </div>
-          </section>
-        )}
 
         {/* 4. Fresh Cut Pure Standards (Branding Line Showcase) */}
         <section className="section-padding" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-light)', borderTop: '2px solid var(--primary-gold)' }}>
@@ -259,13 +267,16 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 6. Featured Products Section */}
+        {/* 6. Featured Products Section — single admin-controlled "Featured" list
+            (replaces the old duplicate Best Sellers + Featured sections). Mark a
+            product as Featured in the admin panel to surface it here. */}
         {featuredProducts.length > 0 && (
           <section className="section-padding" style={{ backgroundColor: 'var(--bg-cream)' }}>
             <div className="container">
-              <h2 className={styles.sectionTitle}>Featured Gourmet Cuts</h2>
+              <span className={styles.sectionTagline}>Chef&apos;s Picks</span>
+              <h2 className={styles.sectionTitle}>Featured Best Sellers</h2>
               <p className={styles.sectionSubtitle}>
-                A collection of special cuts curated for your special culinary nights.
+                A hand-picked selection of our most-loved cuts — chosen by Porville and cut fresh on order.
               </p>
               <ProductCarousel products={featuredProducts} autoplayInterval={3000} />
             </div>
