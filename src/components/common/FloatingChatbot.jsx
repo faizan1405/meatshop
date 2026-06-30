@@ -4,6 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { MessageCircle, X, Send, Bot, ChevronDown, Loader } from 'lucide-react';
 
+const API_FAIL_MSG =
+  "Sorry, I'm having trouble replying right now. You can ask about products, delivery, coupons, or contact support at 9217577006.";
+
 // Local FAQ fallback — used when the AI API is unavailable or slow
 const FAQ_RESPONSES = [
   {
@@ -16,15 +19,18 @@ const FAQ_RESPONSES = [
   },
   {
     patterns: ['coupon', 'discount', 'promo', 'code', 'offer', 'porville10', 'fresh10', 'chicken10', 'meat10'],
-    answer: 'We have 4 active 10% discount coupons:\n• PORVILLE10\n• FRESH10\n• CHICKEN10\n• MEAT10\n\nAll require a minimum order of ₹770. Apply at checkout.',
+    answer:
+      'We have 4 active 10% discount coupons:\n• PORVILLE10\n• FRESH10\n• CHICKEN10\n• MEAT10\n\nAll require a minimum order of ₹770. Apply at checkout.',
   },
   {
     patterns: ['track', 'order status', 'where is my order', 'tracking'],
-    answer: 'You can track your order by visiting "My Orders" in your account, or use the /orders page with your order ID.',
+    answer:
+      'You can track your order by visiting "My Orders" in your account, or use the /orders page with your order ID.',
   },
   {
-    patterns: ['product', 'stock', 'available', 'chicken', 'mutton', 'eggs', 'duck', 'quail', 'live stock', 'ready to eat'],
-    answer: 'We carry fresh Chicken, Mutton, Quail, Duck, Farm Fresh Eggs, Ready-to-Eat items, and Live Stock. Browse all at /shop.',
+    patterns: ['product', 'stock', 'available', 'chicken', 'mutton', 'eggs', 'duck', 'quail', 'live stock', 'ready to eat', 'ready-to-eat'],
+    answer:
+      'We carry fresh Chicken, Mutton, Quail, Duck, Farm Fresh Eggs, Ready-to-Eat items, and Live Stock. Browse all at /shop.',
   },
   {
     patterns: ['location', 'address', 'where', 'store', 'outlet', 'sangam vihar'],
@@ -36,15 +42,23 @@ const FAQ_RESPONSES = [
   },
   {
     patterns: ['payment', 'pay', 'upi', 'card', 'razorpay', 'cash on delivery', 'cod'],
-    answer: 'We accept all major payment methods via Razorpay — UPI, debit/credit cards, net banking, and wallets. No cash on delivery.',
+    answer:
+      'We accept all major payment methods via Razorpay — UPI, debit/credit cards, net banking, and wallets. No cash on delivery.',
   },
   {
     patterns: ['return', 'refund', 'cancel', 'cancellation'],
-    answer: 'Perishable products cannot be returned. For quality issues or wrong orders, contact us within 1 hour of delivery at 9217577006.',
+    answer:
+      'Perishable products cannot be returned. For quality issues or wrong orders, contact us within 1 hour of delivery at 9217577006.',
   },
   {
     patterns: ['fssai', 'license', 'food safety', 'certified', 'registration'],
-    answer: 'Porville is FSSAI registered. FoSCoS Ref: 30260223123490898 — registered with the Govt. of Delhi, Dept. of Food Safety.',
+    answer:
+      'Porville is FSSAI registered. FoSCoS Ref: 30260223123490898 — registered with the Govt. of Delhi, Dept. of Food Safety.',
+  },
+  {
+    patterns: ['help', 'order', 'problem', 'issue', 'support'],
+    answer:
+      'For order help, please call 9217577006 or WhatsApp at wa.me/919217577006. You can also track orders via "My Orders" in your account.',
   },
 ];
 
@@ -53,7 +67,7 @@ function localFallback(userMessage) {
   for (const faq of FAQ_RESPONSES) {
     if (faq.patterns.some((p) => lower.includes(p))) return faq.answer;
   }
-  return "I'm not sure about that. For specific queries, please call 9217577006 or WhatsApp at wa.me/919217577006. Our team is happy to help!";
+  return API_FAIL_MSG;
 }
 
 function Message({ msg }) {
@@ -61,30 +75,49 @@ function Message({ msg }) {
   return (
     <div style={{ display: 'flex', justifyContent: isBot ? 'flex-start' : 'flex-end', marginBottom: '10px' }}>
       {isBot && (
-        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary-gold, #c9a84c)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '8px', flexShrink: 0, marginTop: '2px' }}>
+        <div
+          style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: 'var(--primary-gold, #c9a84c)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: '8px',
+            flexShrink: 0,
+            marginTop: '2px',
+          }}
+        >
           <Bot size={14} color="#000" />
         </div>
       )}
-      <div style={{
-        maxWidth: '78%',
-        padding: '9px 12px',
-        borderRadius: isBot ? '0 12px 12px 12px' : '12px 0 12px 12px',
-        background: isBot ? '#f5f5f5' : 'var(--primary-gold, #c9a84c)',
-        color: isBot ? '#333' : '#000',
-        fontSize: '0.82rem',
-        lineHeight: '1.55',
-        whiteSpace: 'pre-wrap',
-        wordBreak: 'break-word',
-      }}>
+      <div
+        style={{
+          maxWidth: '78%',
+          padding: '9px 12px',
+          borderRadius: isBot ? '0 12px 12px 12px' : '12px 0 12px 12px',
+          background: isBot ? '#f5f5f5' : 'var(--primary-gold, #c9a84c)',
+          color: isBot ? '#333' : '#000',
+          fontSize: '0.82rem',
+          lineHeight: '1.55',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+      >
         {msg.content}
       </div>
     </div>
   );
 }
 
-const INITIAL_MESSAGE = { role: 'assistant', content: 'Hello! Welcome to Porville 🥩 I\'m your AI assistant. Ask me anything about our products, delivery, coupons, or orders!' };
+const INITIAL_MESSAGE = {
+  role: 'assistant',
+  content:
+    "Hello! Welcome to Porville 🥩 I'm your AI assistant. Ask me anything about our products, delivery, coupons, or orders!",
+};
 
-const QUICK_QUESTIONS = ['Delivery time?', 'Free delivery?', 'Coupon codes', 'Contact us'];
+const QUICK_QUESTIONS = ['Products we sell?', 'Delivery charges?', 'Coupon codes', 'Track my order'];
 
 export default function FloatingChatbot() {
   const pathname = usePathname();
@@ -96,6 +129,7 @@ export default function FloatingChatbot() {
 
   if (pathname?.startsWith('/admin')) return null;
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (isOpen && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -118,20 +152,28 @@ export default function FloatingChatbot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: updatedMessages.filter((m) => m.role !== 'assistant' || m !== INITIAL_MESSAGE),
+          // Exclude the static greeting from conversation history sent to AI
+          messages: updatedMessages.filter((m) => m !== INITIAL_MESSAGE),
         }),
       });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
 
       const data = await res.json();
 
       if (data.success && data.reply) {
         setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
       } else {
-        // Fallback to local FAQ
-        setMessages((prev) => [...prev, { role: 'assistant', content: localFallback(userText) }]);
+        // AI returned error — try local FAQ first, else generic fallback
+        const fallback = localFallback(userText);
+        setMessages((prev) => [...prev, { role: 'assistant', content: fallback }]);
       }
     } catch {
-      setMessages((prev) => [...prev, { role: 'assistant', content: localFallback(userText) }]);
+      // Network/server error — try local FAQ, else show API fail message
+      const fallback = localFallback(userText);
+      setMessages((prev) => [...prev, { role: 'assistant', content: fallback }]);
     } finally {
       setIsTyping(false);
     }
@@ -146,34 +188,73 @@ export default function FloatingChatbot() {
 
   return (
     <>
+      <style>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes chatSlideUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .porville-chat-window {
+          position: fixed;
+          bottom: 90px;
+          right: 20px;
+          width: min(340px, calc(100vw - 24px));
+          max-height: min(500px, calc(100dvh - 120px));
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+          display: flex;
+          flex-direction: column;
+          z-index: 9998;
+          overflow: hidden;
+          border: 1px solid rgba(0,0,0,0.08);
+          animation: chatSlideUp 0.22s ease;
+        }
+        @media (max-width: 400px) {
+          .porville-chat-window {
+            right: 8px;
+            bottom: 80px;
+          }
+        }
+      `}</style>
+
       {/* Chat Window */}
       {isOpen && (
-        <div style={{
-          position: 'fixed',
-          bottom: '90px',
-          right: '20px',
-          width: '320px',
-          maxHeight: '500px',
-          background: '#fff',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: 9998,
-          overflow: 'hidden',
-          border: '1px solid rgba(0,0,0,0.08)',
-        }}>
-
+        <div className="porville-chat-window">
           {/* Header */}
-          <div style={{ background: 'var(--bg-dark, #0c0b0a)', color: '#fff', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary-gold, #c9a84c)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            style={{
+              background: 'var(--bg-dark, #0c0b0a)',
+              color: '#fff',
+              padding: '14px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: 'var(--primary-gold, #c9a84c)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Bot size={18} color="#000" />
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Porville AI Assistant</div>
               <div style={{ fontSize: '0.68rem', color: '#aaa' }}>Powered by AI · Usually replies instantly</div>
             </div>
-            <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa' }}>
+            <button
+              onClick={() => setIsOpen(false)}
+              aria-label="Minimise chat"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: '4px' }}
+            >
               <ChevronDown size={20} />
             </button>
           </div>
@@ -187,10 +268,30 @@ export default function FloatingChatbot() {
             {/* Typing indicator */}
             {isTyping && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary-gold, #c9a84c)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    background: 'var(--primary-gold, #c9a84c)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
                   <Bot size={14} color="#000" />
                 </div>
-                <div style={{ background: '#f5f5f5', padding: '9px 14px', borderRadius: '0 12px 12px 12px', display: 'flex', gap: '5px', alignItems: 'center' }}>
+                <div
+                  style={{
+                    background: '#f5f5f5',
+                    padding: '9px 14px',
+                    borderRadius: '0 12px 12px 12px',
+                    display: 'flex',
+                    gap: '5px',
+                    alignItems: 'center',
+                  }}
+                >
                   <Loader size={12} style={{ animation: 'spin 1s linear infinite', color: '#888' }} />
                   <span style={{ fontSize: '0.78rem', color: '#888' }}>Thinking...</span>
                 </div>
@@ -201,7 +302,7 @@ export default function FloatingChatbot() {
           </div>
 
           {/* Quick questions */}
-          <div style={{ padding: '0 12px 8px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <div style={{ padding: '0 12px 8px', display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0 }}>
             {QUICK_QUESTIONS.map((q) => (
               <button
                 key={q}
@@ -225,7 +326,16 @@ export default function FloatingChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ borderTop: '1px solid #eee', padding: '10px 12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div
+            style={{
+              borderTop: '1px solid #eee',
+              padding: '10px 12px',
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+              flexShrink: 0,
+            }}
+          >
             <input
               type="text"
               value={input}
@@ -233,6 +343,7 @@ export default function FloatingChatbot() {
               onKeyDown={handleKeyDown}
               placeholder="Ask anything..."
               disabled={isTyping}
+              aria-label="Type your message"
               style={{
                 flex: 1,
                 border: '1px solid #e0e0e0',
@@ -241,11 +352,13 @@ export default function FloatingChatbot() {
                 fontSize: '0.82rem',
                 outline: 'none',
                 opacity: isTyping ? 0.7 : 1,
+                minWidth: 0,
               }}
             />
             <button
               onClick={() => sendMessage()}
               disabled={isTyping || !input.trim()}
+              aria-label="Send message"
               style={{
                 width: '36px',
                 height: '36px',
@@ -270,6 +383,7 @@ export default function FloatingChatbot() {
       <button
         onClick={() => setIsOpen((o) => !o)}
         title="Chat with Porville AI"
+        aria-label="Open Porville AI assistant"
         style={{
           position: 'fixed',
           bottom: '28px',
@@ -290,14 +404,9 @@ export default function FloatingChatbot() {
         }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
         onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-        aria-label="Open Porville AI assistant"
       >
         {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
       </button>
-
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </>
   );
 }
