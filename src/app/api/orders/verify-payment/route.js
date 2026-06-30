@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { getRazorpayInstance } from '@/lib/razorpay';
 import connectDB from '@/lib/db';
 import Order from '@/models/Order';
 import User from '@/models/User';
@@ -135,6 +136,29 @@ export async function POST(request) {
 
     const serverDeliveryCharge = serverItemsSubtotal >= deliveryThreshold || serverItemsSubtotal === 0 ? 0 : deliveryChargeValue;
     const serverOrderTotal = Math.max(serverItemsSubtotal - serverDiscountAmount + serverDeliveryCharge, 0);
+
+    // SECURITY: bind the captured payment to the server-recomputed total.
+    // The HMAC signature only proves the (order_id, payment_id) pair is authentic
+    // — it does NOT prove how much was actually charged. Without this check a
+    // tampered `cartItems` payload at verify time could create an order whose
+    // recorded total differs from the amount truly paid via Razorpay. Compare the
+    // server total against the amount locked into the Razorpay order at creation.
+    const expectedAmountPaise = Math.round(serverOrderTotal * 100);
+    try {
+      const razorpay = getRazorpayInstance();
+      const rpOrder = await razorpay.orders.fetch(razorpay_order_id);
+      if (rpOrder && typeof rpOrder.amount === 'number' && rpOrder.amount !== expectedAmountPaise) {
+        return NextResponse.json(
+          { success: false, message: 'Payment amount mismatch. Order was not created.' },
+          { status: 400 }
+        );
+      }
+    } catch (gatewayErr) {
+      // Gateway lookup failed (e.g. transient network error). The signature is
+      // already cryptographically verified above, so we proceed rather than
+      // reject a genuinely paid order — but log it for manual reconciliation.
+      console.error('[verify-payment] Could not cross-check Razorpay order amount:', gatewayErr.message);
+    }
 
     // Create the order document
     const newOrder = await Order.create({
