@@ -43,7 +43,9 @@ async function getShopData(searchParamsResolved) {
       filter.productType = type;
     }
 
-    let productQuery = Product.find(filter).populate('category');
+    let productQuery = Product.find(filter)
+      .select('name slug images placeholderImage category variants priceType purchaseMode')
+      .populate('category', 'name slug');
 
     // Sorting by first variant price
     if (sort === 'price_asc') {
