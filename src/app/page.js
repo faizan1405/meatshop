@@ -10,6 +10,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import ProductCard from '@/components/product/ProductCard';
+import ProductCarousel from '@/components/products/ProductCarousel';
 import styles from './page.module.css';
 
 // Pre-seeded fallback data to prevent build failure if database is empty/not loaded yet.
@@ -193,11 +194,7 @@ export default async function Home() {
               <p className={styles.sectionSubtitle}>
                 Our customer favourites, cut fresh and delivered chilled.
               </p>
-              <div className={styles.productsGrid}>
-                {bestSellers.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
+              <ProductCarousel products={bestSellers} autoplayInterval={3000} />
             </div>
           </section>
         )}
@@ -278,11 +275,7 @@ export default async function Home() {
               <p className={styles.sectionSubtitle}>
                 A collection of special cuts curated for your special culinary nights.
               </p>
-              <div className={styles.productsGrid}>
-                {featuredProducts.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
+              <ProductCarousel products={featuredProducts} autoplayInterval={3000} />
             </div>
           </section>
         )}
