@@ -107,7 +107,6 @@ async function getData() {
 export default async function Home() {
   const { categories, featuredProducts, bestSellers, banners, reviews } = await getData();
 
-  const heroImage = banners?.[0]?.image || 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80';
   const heroTitle = banners?.[0]?.title || 'Premium Fresh Meat & Cuts';
 
   return (
@@ -117,14 +116,13 @@ export default async function Home() {
 
       <main style={{ minHeight: '100vh' }}>
         
-        {/* 1. Premium Hero Section */}
+        {/* 1. Slim Hero Banner */}
         <section className={styles.hero}>
           <div className="container">
             <div className={styles.heroContent}>
-              <span className={styles.tagline}>Fresh Cut Pure Standards</span>
               <h1 className={styles.title}>{heroTitle}</h1>
               <p className={styles.subtitle}>
-                Experience premium quality meats, pasture-raised birds, and organic farm fresh eggs processed in 100% hygienic facilities. Delivered fresh to your home within 2 hours.
+                Fresh-cut, pasture-raised meats and organic eggs delivered to your door within 2 hours.
               </p>
               <div className={styles.heroBtns}>
                 <Link href="/shop" className="btn-gold">
@@ -135,13 +133,6 @@ export default async function Home() {
                 </Link>
               </div>
             </div>
-          </div>
-          <div className={styles.heroBg}>
-            <img 
-              src={heroImage} 
-              alt="Porville Premium Meat Hero"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
           </div>
         </section>
 
