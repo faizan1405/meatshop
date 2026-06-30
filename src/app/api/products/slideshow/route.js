@@ -3,12 +3,15 @@ import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category'; // Required for populate
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(req) {
   try {
     await connectDB();
 
     // Fetch 10 active products. Prefer featured or best sellers.
-    const products = await Product.find({ isActive: true })
+    // Use $ne: false to include products where isActive is missing but implicitly true
+    const products = await Product.find({ isActive: { $ne: false } })
       .sort({ isFeatured: -1, isBestSeller: -1, createdAt: -1 })
       .limit(10)
       .populate('category', 'name slug')
