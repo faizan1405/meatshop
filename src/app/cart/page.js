@@ -82,18 +82,22 @@ export default function CartPage() {
                             backgroundColor: 'var(--white)',
                           }}
                         >
-                          <button 
+                          <button
+                            type="button"
                             style={{ padding: '6px 12px', fontWeight: 'bold' }}
                             onClick={() => updateQuantity(item.product._id, item.variant.name, item.quantity - 1)}
+                            aria-label={`Decrease quantity of ${item.product.name}`}
                           >
                             -
                           </button>
                           <span style={{ padding: '0 12px', fontWeight: '600', fontSize: '0.9rem' }}>
                             {item.quantity}
                           </span>
-                          <button 
+                          <button
+                            type="button"
                             style={{ padding: '6px 12px', fontWeight: 'bold' }}
                             onClick={() => updateQuantity(item.product._id, item.variant.name, item.quantity + 1)}
+                            aria-label={`Increase quantity of ${item.product.name}`}
                           >
                             +
                           </button>
@@ -103,10 +107,12 @@ export default function CartPage() {
                         <span className={styles.price}>₹{itemPrice * item.quantity}</span>
 
                         {/* Remove */}
-                        <button 
+                        <button
+                          type="button"
                           className={styles.removeBtn}
                           onClick={() => removeFromCart(item.product._id, item.variant.name)}
                           title="Remove item"
+                          aria-label={`Remove ${item.product.name} from cart`}
                         >
                           <Trash2 size={18} />
                         </button>
@@ -150,7 +156,7 @@ export default function CartPage() {
                   </Link>
 
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', textAlign: 'center', marginTop: '10px' }}>
-                    * Free Delivery on order values above ₹500
+                    Free delivery on orders above ₹770. Otherwise ₹40 applies.
                   </div>
                 </div>
               </div>

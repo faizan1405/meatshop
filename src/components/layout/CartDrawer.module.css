@@ -202,9 +202,14 @@
   border-radius: var(--border-radius-sm);
 }
 
-.couponApplyBtn:hover {
+.couponApplyBtn:not(:disabled):hover {
   background-color: var(--primary-gold);
   color: var(--bg-dark);
+}
+
+.couponApplyBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .couponApplied {

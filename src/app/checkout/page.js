@@ -298,9 +298,9 @@ export default function CheckoutPage() {
                           Log in to save multiple addresses and track orders in one place.
                         </p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => router.push(`/login?callbackUrl=/checkout`)}
-                        className="btn-primary btn-secondary" 
+                        className="btn-secondary"
                         style={{ padding: '8px 18px', fontSize: '0.8rem' }}
                       >
                         Log in with Google

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash, UploadCloud, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, UploadCloud, CheckCircle, AlertCircle } from 'lucide-react';
 import styles from '../page.module.css';
 
 export default function AdminCategoriesPage() {
@@ -75,6 +75,27 @@ export default function AdminCategoriesPage() {
         setIsUploading(false);
       }
     };
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this category? This cannot be undone.')) return;
+    setMessage(null);
+
+    try {
+      const res = await fetch(`/api/admin/categories?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (data.success) {
+        setCategories((prev) => prev.filter((c) => c._id !== id));
+        setMessage({ type: 'success', text: 'Category deleted successfully.' });
+        if (editingId === id) handleReset();
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Failed to delete category.' });
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: 'error', text: 'Server error deleting category.' });
+    }
   };
 
   const handleEditClick = (cat) => {
@@ -251,7 +272,7 @@ export default function AdminCategoriesPage() {
               {isSaving ? 'Saving...' : editingId ? 'Update' : 'Create'}
             </button>
             {editingId && (
-              <button type="button" onClick={handleReset} className="btn-primary btn-secondary" style={{ flex: 1 }}>
+              <button type="button" onClick={handleReset} className="btn-secondary" style={{ flex: 1 }}>
                 Cancel
               </button>
             )}
@@ -309,14 +330,24 @@ export default function AdminCategoriesPage() {
                     </span>
                   </td>
                   <td>
-                    <button 
-                      onClick={() => handleEditClick(cat)}
-                      className={styles.actionLink}
-                      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-                    >
-                      <Edit size={14} />
-                      <span>Edit</span>
-                    </button>
+                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                      <button
+                        onClick={() => handleEditClick(cat)}
+                        className={styles.actionLink}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Edit size={14} />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(cat._id)}
+                        className={styles.actionLink}
+                        style={{ color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Trash2 size={14} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

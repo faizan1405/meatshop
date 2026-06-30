@@ -32,12 +32,31 @@ export async function GET(request) {
       });
     }
 
+    // GET is public (customer site needs business info). Whitelist only
+    // public-safe fields — never spread the raw doc, which would leak
+    // internal _id / __v / timestamps.
+    const publicSettings = {
+      contactNumber: settings.contactNumber,
+      email: settings.email,
+      address: settings.address,
+      deliveryNote: settings.deliveryNote,
+      deliveryCharge: settings.deliveryCharge,
+      freeDeliveryThreshold: settings.freeDeliveryThreshold,
+      whatsappNumber: settings.whatsappNumber,
+      facebookUrl: settings.facebookUrl,
+      instagramUrl: settings.instagramUrl,
+      logoUrl: settings.logoUrl,
+      fssaiRefNo: settings.fssaiRefNo,
+      fssaiLicenseName: settings.fssaiLicenseName,
+      fssaiAddress: settings.fssaiAddress,
+      fssaiKindOfBusiness: settings.fssaiKindOfBusiness,
+      fssaiAppDate: settings.fssaiAppDate,
+      fssaiNote: settings.fssaiNote,
+    };
+
     return NextResponse.json({
       success: true,
-      settings: {
-        ...settings,
-        _id: settings._id.toString(),
-      },
+      settings: publicSettings,
     });
   } catch (error) {
     console.error('Error fetching site settings:', error);

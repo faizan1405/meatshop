@@ -39,6 +39,27 @@ export default function AdminCouponsPage() {
     fetchCoupons();
   }, []);
 
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this coupon? This cannot be undone.')) return;
+    setMessage(null);
+
+    try {
+      const res = await fetch(`/api/admin/coupons?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (data.success) {
+        setCoupons((prev) => prev.filter((c) => c._id !== id));
+        setMessage({ type: 'success', text: 'Coupon deleted successfully.' });
+        if (editingId === id) handleReset();
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Failed to delete coupon.' });
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: 'error', text: 'Server error deleting coupon.' });
+    }
+  };
+
   const handleEditClick = (c) => {
     setEditingId(c._id);
     setCode(c.code);
@@ -228,7 +249,7 @@ export default function AdminCouponsPage() {
               {isSaving ? 'Saving...' : editingId ? 'Update' : 'Create'}
             </button>
             {editingId && (
-              <button type="button" onClick={handleReset} className="btn-primary btn-secondary" style={{ flex: 1 }}>
+              <button type="button" onClick={handleReset} className="btn-secondary" style={{ flex: 1 }}>
                 Cancel
               </button>
             )}
@@ -293,14 +314,24 @@ export default function AdminCouponsPage() {
                     </span>
                   </td>
                   <td>
-                    <button 
-                      onClick={() => handleEditClick(c)}
-                      className={styles.actionLink}
-                      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-                    >
-                      <Edit size={14} />
-                      <span>Edit</span>
-                    </button>
+                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                      <button
+                        onClick={() => handleEditClick(c)}
+                        className={styles.actionLink}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Edit size={14} />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(c._id)}
+                        className={styles.actionLink}
+                        style={{ color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Trash2 size={14} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

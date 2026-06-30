@@ -2,16 +2,28 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { ShieldCheck, AlertCircle } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect to dashboard if already logged in as admin
+  React.useEffect(() => {
+    if (status === 'authenticated' && session?.user?.role === 'admin') {
+      router.replace('/admin');
+    }
+  }, [status, session, router]);
+
+  if (status === 'loading' || (status === 'authenticated' && session?.user?.role === 'admin')) {
+    return null;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

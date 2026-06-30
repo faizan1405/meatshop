@@ -258,18 +258,20 @@ export default function ProductDetailClient({ product, initialReviews }) {
           ) : (
             <div className={styles.purchaseSection}>
               <div className={styles.qtySelector}>
-                <button 
-                  className={styles.qtyBtn} 
+                <button
+                  className={styles.qtyBtn}
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={isOutOfStock}
+                  aria-label="Decrease quantity"
                 >
                   -
                 </button>
                 <span className={styles.qtyValue}>{quantity}</span>
-                <button 
-                  className={styles.qtyBtn} 
+                <button
+                  className={styles.qtyBtn}
                   onClick={() => setQuantity(quantity + 1)}
                   disabled={isOutOfStock}
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
@@ -361,14 +363,21 @@ export default function ProductDetailClient({ product, initialReviews }) {
                   <label>Rating</label>
                   <div className={styles.starsInput}>
                     {[1, 2, 3, 4, 5].map((val) => (
-                      <Star
+                      <button
                         key={val}
-                        size={22}
-                        className={styles.starSelectable}
-                        fill={val <= rating ? "var(--primary-gold)" : "none"}
-                        stroke="var(--primary-gold)"
+                        type="button"
+                        className={styles.starBtn}
                         onClick={() => setRating(val)}
-                      />
+                        aria-label={`Rate ${val} star${val > 1 ? 's' : ''}`}
+                        aria-pressed={val <= rating}
+                      >
+                        <Star
+                          size={22}
+                          className={styles.starSelectable}
+                          fill={val <= rating ? "var(--primary-gold)" : "none"}
+                          stroke="var(--primary-gold)"
+                        />
+                      </button>
                     ))}
                   </div>
                 </div>

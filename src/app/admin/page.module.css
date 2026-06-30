@@ -104,3 +104,27 @@
 .actionLink:hover {
   text-decoration: underline;
 }
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.formGroup label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--border-cream);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  width: 100%;
+  background-color: var(--white);
+  color: var(--text-dark);
+}

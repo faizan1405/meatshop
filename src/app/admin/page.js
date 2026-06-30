@@ -87,7 +87,7 @@ export default async function AdminDashboardPage() {
         <div className={styles.statCard}>
           <div className={styles.statInfo}>
             <span className={styles.statLabel}>Total Revenue</span>
-            <span className={styles.statValue}>₹{stats.totalRevenue}</span>
+            <span className={styles.statValue}>₹{stats.totalRevenue.toLocaleString('en-IN')}</span>
           </div>
           <div className={styles.statIcon}>
             <IndianRupee size={24} />

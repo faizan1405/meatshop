@@ -21,6 +21,36 @@ export async function GET(request) {
   }
 }
 
+export async function DELETE(request) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user?.role !== 'admin') {
+      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: 'Category ID is required' }, { status: 400 });
+    }
+
+    await connectDB();
+
+    const deleted = await Category.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return NextResponse.json({ success: false, message: 'Category not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: 'Category deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    return NextResponse.json({ success: false, message: 'Server error deleting category' }, { status: 500 });
+  }
+}
+
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);

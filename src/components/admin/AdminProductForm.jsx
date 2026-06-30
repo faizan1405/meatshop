@@ -229,21 +229,22 @@ export default function AdminProductForm({ productId }) {
       return;
     }
 
-    // Map variants back to correct type format (Numbers)
-    const formattedVariants = variants.map((v) => {
-      if (!v.name || !v.price) {
-        throw new Error('All variants must have a name/weight and price.');
+    try {
+      // Validate and format variants — inside try so any error shows to the user
+      for (const v of variants) {
+        if (!v.name || !v.price) {
+          setStatusMessage({ type: 'error', text: 'All variants must have a weight/name and price.' });
+          setIsSaving(false);
+          return;
+        }
       }
-      return {
+      const formattedVariants = variants.map((v) => ({
         name: v.name,
         price: parseFloat(v.price),
         salePrice: v.salePrice ? parseFloat(v.salePrice) : undefined,
         stockStatus: v.stockStatus,
         stockQty: parseInt(v.stockQty || '0', 10),
-      };
-    });
-
-    try {
+      }));
       const endpoint = productId ? `/api/admin/products/${productId}` : '/api/admin/products';
       const res = await fetch(endpoint, {
         method: 'POST', // Dynamic handlers on server

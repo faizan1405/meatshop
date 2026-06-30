@@ -132,16 +132,18 @@ export default function CartDrawer() {
                         
                         {/* Qty Controls */}
                         <div className={styles.qtyControls}>
-                          <button 
-                            className={styles.qtyBtn} 
+                          <button
+                            className={styles.qtyBtn}
                             onClick={() => updateQuantity(item.product._id, item.variant.name, item.quantity - 1)}
+                            aria-label={`Decrease quantity of ${item.product.name}`}
                           >
                             -
                           </button>
                           <span className={styles.qtyVal}>{item.quantity}</span>
-                          <button 
-                            className={styles.qtyBtn} 
+                          <button
+                            className={styles.qtyBtn}
                             onClick={() => updateQuantity(item.product._id, item.variant.name, item.quantity + 1)}
+                            aria-label={`Increase quantity of ${item.product.name}`}
                           >
                             +
                           </button>

@@ -170,3 +170,22 @@
     flex-direction: column;
   }
 }
+
+/* On small phones, let the item row wrap so the qty / price / remove
+   controls never overflow or sit on top of each other. */
+@media (max-width: 560px) {
+  .itemCard {
+    flex-wrap: wrap;
+  }
+
+  .itemControls {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .price {
+    width: auto;
+    text-align: left;
+  }
+}

@@ -147,7 +147,7 @@ input:focus, select:focus, textarea:focus {
   box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover {
+.btn-primary:not(:disabled):hover {
   background-color: var(--primary-gold);
   color: var(--bg-dark);
   box-shadow: var(--shadow-gold);
@@ -166,7 +166,7 @@ input:focus, select:focus, textarea:focus {
   border-radius: var(--border-radius-sm);
 }
 
-.btn-secondary:hover {
+.btn-secondary:not(:disabled):hover {
   background-color: var(--text-dark);
   color: var(--white);
   transform: translateY(-2px);
@@ -184,7 +184,7 @@ input:focus, select:focus, textarea:focus {
   border-radius: var(--border-radius-sm);
 }
 
-.btn-gold:hover {
+.btn-gold:not(:disabled):hover {
   background-color: var(--bg-dark);
   color: var(--text-gold);
   border-color: var(--primary-gold);
@@ -192,10 +192,28 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(-2px);
 }
 
-.btn-primary:active,
-.btn-secondary:active,
-.btn-gold:active {
+.btn-primary:not(:disabled):active,
+.btn-secondary:not(:disabled):active,
+.btn-gold:not(:disabled):active {
   transform: translateY(0);
+}
+
+/* Disabled state for primary action buttons — visibly inert: dimmed,
+   no hover lift, not-allowed cursor. Covers every button that toggles a
+   `disabled` attribute during loading/submitting (checkout, coupons,
+   reviews, order tracking, and all admin create/update/delete forms). */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-gold:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Any disabled button should never present a clickable cursor. */
+button:disabled {
+  cursor: not-allowed;
 }
 
 /* Custom Scrollbar */

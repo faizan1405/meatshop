@@ -248,7 +248,7 @@ export default function AdminBannersPage() {
               {isSaving ? 'Saving...' : editingId ? 'Update' : 'Create'}
             </button>
             {editingId && (
-              <button type="button" onClick={handleReset} className="btn-primary btn-secondary" style={{ flex: 1 }}>
+              <button type="button" onClick={handleReset} className="btn-secondary" style={{ flex: 1 }}>
                 Cancel
               </button>
             )}

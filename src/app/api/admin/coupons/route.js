@@ -30,6 +30,36 @@ export async function GET(request) {
   }
 }
 
+export async function DELETE(request) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user?.role !== 'admin') {
+      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: 'Coupon ID is required' }, { status: 400 });
+    }
+
+    await connectDB();
+
+    const deleted = await Coupon.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return NextResponse.json({ success: false, message: 'Coupon not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: 'Coupon deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting coupon:', error);
+    return NextResponse.json({ success: false, message: 'Server error deleting coupon' }, { status: 500 });
+  }
+}
+
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { MessageCircle, X, Send, Bot, ChevronDown, Loader } from 'lucide-react';
+import { useCart } from './Providers';
 
 const API_FAIL_MSG =
   "Sorry, I'm having trouble replying right now. You can ask about products, delivery, coupons, or contact support at 9217577006.";
@@ -121,6 +122,7 @@ const QUICK_QUESTIONS = ['Products we sell?', 'Delivery charges?', 'Coupon codes
 
 export default function FloatingChatbot() {
   const pathname = usePathname();
+  const { isCartOpen } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
@@ -218,8 +220,9 @@ export default function FloatingChatbot() {
         }
       `}</style>
 
-      {/* Chat Window */}
-      {isOpen && (
+      {/* Chat Window — hidden while the cart drawer is open so it never
+          overlaps the drawer's checkout button. */}
+      {isOpen && !isCartOpen && (
         <div className="porville-chat-window">
           {/* Header */}
           <div
@@ -395,7 +398,7 @@ export default function FloatingChatbot() {
           border: '2px solid var(--primary-gold, #c9a84c)',
           color: 'var(--primary-gold, #c9a84c)',
           cursor: 'pointer',
-          display: 'flex',
+          display: isCartOpen ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 9999,
