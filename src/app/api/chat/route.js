@@ -42,14 +42,49 @@ RULES YOU MUST FOLLOW:
 6. If unsure, say "For accurate information, please call 9217577006 or WhatsApp us."
 7. Never discuss competitors or make comparative claims.`;
 
+// Models tried in order — first success wins
+const MODELS = [
+  'google/gemma-2-9b-it:free',
+  'meta-llama/llama-3.1-8b-instruct:free',
+  'mistralai/mistral-7b-instruct:free',
+];
+
+async function callOpenRouter(apiKey, model, messages) {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://meatshop-three.vercel.app',
+      'X-Title': 'Porville Fresh Cuts Assistant',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+      max_tokens: 400,
+      temperature: 0.5,
+    }),
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text();
+    throw new Error(`OpenRouter ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  const reply = data.choices?.[0]?.message?.content?.trim();
+  if (!reply) throw new Error('Empty content in response');
+  return reply;
+}
+
 export async function POST(request) {
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
-      console.error('OPENROUTER_API_KEY is not set in environment variables');
+      console.error('[chat] OPENROUTER_API_KEY is not set — restart the server after adding it to .env.local');
       return NextResponse.json(
-        { success: false, message: 'AI service not configured. Add OPENROUTER_API_KEY to .env.local and restart the server.' },
+        { success: false, message: 'AI not configured (missing API key)' },
         { status: 503 }
       );
     }
@@ -67,51 +102,37 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'messages must be a non-empty array' }, { status: 400 });
     }
 
-    // Validate last user message has content
     const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
     if (!lastUserMsg || typeof lastUserMsg.content !== 'string' || !lastUserMsg.content.trim()) {
       return NextResponse.json({ success: false, message: 'No user message found' }, { status: 400 });
     }
 
-    // Only send last 12 messages to keep context manageable and reduce token cost
     const recentMessages = messages.slice(-12).map((m) => ({
       role: m.role === 'assistant' ? 'assistant' : 'user',
       content: String(m.content).trim(),
     }));
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://meatshop-three.vercel.app',
-        'X-Title': 'Porville Fresh Cuts Assistant',
-      },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...recentMessages],
-        max_tokens: 400,
-        temperature: 0.5,
-      }),
-    });
-
-    if (!response.ok) {
-      const errBody = await response.text();
-      console.error(`OpenRouter error ${response.status}:`, errBody);
-      return NextResponse.json({ success: false, message: 'AI service error' }, { status: 502 });
+    // Try each model in order — first success wins
+    const errors = [];
+    for (const model of MODELS) {
+      try {
+        const reply = await callOpenRouter(apiKey, model, recentMessages);
+        console.log(`[chat] Success with model: ${model}`);
+        return NextResponse.json({ success: true, reply });
+      } catch (err) {
+        console.warn(`[chat] Model ${model} failed:`, err.message);
+        errors.push(`${model}: ${err.message}`);
+      }
     }
 
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content?.trim();
-
-    if (!reply) {
-      console.error('Empty response from OpenRouter:', JSON.stringify(data));
-      return NextResponse.json({ success: false, message: 'Empty AI response' }, { status: 502 });
-    }
-
-    return NextResponse.json({ success: true, reply });
+    // All models failed
+    console.error('[chat] All models failed:', errors);
+    return NextResponse.json(
+      { success: false, message: 'All AI models failed', errors },
+      { status: 502 }
+    );
   } catch (error) {
-    console.error('Chat API unhandled error:', error);
+    console.error('[chat] Unhandled error:', error);
     return NextResponse.json({ success: false, message: error.message || 'Server error' }, { status: 500 });
   }
 }
