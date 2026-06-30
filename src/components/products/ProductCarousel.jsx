@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import ProductCard from './ProductCard';
+import ProductCard from '../product/ProductCard';
 import styles from './ProductCarousel.module.css';
 
 export default function ProductCarousel({ products, autoplayInterval = 3000 }) {
