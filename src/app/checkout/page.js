@@ -49,6 +49,7 @@ export default function CheckoutPage() {
   const [config, setConfig] = useState({ 
     isGoogleConfigured: true, 
     isRazorpayConfigured: true, 
+    isDemoCheckoutEnabled: false,
     isLoading: true 
   });
 
@@ -59,11 +60,12 @@ export default function CheckoutPage() {
       .then(data => setConfig({ 
         isGoogleConfigured: data.isGoogleConfigured,
         isRazorpayConfigured: data.isRazorpayConfigured,
+        isDemoCheckoutEnabled: data.isDemoCheckoutEnabled,
         isLoading: false
       }))
       .catch(err => {
         console.error('Failed to fetch config', err);
-        setConfig({ isGoogleConfigured: false, isRazorpayConfigured: false, isLoading: false });
+        setConfig({ isGoogleConfigured: false, isRazorpayConfigured: false, isDemoCheckoutEnabled: false, isLoading: false });
       });
   }, []);
 
@@ -145,6 +147,59 @@ export default function CheckoutPage() {
       return 'Please enter your email for guest checkout.';
     }
     return null;
+  };
+
+  // Trigger Demo Payment
+  const handleDemoPayment = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    const validationErr = validateForm();
+    if (validationErr) {
+      setErrorMessage(validationErr);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      setErrorMessage('Processing demo order, please wait...');
+
+      const res = await fetch('/api/orders/create-demo-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cartItems,
+          shippingAddress: addressForm,
+          couponCode: coupon?.code || '',
+          itemsSubtotal,
+          discountAmount,
+          deliveryCharge,
+          orderTotal,
+          isGuest: !session,
+          guestInfo: !session ? {
+            name: addressForm.name,
+            email: guestEmail,
+            phone: addressForm.phone,
+          } : null,
+          userEmail: session?.user?.email || null,
+        }),
+      });
+
+      const data = await res.json();
+      
+      if (data.success) {
+        clearCart();
+        router.push(`/order-success?orderId=${data.orderId}`);
+      } else {
+        setErrorMessage(data.message || 'Demo checkout failed.');
+        setIsSubmitting(false);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('An error occurred during demo checkout.');
+      setIsSubmitting(false);
+    }
   };
 
   // Trigger Razorpay Payment & Order Creation
@@ -498,6 +553,21 @@ export default function CheckoutPage() {
                     <button className={`${styles.paymentBtn} btn-gold`} disabled>
                       <span>Loading...</span>
                     </button>
+                  ) : (!config.isRazorpayConfigured && config.isDemoCheckoutEnabled) || (config.isDemoCheckoutEnabled && process.env.NODE_ENV !== 'production') ? (
+                    <>
+                      <button 
+                        onClick={handleDemoPayment} 
+                        className={`${styles.paymentBtn}`}
+                        style={{ backgroundColor: '#2196F3', color: 'white', border: 'none' }}
+                        disabled={isSubmitting}
+                      >
+                        <ShieldCheck size={18} />
+                        <span>{isSubmitting ? 'Processing...' : `Place Demo Order ₹${orderTotal}`}</span>
+                      </button>
+                      <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '0.8rem', color: '#666' }}>
+                        Razorpay is not configured. Demo checkout is enabled for testing.
+                      </div>
+                    </>
                   ) : config.isRazorpayConfigured ? (
                     <button 
                       onClick={handlePayment} 
@@ -514,10 +584,12 @@ export default function CheckoutPage() {
                     </button>
                   )}
 
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', color: 'var(--text-dark-muted)', fontSize: '0.7rem', marginTop: '15px' }}>
-                    <ShieldCheck size={14} style={{ color: 'var(--success)' }} />
-                    <span>Secure Payment processed via Razorpay</span>
-                  </div>
+                  {!((!config.isRazorpayConfigured && config.isDemoCheckoutEnabled) || (config.isDemoCheckoutEnabled && process.env.NODE_ENV !== 'production')) && (
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', color: 'var(--text-dark-muted)', fontSize: '0.7rem', marginTop: '15px' }}>
+                      <ShieldCheck size={14} style={{ color: 'var(--success)' }} />
+                      <span>Secure Payment processed via Razorpay</span>
+                    </div>
+                  )}
 
                   {/* Delivery note */}
                   <div style={{ marginTop: '12px', padding: '10px 12px', background: '#f0faf0', borderRadius: '6px', fontSize: '0.75rem', color: '#2e7d32', display: 'flex', alignItems: 'center', gap: '6px' }}>

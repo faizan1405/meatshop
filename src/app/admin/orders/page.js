@@ -20,6 +20,7 @@ async function getOrders() {
       shippingAddressName: order.shippingAddress.name,
       shippingAddressPhone: order.shippingAddress.phone,
       isGuest: order.isGuest,
+      isDemoOrder: order.isDemoOrder,
     }));
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -79,7 +80,10 @@ export default async function AdminOrdersPage() {
               return (
                 <tr key={order._id}>
                   <td>
-                    <strong style={{ fontSize: '0.75rem' }}>{order._id}</strong>
+                    <strong style={{ fontSize: '0.75rem', display: 'block' }}>{order._id}</strong>
+                    {order.isDemoOrder && (
+                      <span style={{ fontSize: '0.65rem', backgroundColor: '#e3f2fd', color: '#1565c0', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-block', marginTop: '4px' }}>Demo</span>
+                    )}
                   </td>
                   <td>{order.shippingAddressName}</td>
                   <td>{order.shippingAddressPhone}</td>

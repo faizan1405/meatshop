@@ -98,8 +98,13 @@ export default function AdminOrderDetailsPage({ params }) {
           
           {/* Items */}
           <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Order Items</h2>
-            <div className={styles.table} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h2 className={styles.cardTitle} style={{ marginBottom: 0 }}>Order Items</h2>
+              {order.isDemoOrder && (
+                <span style={{ fontSize: '0.75rem', backgroundColor: '#e3f2fd', color: '#1565c0', padding: '4px 8px', borderRadius: '4px', fontWeight: 700 }}>DEMO ORDER</span>
+              )}
+            </div>
+            <div className={styles.table} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' }}>
               {order.items.map((item) => (
                 <div key={item._id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-cream)', paddingBottom: '10px' }}>
                   <div>
@@ -126,6 +131,14 @@ export default function AdminOrderDetailsPage({ params }) {
                 <div><strong>Checkout Type:</strong> <span style={{ color: '#7e57c2', fontWeight: 700 }}>Guest Checkout</span></div>
               ) : (
                 <div><strong>Checkout Type:</strong> <span style={{ color: '#0288d1', fontWeight: 700 }}>Registered Account</span></div>
+              )}
+              {order.isDemoOrder && (
+                <>
+                  <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-cream)' }}>
+                    <strong>Payment Method:</strong> {order.paymentMethod}
+                  </div>
+                  <div><strong>Payment Provider:</strong> {order.paymentProvider}</div>
+                </>
               )}
             </div>
           </div>

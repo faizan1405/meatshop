@@ -13,9 +13,14 @@ export async function GET() {
     !!process.env.RAZORPAY_KEY_SECRET && 
     !!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID &&
     !process.env.RAZORPAY_KEY_ID.includes('yourkeyid');
+
+  const isDemoCheckoutEnabled = 
+    process.env.NEXT_PUBLIC_DEMO_CHECKOUT_ENABLED === 'true' || 
+    (process.env.NODE_ENV !== 'production' && !isRazorpayConfigured);
                                
   return NextResponse.json({ 
     isGoogleConfigured, 
-    isRazorpayConfigured 
+    isRazorpayConfigured,
+    isDemoCheckoutEnabled
   });
 }
