@@ -98,7 +98,13 @@ export async function POST(request) {
       },
     });
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
-    return NextResponse.json({ success: false, message: error.message || 'Server error creating order' }, { status: 500 });
+    // Razorpay SDK auth/validation errors carry their detail in error.error.description,
+    // not error.message — surface it so misconfigured/inactive live keys are diagnosable.
+    const rzpDescription = error?.error?.description;
+    console.error('Error creating Razorpay order:', rzpDescription || error?.message || error);
+    return NextResponse.json(
+      { success: false, message: rzpDescription || error?.message || 'Server error creating order' },
+      { status: 500 }
+    );
   }
 }
