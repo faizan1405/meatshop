@@ -124,8 +124,10 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Pre-save hook to synchronize deprecated/alias fields
-ProductSchema.pre('save', function(next) {
+// Pre-save hook to synchronize deprecated/alias fields.
+// Mongoose 9 removed callback-style middleware: hooks no longer receive a
+// `next` argument. Sync hooks just return; async work returns a promise.
+ProductSchema.pre('save', function() {
   if (this.isModified('isFeatured')) {
     this.featured = this.isFeatured;
   } else if (this.isModified('featured')) {
@@ -136,7 +138,6 @@ ProductSchema.pre('save', function(next) {
   } else if (this.isModified('bestSeller')) {
     this.isBestSeller = this.bestSeller;
   }
-  next();
 });
 
 export default mongoose.models.Product || mongoose.model('Product', ProductSchema);
