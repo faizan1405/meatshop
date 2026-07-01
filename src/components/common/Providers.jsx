@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { SessionProvider, useSession } from 'next-auth/react';
+import { computeDeliveryCharge } from '@/lib/delivery';
 
 const CartContext = createContext(null);
 
@@ -29,6 +30,10 @@ export function CartProvider({ children }) {
   const [isMounted, setIsMounted] = useState(false);
   // True once we've completed the initial server load/merge for this session.
   const [serverSynced, setServerSynced] = useState(false);
+  // Admin-configured delivery rule. Starts null → computeDeliveryCharge falls
+  // back to defaults (₹40 / free above ₹770) until the real values load, so the
+  // displayed total matches what the server will charge.
+  const [deliveryConfig, setDeliveryConfig] = useState(null);
 
   // Live ref so async sync logic reads the latest cart without stale closures.
   const cartItemsRef = useRef(cartItems);
@@ -53,6 +58,22 @@ export function CartProvider({ children }) {
     } catch (e) {
       console.error('Failed to parse coupon', e);
     }
+  }, []);
+
+  // 1b. Load the admin-configured delivery rule so the cart total shown to the
+  //     customer uses the same charge/threshold the server bills them with.
+  useEffect(() => {
+    fetch('/api/config')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && typeof data.deliveryCharge !== 'undefined') {
+          setDeliveryConfig({
+            deliveryCharge: data.deliveryCharge,
+            freeDeliveryThreshold: data.freeDeliveryThreshold,
+          });
+        }
+      })
+      .catch((err) => console.error('Failed to load delivery config', err));
   }, []);
 
   // 2. Mirror cart to localStorage whenever it changes (guest persistence + cache).
@@ -230,10 +251,8 @@ export function CartProvider({ children }) {
       : coupon.discountValue
     : 0;
 
-  // Delivery: free above ₹770, otherwise ₹40
-  const deliveryThreshold = 770;
-  const deliveryChargeValue = 40;
-  const deliveryCharge = itemsSubtotal >= deliveryThreshold || itemsSubtotal === 0 ? 0 : deliveryChargeValue;
+  // Delivery: shared rule (admin-configured, defaults to free above ₹770 / ₹40).
+  const deliveryCharge = computeDeliveryCharge(itemsSubtotal, deliveryConfig);
 
   const orderTotal = Math.max(itemsSubtotal - discountAmount + deliveryCharge, 0);
 

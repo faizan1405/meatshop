@@ -4,6 +4,7 @@ import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Coupon from '@/models/Coupon';
 import SiteSettings from '@/models/SiteSettings';
+import { computeDeliveryCharge } from '@/lib/delivery';
 
 export async function POST(request) {
   try {
@@ -58,12 +59,9 @@ export async function POST(request) {
       }
     }
 
-    // 3. Get Site Settings for delivery charge
+    // 3. Get Site Settings for delivery charge (shared rule; same as the cart UI)
     const settings = await SiteSettings.findOne({});
-    const deliveryThreshold = settings?.freeDeliveryThreshold !== undefined ? settings.freeDeliveryThreshold : 500;
-    const deliveryChargeValue = settings?.deliveryCharge !== undefined ? settings.deliveryCharge : 50;
-
-    const deliveryCharge = itemsSubtotal >= deliveryThreshold || itemsSubtotal === 0 ? 0 : deliveryChargeValue;
+    const deliveryCharge = computeDeliveryCharge(itemsSubtotal, settings);
 
     // 4. Calculate final order total
     const orderTotal = Math.max(itemsSubtotal - discountAmount + deliveryCharge, 0);

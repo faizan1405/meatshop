@@ -8,6 +8,7 @@ import Product from '@/models/Product';
 import Address from '@/models/Address';
 import Coupon from '@/models/Coupon';
 import SiteSettings from '@/models/SiteSettings';
+import { computeDeliveryCharge } from '@/lib/delivery';
 
 export async function POST(request) {
   try {
@@ -131,10 +132,7 @@ export async function POST(request) {
     }
 
     const settings = await SiteSettings.findOne({});
-    const deliveryThreshold = settings?.freeDeliveryThreshold !== undefined ? settings.freeDeliveryThreshold : 500;
-    const deliveryChargeValue = settings?.deliveryCharge !== undefined ? settings.deliveryCharge : 50;
-
-    const serverDeliveryCharge = serverItemsSubtotal >= deliveryThreshold || serverItemsSubtotal === 0 ? 0 : deliveryChargeValue;
+    const serverDeliveryCharge = computeDeliveryCharge(serverItemsSubtotal, settings);
     const serverOrderTotal = Math.max(serverItemsSubtotal - serverDiscountAmount + serverDeliveryCharge, 0);
 
     // SECURITY: bind the captured payment to the server-recomputed total.

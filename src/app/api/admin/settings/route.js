@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import SiteSettings from '@/models/SiteSettings';
+import { DEFAULT_DELIVERY_CHARGE, DEFAULT_FREE_DELIVERY_THRESHOLD } from '@/lib/delivery';
 
 export async function GET(request) {
   try {
@@ -121,13 +122,18 @@ export async function POST(request) {
 
     let settings = await SiteSettings.findOne({});
 
+    // Guard numeric fields: a blank/NaN input must NOT persist as 0 — a 0
+    // threshold makes every order ship free, and a 0 charge silently waives it.
+    const parsedCharge = parseFloat(deliveryCharge);
+    const parsedThreshold = parseFloat(freeDeliveryThreshold);
+
     const updateFields = {
       contactNumber,
       email,
       address,
       deliveryNote,
-      deliveryCharge: parseFloat(deliveryCharge || '0'),
-      freeDeliveryThreshold: parseFloat(freeDeliveryThreshold || '0'),
+      deliveryCharge: Number.isFinite(parsedCharge) && parsedCharge >= 0 ? parsedCharge : DEFAULT_DELIVERY_CHARGE,
+      freeDeliveryThreshold: Number.isFinite(parsedThreshold) && parsedThreshold > 0 ? parsedThreshold : DEFAULT_FREE_DELIVERY_THRESHOLD,
       whatsappNumber,
       facebookUrl,
       instagramUrl,

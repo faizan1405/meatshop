@@ -233,9 +233,17 @@ export default function CheckoutPage() {
 
       const order = orderData.order;
 
-      // 2. Open Razorpay Checkout modal
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_7f5U1G53q78bUe'; // Fallback to public test key
-      
+      // 2. Open Razorpay Checkout modal.
+      // The checkout key MUST belong to the same Razorpay account (and mode:
+      // test vs live) as the server keys that created this order_id. A mismatch
+      // makes the modal load but payment methods/UPI QR fail to generate. No
+      // hardcoded fallback — a missing key should fail loudly, not silently open
+      // with a stranger's test key that can never match this order.
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        throw new Error('Payment is not configured (missing checkout key). Please contact support.');
+      }
+
       const options = {
         key: razorpayKey,
         amount: order.amount,

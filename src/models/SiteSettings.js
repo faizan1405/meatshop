@@ -20,11 +20,11 @@ const SiteSettingsSchema = new mongoose.Schema(
     },
     deliveryCharge: {
       type: Number,
-      default: 50,
+      default: 40,
     },
     freeDeliveryThreshold: {
       type: Number,
-      default: 500,
+      default: 770,
     },
     whatsappNumber: {
       type: String,
