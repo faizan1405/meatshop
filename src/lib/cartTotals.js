@@ -14,29 +14,32 @@
 // or empty sale price can never inflate the total.
 //
 // ---------------------------------------------------------------------------
-// TEMPORARY: delivery charge is disabled for payment testing.
-// While DELIVERY_DISABLED_FOR_TESTING is true, the delivery fee is forced to 0
-// in the cart, checkout, order creation and Razorpay amount, and the free
-// delivery threshold behaves as 0.
+// OPTIONAL TESTING SWITCH: delivery charges can be temporarily disabled for
+// payment testing. Delivery is ENABLED by default (the switch is off); it only
+// turns off when DISABLE_DELIVERY_CHARGE_FOR_TESTING is explicitly set to
+// 'true'. While disabled, the delivery fee is forced to 0 in the cart,
+// checkout, order creation and Razorpay amount, and the free delivery threshold
+// behaves as 0.
 //
-// This does NOT remove or modify any delivery settings: the admin fields
+// This never removes or modifies any delivery settings: the admin fields
 // (deliveryCharge / freeDeliveryThreshold) and the DB values are untouched and
-// still resolved below — they are simply bypassed at calculation time. To
-// re-enable delivery charges later, set the env flag(s) to 'false' (or delete
-// them and flip the default constant back to false).
+// always resolved below — they are only bypassed while the switch is on. Keep
+// the flag system in place for future testing; to disable delivery again, set
+// the env flag(s) to 'true'.
 // ===========================================================================
 
 import { variantPrice } from './pricing';
 import { resolveDeliveryConfig, computeDeliveryCharge } from './delivery';
 
-// Env-controlled kill switch. NEXT_PUBLIC_* is read first so the browser cart
+// Env-controlled testing switch. NEXT_PUBLIC_* is read first so the browser cart
 // and the server agree; on the client only the NEXT_PUBLIC_ value is inlined.
-// Defaults to `true` (disabled) so payment testing works out of the box.
+// Defaults to `false` (delivery ENABLED) so production is safe even when the
+// flag is not set — it is only disabled when explicitly set to the string 'true'.
 const envFlag =
   process.env.NEXT_PUBLIC_DISABLE_DELIVERY_CHARGE_FOR_TESTING ??
   process.env.DISABLE_DELIVERY_CHARGE_FOR_TESTING;
 
-export const DELIVERY_DISABLED_FOR_TESTING = envFlag ? envFlag === 'true' : true;
+export const DELIVERY_DISABLED_FOR_TESTING = envFlag === 'true';
 
 /**
  * Coupon discount for a given subtotal. Handles both discount types and

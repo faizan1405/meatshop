@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
+import DeliveryThresholdBar from '@/components/common/DeliveryThresholdBar';
 import { variantPrice } from '@/lib/pricing';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -20,6 +21,7 @@ export default function CartPage() {
     deliveryCharge,
     orderTotal,
     coupon,
+    freeDeliveryThreshold,
     deliveryDisabledForTesting,
     isMounted,
   } = useCart();
@@ -155,18 +157,15 @@ export default function CartPage() {
                     <span>₹{orderTotal}</span>
                   </div>
 
+                  {/* Free-delivery progress — threshold/charge from admin settings. */}
+                  <DeliveryThresholdBar subtotal={itemsSubtotal} freeDeliveryThreshold={freeDeliveryThreshold} />
+
                   <Link href="/checkout" className={`${styles.checkoutBtn} btn-gold`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     <span>Proceed to Checkout</span>
                     <ArrowRight size={18} />
                   </Link>
 
-                  {!deliveryDisabledForTesting && (
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', textAlign: 'center', marginTop: '10px' }}>
-                      Free delivery on orders above ₹770. Otherwise ₹40 applies.
-                    </div>
-                  )}
-
-                  {/* Dev-only notice — not shown to real customers in production. */}
+                  {/* Dev-only notice — only while delivery is disabled for testing. */}
                   {deliveryDisabledForTesting && process.env.NODE_ENV !== 'production' && (
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', textAlign: 'center', marginTop: '10px' }}>
                       Delivery temporarily disabled for testing.

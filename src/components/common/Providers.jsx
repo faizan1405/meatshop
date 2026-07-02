@@ -248,6 +248,7 @@ export function CartProvider({ children }) {
     discount: discountAmount,
     deliveryCharge,
     total: orderTotal,
+    freeDeliveryThreshold,
     deliveryDisabledForTesting,
   } = calculateCartTotals({
     items: cartItems,
@@ -272,6 +273,7 @@ export function CartProvider({ children }) {
         discountAmount,
         deliveryCharge,
         orderTotal,
+        freeDeliveryThreshold,
         deliveryDisabledForTesting,
         isMounted,
       }}

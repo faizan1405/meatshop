@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../common/Providers';
+import DeliveryThresholdBar from '../common/DeliveryThresholdBar';
 import { variantPrice } from '@/lib/pricing';
 import styles from './CartDrawer.module.css';
 
@@ -20,6 +21,7 @@ export default function CartDrawer() {
     discountAmount,
     deliveryCharge,
     orderTotal,
+    freeDeliveryThreshold,
     deliveryDisabledForTesting,
     isMounted,
   } = useCart();
@@ -225,13 +227,11 @@ export default function CartDrawer() {
               <span>₹{orderTotal}</span>
             </div>
 
-            {!deliveryDisabledForTesting && (
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', textAlign: 'center', padding: '6px 0 2px' }}>
-                Free delivery on orders above ₹770. Otherwise ₹40 applies.
-              </div>
-            )}
+            {/* Free-delivery progress — threshold/charge come from admin settings.
+                Hides itself when the threshold is 0 (e.g. during delivery testing). */}
+            <DeliveryThresholdBar subtotal={itemsSubtotal} freeDeliveryThreshold={freeDeliveryThreshold} />
 
-            {/* Dev-only notice — never shown to real customers in production. */}
+            {/* Dev-only notice — only while delivery is disabled for testing. */}
             {deliveryDisabledForTesting && process.env.NODE_ENV !== 'production' && (
               <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', textAlign: 'center', padding: '6px 0 2px' }}>
                 Delivery temporarily disabled for testing.

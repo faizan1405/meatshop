@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle, Award } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
+import DeliveryThresholdBar from '@/components/common/DeliveryThresholdBar';
 import { variantPrice } from '@/lib/pricing';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -22,6 +23,7 @@ export default function CheckoutPage() {
     orderTotal,
     coupon,
     clearCart,
+    freeDeliveryThreshold,
     deliveryDisabledForTesting,
     isMounted,
   } = useCart();
@@ -555,6 +557,9 @@ export default function CheckoutPage() {
                     <span style={{ color: 'var(--text-dark)' }}>₹{orderTotal}</span>
                   </div>
 
+                  {/* Free-delivery progress — threshold/charge from admin settings. */}
+                  <DeliveryThresholdBar subtotal={itemsSubtotal} freeDeliveryThreshold={freeDeliveryThreshold} style={{ marginBottom: '18px' }} />
+
                   {errorMessage && (
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', color: 'var(--error)', backgroundColor: '#ffebee', padding: '12px', borderRadius: 'var(--border-radius-sm)', marginBottom: '15px', fontSize: '0.85rem' }}>
                       <AlertCircle size={18} style={{ flexShrink: 0 }} />
@@ -604,15 +609,8 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {/* Delivery note — hidden while delivery is disabled for testing. */}
-                  {!deliveryDisabledForTesting && (
-                    <div style={{ marginTop: '12px', padding: '10px 12px', background: '#f0faf0', borderRadius: '6px', fontSize: '0.75rem', color: '#2e7d32', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <ShieldCheck size={13} />
-                      <span>Free delivery on orders above ₹770. Otherwise ₹40 delivery charge applies.</span>
-                    </div>
-                  )}
-
-                  {/* Dev-only notice — not shown to real customers in production. */}
+                  {/* Dev-only notice — only while delivery is disabled for testing.
+                      Real delivery messaging is the dynamic DeliveryThresholdBar above. */}
                   {deliveryDisabledForTesting && process.env.NODE_ENV !== 'production' && (
                     <div style={{ marginTop: '12px', padding: '10px 12px', background: '#fff8e1', borderRadius: '6px', fontSize: '0.75rem', color: '#8a6d1b', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <ShieldCheck size={13} />
