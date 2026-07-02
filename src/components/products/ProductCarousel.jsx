@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import ProductCard from '../product/ProductCard';
 import styles from './ProductCarousel.module.css';
 
-export default function ProductCarousel({ products, autoplayInterval = 3000 }) {
+export default function ProductCarousel({ products, autoplayInterval = 3000, compact = false }) {
   const carouselRef = useRef(null);
 
   // Duplicate products if there are few, to ensure it can scroll on large screens
@@ -65,7 +65,7 @@ export default function ProductCarousel({ products, autoplayInterval = 3000 }) {
       <div className={styles.carouselTrack} ref={carouselRef}>
         {displayProducts.map((product) => (
           <div key={product._id || product.slug} className={styles.slide}>
-            <ProductCard product={product} />
+            <ProductCard product={product} compact={compact} />
           </div>
         ))}
       </div>

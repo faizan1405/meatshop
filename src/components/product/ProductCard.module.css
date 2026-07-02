@@ -220,3 +220,48 @@
   align-items: center;
   justify-content: center;
 }
+
+/* ============================================
+   COMPACT VARIANT
+   Used by the homepage category rows so two
+   sections can share one desktop viewport.
+   Trims image height, padding and the fixed
+   slots — every interactive element (variant
+   select, price, Add to Cart) is untouched.
+   ============================================ */
+.card.compact .imageWrapper {
+  aspect-ratio: 16 / 10;
+}
+
+.card.compact .content {
+  padding: 12px;
+}
+
+.card.compact .categoryName {
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+}
+
+.card.compact .title {
+  font-size: 1rem;
+  min-height: 38px;
+  margin-bottom: 6px;
+}
+
+.card.compact .variantArea {
+  min-height: 46px;
+  margin-bottom: 8px;
+}
+
+.card.compact .priceRow {
+  margin-bottom: 10px;
+}
+
+.card.compact .price {
+  font-size: 1.05rem;
+}
+
+.card.compact .addBtn,
+.card.compact .outOfStockBtn {
+  padding: 8px;
+}

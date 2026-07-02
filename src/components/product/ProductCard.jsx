@@ -7,7 +7,7 @@ import { useCart } from '../common/Providers';
 import { getPricingInfo, variantPrice } from '@/lib/pricing';
 import styles from './ProductCard.module.css';
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, compact = false }) {
   const { addToCart } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(null);
 
@@ -75,7 +75,7 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card}${compact ? ` ${styles.compact}` : ''}`}>
       {hasDiscount && !isOnCall && (
         <span className={styles.badge}>
           Save {discountPercent}%

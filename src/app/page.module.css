@@ -91,66 +91,79 @@
   flex-shrink: 0;
 }
 
-/* Live category showcase — a 2x2 mosaic of real catalogue imagery */
-.heroShowcase {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: 1fr;
-  gap: 16px;
+/* Compact "Shop by Category" panel — every available category as a small
+   chip/mini-card, so the hero surfaces the whole catalogue, not just four. */
+.heroCategories {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-dark);
+  background: rgba(24, 22, 19, 0.55);
+  box-shadow: var(--shadow-lg);
   animation: fadeInScale 0.9s var(--ease-premium) both;
   animation-delay: 0.25s;
 }
 
-.heroTile {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--border-radius-lg);
-  overflow: hidden;
+.heroCategoriesLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--primary-gold);
+}
+
+.heroChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.heroChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 999px;
   border: 1px solid var(--border-dark);
-  box-shadow: var(--shadow-lg);
+  background: rgba(12, 11, 10, 0.4);
   transition: var(--transition);
 }
 
-.heroTile:nth-child(1),
-.heroTile:nth-child(4) {
-  aspect-ratio: 1 / 1.18;
+.heroChip:hover {
+  border-color: var(--primary-gold);
+  background: rgba(197, 160, 89, 0.12);
+  transform: translateY(-2px);
 }
 
-.heroTile img {
+.heroChipThumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: var(--bg-dark-sec);
+}
+
+.heroChipThumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.7s var(--ease-premium);
 }
 
-.heroTile::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(12, 11, 10, 0.78) 0%, rgba(12, 11, 10, 0.1) 45%, transparent 70%);
+.heroChipLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-light);
+  white-space: nowrap;
 }
 
-.heroTile:hover {
-  border-color: var(--primary-gold);
-  transform: translateY(-4px);
-}
-
-.heroTile:hover img {
-  transform: scale(1.08);
-}
-
-.heroTileLabel {
-  position: absolute;
-  left: 14px;
-  bottom: 12px;
-  z-index: 1;
-  font-family: var(--font-playfair);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--white);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+.heroCategoriesBtn {
+  align-self: flex-start;
+  margin-top: 2px;
 }
 
 @media (max-width: 992px) {
@@ -186,11 +199,23 @@
   .subtitle {
     font-size: 0.95rem;
   }
-  .heroShowcase {
+  .heroCategories {
+    padding: 16px;
     gap: 12px;
   }
-  .heroTileLabel {
-    font-size: 0.9rem;
+  .heroChip {
+    padding: 5px 10px 5px 5px;
+  }
+  .heroChipThumb {
+    width: 26px;
+    height: 26px;
+  }
+  .heroChipLabel {
+    font-size: 0.8rem;
+  }
+  .heroCategoriesBtn {
+    align-self: stretch;
+    text-align: center;
   }
 }
 
@@ -233,6 +258,45 @@
   max-width: 700px;
   margin: 0 auto 40px;
   line-height: 1.6;
+}
+
+/* ============================================
+   COMPACT SECTION
+   Half-height product rows for the homepage
+   category stack. Slashes vertical padding and
+   heading margins so two rows fit one desktop
+   viewport while scrolling. Pairs with the
+   ProductCard `.compact` variant.
+   ============================================ */
+.compactSection {
+  padding: 34px 0;
+}
+
+.compactSection .sectionTagline {
+  margin-bottom: 4px;
+}
+
+.compactSection .sectionTitle {
+  font-size: 1.9rem;
+  margin-bottom: 8px;
+}
+
+.compactSection .sectionTitle::after {
+  margin: 10px auto 0;
+}
+
+.compactSection .sectionSubtitle {
+  font-size: 0.9rem;
+  margin: 0 auto 18px;
+}
+
+@media (max-width: 768px) {
+  .compactSection {
+    padding: 28px 0;
+  }
+  .compactSection .sectionTitle {
+    font-size: 1.6rem;
+  }
 }
 
 .categoryGrid {

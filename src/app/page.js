@@ -62,11 +62,12 @@ async function getData() {
       .limit(12)
       .lean();
 
-    // Query products for the Chicken / Duck / Quail homepage rows. Match the
-    // loaded categories by slug OR name, case-insensitively, so DB variations
-    // ('chicken' vs 'Chicken') resolve safely. Then fetch active products for
-    // those category ids in one go and split per slug below.
-    const targetSlugs = ['chicken', 'duck', 'quail'];
+    // Query products for the Chicken / Mutton / Quail / Ready-to-Eat / Eggs
+    // (and Duck) homepage rows. Match the loaded categories by slug OR name,
+    // case-insensitively, so DB variations ('chicken' vs 'Chicken') resolve
+    // safely. Then fetch active products for those category ids in one go and
+    // split per slug below.
+    const targetSlugs = ['chicken', 'mutton', 'quail', 'ready-to-eat', 'eggs', 'duck'];
     const targetCatIds = categories
       .filter((c) => targetSlugs.includes((c.slug || '').toLowerCase()) || targetSlugs.includes((c.name || '').toLowerCase()))
       .map((c) => c._id);
@@ -97,8 +98,11 @@ async function getData() {
     }));
 
     const categoryProductsStr = stringify(categoryProducts);
+    // Normalise slug/name to a lowercase hyphenated key so 'Ready To Eat',
+    // 'ready to eat' and 'ready-to-eat' all resolve to the same section.
+    const norm = (s) => (s || '').toString().trim().toLowerCase().replace(/\s+/g, '-');
     const bySlug = (slug) => categoryProductsStr.filter(
-      (p) => (p.category?.slug || '').toLowerCase() === slug || (p.category?.name || '').toLowerCase() === slug
+      (p) => norm(p.category?.slug) === slug || norm(p.category?.name) === slug
     );
 
     return {
@@ -106,8 +110,11 @@ async function getData() {
       featuredProducts: stringify(featuredProducts),
       bestSellerProducts: stringify(bestSellerProducts),
       chickenProducts: bySlug('chicken'),
-      duckProducts: bySlug('duck'),
+      muttonProducts: bySlug('mutton'),
       quailProducts: bySlug('quail'),
+      readyToEatProducts: bySlug('ready-to-eat'),
+      eggsProducts: bySlug('eggs'),
+      duckProducts: bySlug('duck'),
       banners: stringify(banners),
       reviews: reviews.length ? stringify(reviews) : fallbackReviews,
     };
@@ -121,27 +128,35 @@ async function getData() {
       featuredProducts: [],
       bestSellerProducts: [],
       chickenProducts: [],
-      duckProducts: [],
+      muttonProducts: [],
       quailProducts: [],
+      readyToEatProducts: [],
+      eggsProducts: [],
+      duckProducts: [],
       banners: [],
       reviews: fallbackReviews,
     };
   }
 }
 
-// Reusable homepage product row — keeps Chicken/Duck/Quail/Best Seller sections
+// Reusable homepage product row — keeps every category / Best Seller section
 // identical in structure (no duplicate JSX). Renders nothing when empty.
-function ProductSection({ tagline, title, subtitle, products, viewAllLink, background }) {
+// `compact` trims the vertical rhythm (padding, heading margins, card height)
+// so two category rows can share a single desktop viewport while scrolling.
+function ProductSection({ tagline, title, subtitle, products, viewAllLink, background, compact }) {
   if (!products || products.length === 0) return null;
   return (
-    <section className="section-padding" style={{ backgroundColor: background || 'var(--bg-cream)' }}>
+    <section
+      className={compact ? styles.compactSection : 'section-padding'}
+      style={{ backgroundColor: background || 'var(--bg-cream)' }}
+    >
       <div className="container">
         {tagline && <span className={styles.sectionTagline}>{tagline}</span>}
         <h2 className={styles.sectionTitle}>{title}</h2>
         {subtitle && <p className={styles.sectionSubtitle}>{subtitle}</p>}
-        <ProductCarousel products={products} autoplayInterval={3000} />
+        <ProductCarousel products={products} autoplayInterval={3000} compact={compact} />
         {viewAllLink && (
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <div style={{ textAlign: 'center', marginTop: compact ? '1.25rem' : '2rem' }}>
             <Link href={viewAllLink} className="btn-primary">View All</Link>
           </div>
         )}
@@ -151,18 +166,28 @@ function ProductSection({ tagline, title, subtitle, products, viewAllLink, backg
 }
 
 export default async function Home() {
-  const { categories, featuredProducts, bestSellerProducts, chickenProducts, duckProducts, quailProducts, banners, reviews } = await getData();
+  const {
+    categories,
+    featuredProducts,
+    bestSellerProducts,
+    chickenProducts,
+    muttonProducts,
+    quailProducts,
+    readyToEatProducts,
+    eggsProducts,
+    duckProducts,
+    banners,
+    reviews,
+  } = await getData();
 
   // Best Sellers row: prefer admin-flagged best sellers, fall back to featured.
   const bestSellers = bestSellerProducts?.length ? bestSellerProducts : featuredProducts;
 
   const heroTitle = banners?.[0]?.title || 'Premium Fresh Meat & Cuts';
 
-  // Lead the hero with our actual catalogue: pick the first four categories
-  // that have imagery so visitors see real butcher cuts, not a stock banner.
-  const heroCategories = categories
-    .filter((c) => c.image)
-    .slice(0, 4);
+  // Lead the hero with our full catalogue as compact chips so every available
+  // category is one tap away, not just the first four.
+  const heroCategories = categories;
 
   return (
     <>
@@ -186,9 +211,6 @@ export default async function Home() {
                   <Link href="/shop" className="btn-gold">
                     Shop Fresh Cuts
                   </Link>
-                  <Link href="#categories" className="btn-primary">
-                    Explore Categories
-                  </Link>
                 </div>
                 <ul className={styles.heroTrust}>
                   <li><Sparkles size={16} /> Cut after you order</li>
@@ -197,45 +219,70 @@ export default async function Home() {
                 </ul>
               </div>
 
-              {heroCategories.length >= 4 && (
-                <div className={styles.heroShowcase} aria-label="Shop by category">
-                  {heroCategories.map((cat) => (
-                    <Link
-                      key={cat.slug}
-                      href={`/category/${cat.slug}`}
-                      className={styles.heroTile}
-                    >
-                      <img src={cat.image} alt={cat.name} loading="eager" />
-                      <span className={styles.heroTileLabel}>{cat.name}</span>
-                    </Link>
-                  ))}
+              {heroCategories.length > 0 && (
+                <div className={styles.heroCategories} aria-label="Shop by category">
+                  <span className={styles.heroCategoriesLabel}>Shop by Category</span>
+                  <div className={styles.heroChips}>
+                    {heroCategories.map((cat) => (
+                      <Link
+                        key={cat.slug}
+                        href={`/category/${cat.slug}`}
+                        className={styles.heroChip}
+                      >
+                        <span className={styles.heroChipThumb}>
+                          <img
+                            src={cat.image || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=200&q=80'}
+                            alt=""
+                            loading="eager"
+                          />
+                        </span>
+                        <span className={styles.heroChipLabel}>{cat.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link href="#categories" className={`btn-gold ${styles.heroCategoriesBtn}`}>
+                    Explore Categories
+                  </Link>
                 </div>
               )}
             </div>
           </div>
         </section>
 
-        {/* 2. Fresh Chicken */}
+        {/* 2. Best Sellers — leads the product rows straight after the hero */}
+        <ProductSection
+          tagline="Chef's Picks"
+          title="Best Sellers"
+          subtitle="Our most-loved cuts, cut fresh on order."
+          products={bestSellers}
+          viewAllLink="/shop"
+          background="var(--bg-cream)"
+          compact
+        />
+
+        {/* 3. Fresh Chicken */}
         <ProductSection
           tagline="Farm Fresh"
           title="Fresh Chicken"
-          subtitle="Tender, antibiotic-free chicken — custom-cut on order and delivered chilled."
+          subtitle="Tender, antibiotic-free chicken — custom-cut on order."
           products={chickenProducts}
           viewAllLink="/category/chicken"
           background="var(--white)"
+          compact
         />
 
-        {/* 3. Fresh Duck */}
+        {/* 4. Fresh Mutton */}
         <ProductSection
           tagline="Farm Fresh"
-          title="Fresh Duck"
-          subtitle="Rich, dressed duck sourced from healthy pasture-raised birds."
-          products={duckProducts}
-          viewAllLink="/category/duck"
+          title="Fresh Mutton"
+          subtitle="Juicy, tender curry cuts from healthy, pasture-raised goats."
+          products={muttonProducts}
+          viewAllLink="/category/mutton"
           background="var(--bg-cream)"
+          compact
         />
 
-        {/* 4. Fresh Quail */}
+        {/* 5. Fresh Quail */}
         <ProductSection
           tagline="Farm Fresh"
           title="Fresh Quail"
@@ -243,19 +290,43 @@ export default async function Home() {
           products={quailProducts}
           viewAllLink="/category/quail"
           background="var(--white)"
+          compact
         />
 
-        {/* 5. Best Sellers */}
+        {/* 6. Ready to Eat */}
         <ProductSection
-          tagline="Chef's Picks"
-          title="Best Sellers"
-          subtitle="Our most-loved cuts, chosen by Porville customers and cut fresh on order."
-          products={bestSellers}
-          viewAllLink="/shop"
+          tagline="Heat & Serve"
+          title="Ready to Eat"
+          subtitle="Smoked, cooked and marinated favourites — ready in minutes."
+          products={readyToEatProducts}
+          viewAllLink="/category/ready-to-eat"
           background="var(--bg-cream)"
+          compact
         />
 
-        {/* 6. Category Section: Explore Fresh Categories */}
+        {/* 7. Farm-Fresh Eggs */}
+        <ProductSection
+          tagline="Farm Fresh"
+          title="Eggs"
+          subtitle="Farm-fresh organic eggs, gathered daily."
+          products={eggsProducts}
+          viewAllLink="/category/eggs"
+          background="var(--white)"
+          compact
+        />
+
+        {/* 8. Fresh Duck — existing catalogue row, kept below the requested order */}
+        <ProductSection
+          tagline="Farm Fresh"
+          title="Fresh Duck"
+          subtitle="Rich, dressed duck sourced from healthy pasture-raised birds."
+          products={duckProducts}
+          viewAllLink="/category/duck"
+          background="var(--bg-cream)"
+          compact
+        />
+
+        {/* 9. Category Section: Explore Fresh Categories */}
         <section id="categories" className="section-padding" style={{ backgroundColor: 'var(--bg-cream)', borderBottom: '1px solid var(--border-cream)' }}>
           <div className="container">
             <span className={styles.sectionTagline}>Curated Selection</span>
