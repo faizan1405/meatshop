@@ -293,35 +293,35 @@ export default async function Home() {
           compact
         />
 
-        {/* 6. Ready to Eat */}
-        <ProductSection
-          tagline="Heat & Serve"
-          title="Ready to Eat"
-          subtitle="Smoked, cooked and marinated favourites — ready in minutes."
-          products={readyToEatProducts}
-          viewAllLink="/category/ready-to-eat"
-          background="var(--bg-cream)"
-          compact
-        />
-
-        {/* 7. Farm-Fresh Eggs */}
-        <ProductSection
-          tagline="Farm Fresh"
-          title="Eggs"
-          subtitle="Farm-fresh organic eggs, gathered daily."
-          products={eggsProducts}
-          viewAllLink="/category/eggs"
-          background="var(--white)"
-          compact
-        />
-
-        {/* 8. Fresh Duck — existing catalogue row, kept below the requested order */}
+        {/* 6. Fresh Duck — sits between Quail and Ready to Eat */}
         <ProductSection
           tagline="Farm Fresh"
           title="Fresh Duck"
           subtitle="Rich, dressed duck sourced from healthy pasture-raised birds."
           products={duckProducts}
           viewAllLink="/category/duck"
+          background="var(--bg-cream)"
+          compact
+        />
+
+        {/* 7. Ready to Eat */}
+        <ProductSection
+          tagline="Heat & Serve"
+          title="Ready to Eat"
+          subtitle="Smoked, cooked and marinated favourites — ready in minutes."
+          products={readyToEatProducts}
+          viewAllLink="/category/ready-to-eat"
+          background="var(--white)"
+          compact
+        />
+
+        {/* 8. Farm-Fresh Eggs */}
+        <ProductSection
+          tagline="Farm Fresh"
+          title="Eggs"
+          subtitle="Farm-fresh organic eggs, gathered daily."
+          products={eggsProducts}
+          viewAllLink="/category/eggs"
           background="var(--bg-cream)"
           compact
         />
