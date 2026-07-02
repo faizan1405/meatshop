@@ -56,6 +56,26 @@ async function getData() {
       .limit(12)
       .lean();
 
+    // Query best sellers (support both `bestSeller` and the `isBestSeller` alias).
+    let bestSellerProducts = await Product.find({ $or: [{ bestSeller: true }, { isBestSeller: true }], isActive: { $ne: false } })
+      .populate('category')
+      .limit(12)
+      .lean();
+
+    // Query products for the Chicken / Duck / Quail homepage rows. Match the
+    // loaded categories by slug OR name, case-insensitively, so DB variations
+    // ('chicken' vs 'Chicken') resolve safely. Then fetch active products for
+    // those category ids in one go and split per slug below.
+    const targetSlugs = ['chicken', 'duck', 'quail'];
+    const targetCatIds = categories
+      .filter((c) => targetSlugs.includes((c.slug || '').toLowerCase()) || targetSlugs.includes((c.name || '').toLowerCase()))
+      .map((c) => c._id);
+    let categoryProducts = targetCatIds.length
+      ? await Product.find({ category: { $in: targetCatIds }, isActive: { $ne: false } })
+          .populate('category')
+          .lean()
+      : [];
+
     // Query active banners
     let banners = await Banner.find({ active: true }).sort({ displayOrder: 1 }).lean();
 
@@ -76,9 +96,18 @@ async function getData() {
       productCount: countMap[cat._id.toString()] || 0
     }));
 
+    const categoryProductsStr = stringify(categoryProducts);
+    const bySlug = (slug) => categoryProductsStr.filter(
+      (p) => (p.category?.slug || '').toLowerCase() === slug || (p.category?.name || '').toLowerCase() === slug
+    );
+
     return {
       categories: stringifiedCategories.length ? stringifiedCategories : fallbackCategories,
       featuredProducts: stringify(featuredProducts),
+      bestSellerProducts: stringify(bestSellerProducts),
+      chickenProducts: bySlug('chicken'),
+      duckProducts: bySlug('duck'),
+      quailProducts: bySlug('quail'),
       banners: stringify(banners),
       reviews: reviews.length ? stringify(reviews) : fallbackReviews,
     };
@@ -90,14 +119,42 @@ async function getData() {
     return {
       categories: fallbackCategories,
       featuredProducts: [],
+      bestSellerProducts: [],
+      chickenProducts: [],
+      duckProducts: [],
+      quailProducts: [],
       banners: [],
       reviews: fallbackReviews,
     };
   }
 }
 
+// Reusable homepage product row — keeps Chicken/Duck/Quail/Best Seller sections
+// identical in structure (no duplicate JSX). Renders nothing when empty.
+function ProductSection({ tagline, title, subtitle, products, viewAllLink, background }) {
+  if (!products || products.length === 0) return null;
+  return (
+    <section className="section-padding" style={{ backgroundColor: background || 'var(--bg-cream)' }}>
+      <div className="container">
+        {tagline && <span className={styles.sectionTagline}>{tagline}</span>}
+        <h2 className={styles.sectionTitle}>{title}</h2>
+        {subtitle && <p className={styles.sectionSubtitle}>{subtitle}</p>}
+        <ProductCarousel products={products} autoplayInterval={3000} />
+        {viewAllLink && (
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <Link href={viewAllLink} className="btn-primary">View All</Link>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default async function Home() {
-  const { categories, featuredProducts, banners, reviews } = await getData();
+  const { categories, featuredProducts, bestSellerProducts, chickenProducts, duckProducts, quailProducts, banners, reviews } = await getData();
+
+  // Best Sellers row: prefer admin-flagged best sellers, fall back to featured.
+  const bestSellers = bestSellerProducts?.length ? bestSellerProducts : featuredProducts;
 
   const heroTitle = banners?.[0]?.title || 'Premium Fresh Meat & Cuts';
 
@@ -158,7 +215,47 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 2. Category Section: Shop by Category */}
+        {/* 2. Fresh Chicken */}
+        <ProductSection
+          tagline="Farm Fresh"
+          title="Fresh Chicken"
+          subtitle="Tender, antibiotic-free chicken — custom-cut on order and delivered chilled."
+          products={chickenProducts}
+          viewAllLink="/category/chicken"
+          background="var(--white)"
+        />
+
+        {/* 3. Fresh Duck */}
+        <ProductSection
+          tagline="Farm Fresh"
+          title="Fresh Duck"
+          subtitle="Rich, dressed duck sourced from healthy pasture-raised birds."
+          products={duckProducts}
+          viewAllLink="/category/duck"
+          background="var(--bg-cream)"
+        />
+
+        {/* 4. Fresh Quail */}
+        <ProductSection
+          tagline="Farm Fresh"
+          title="Fresh Quail"
+          subtitle="Pasture-raised batair — clean, tender and full of flavor."
+          products={quailProducts}
+          viewAllLink="/category/quail"
+          background="var(--white)"
+        />
+
+        {/* 5. Best Sellers */}
+        <ProductSection
+          tagline="Chef's Picks"
+          title="Best Sellers"
+          subtitle="Our most-loved cuts, chosen by Porville customers and cut fresh on order."
+          products={bestSellers}
+          viewAllLink="/shop"
+          background="var(--bg-cream)"
+        />
+
+        {/* 6. Category Section: Explore Fresh Categories */}
         <section id="categories" className="section-padding" style={{ backgroundColor: 'var(--bg-cream)', borderBottom: '1px solid var(--border-cream)' }}>
           <div className="container">
             <span className={styles.sectionTagline}>Curated Selection</span>
