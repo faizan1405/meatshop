@@ -38,6 +38,16 @@ const ShippingAddressSchema = new mongoose.Schema({
   country: { type: String, default: 'India' },
 });
 
+// Chosen raw-item delivery slot (null for ready-to-eat-only orders).
+const DeliverySlotSchema = new mongoose.Schema(
+  {
+    label: { type: String },      // e.g. '9:00 AM – 12:00 PM'
+    startTime: { type: String },  // 'HH:MM' 24h
+    endTime: { type: String },    // 'HH:MM' 24h
+  },
+  { _id: false }
+);
+
 const OrderSchema = new mongoose.Schema(
   {
     user: {
@@ -77,6 +87,33 @@ const OrderSchema = new mongoose.Schema(
     },
     couponUsed: {
       type: String, // Coupon code used
+    },
+    // ---- Delivery timing (added for item-type-based delivery) ----
+    // Optional with a safe default so older orders keep working untouched.
+    deliveryMode: {
+      type: String,
+      enum: ['RAW_SLOT', 'READY_TO_EAT_2_HOURS'],
+      default: 'RAW_SLOT',
+    },
+    deliveryDate: {
+      type: String, // 'YYYY-MM-DD' civil date (IST). Null for ready-to-eat.
+      default: null,
+    },
+    deliveryDateLabel: {
+      type: String, // e.g. 'Monday, 15 July'
+      default: '',
+    },
+    deliverySlot: {
+      type: DeliverySlotSchema,
+      default: null,
+    },
+    deliveryEstimate: {
+      type: String, // e.g. 'Within 2 hours' (ready-to-eat orders)
+      default: '',
+    },
+    deliveryNote: {
+      type: String, // e.g. mixed-cart note
+      default: '',
     },
     paymentStatus: {
       type: String,

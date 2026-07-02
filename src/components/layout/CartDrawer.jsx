@@ -6,6 +6,7 @@ import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../common/Providers';
 import DeliveryThresholdBar from '../common/DeliveryThresholdBar';
 import { variantPrice } from '@/lib/pricing';
+import { getCartDeliveryMode, DELIVERY_MODE } from '@/lib/deliverySlots';
 import styles from './CartDrawer.module.css';
 
 export default function CartDrawer() {
@@ -230,6 +231,13 @@ export default function CartDrawer() {
             {/* Free-delivery progress — threshold/charge come from admin settings.
                 Hides itself when the threshold is 0 (e.g. during delivery testing). */}
             <DeliveryThresholdBar subtotal={itemsSubtotal} freeDeliveryThreshold={freeDeliveryThreshold} />
+
+            {/* Delivery timing hint (raw slot vs ready-to-eat). */}
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', textAlign: 'center', padding: '2px 0 4px' }}>
+              {getCartDeliveryMode(cartItems).mode === DELIVERY_MODE.READY_TO_EAT_2_HOURS
+                ? 'Ready-to-eat items delivered within 2 hours.'
+                : 'Delivery slot will be selected at checkout.'}
+            </div>
 
             {/* Dev-only notice — only while delivery is disabled for testing. */}
             {deliveryDisabledForTesting && process.env.NODE_ENV !== 'production' && (

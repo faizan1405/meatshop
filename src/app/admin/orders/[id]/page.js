@@ -143,6 +143,28 @@ export default function AdminOrderDetailsPage({ params }) {
             </div>
           </div>
 
+          {/* Delivery timing */}
+          <div className={styles.card}>
+            <h2 className={styles.cardTitle}>Delivery Timing</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem' }}>
+              <div>
+                <strong>Mode:</strong>{' '}
+                {order.deliveryMode === 'READY_TO_EAT_2_HOURS'
+                  ? 'Ready-to-eat (within 2 hours)'
+                  : 'Raw items — fixed slot'}
+              </div>
+              {order.deliveryMode === 'READY_TO_EAT_2_HOURS' ? (
+                <div><strong>Estimated Delivery:</strong> {order.deliveryEstimate || 'Within 2 hours'}</div>
+              ) : (
+                <>
+                  <div><strong>Delivery Date:</strong> {order.deliveryDateLabel || order.deliveryDate || '—'}</div>
+                  <div><strong>Delivery Slot:</strong> {order.deliverySlot?.label || '—'}</div>
+                </>
+              )}
+              {order.deliveryNote && <div><strong>Note:</strong> {order.deliveryNote}</div>}
+            </div>
+          </div>
+
         </div>
 
         {/* Right Column: Order breakdown & status controls */}

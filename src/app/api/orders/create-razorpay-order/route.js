@@ -6,10 +6,11 @@ import Coupon from '@/models/Coupon';
 import SiteSettings from '@/models/SiteSettings';
 import { variantPrice } from '@/lib/pricing';
 import { calculateCartTotals } from '@/lib/cartTotals';
+import { validateDeliverySelection } from '@/lib/deliverySlots';
 
 export async function POST(request) {
   try {
-    const { cartItems, couponCode } = await request.json();
+    const { cartItems, couponCode, deliveryDate, deliverySlot } = await request.json();
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return NextResponse.json({ success: false, message: 'Invalid or empty cart' }, { status: 400 });
@@ -21,6 +22,7 @@ export async function POST(request) {
     //    variantPrice() (single source of truth) so a 0/inverted sale price can
     //    never inflate the amount — this is what caused a ₹1 item to charge ₹10.
     const itemsForTotals = [];
+    const deliveryItems = [];
     for (const item of cartItems) {
       const dbProduct = await Product.findById(item.product._id);
       if (!dbProduct) {
@@ -41,6 +43,15 @@ export async function POST(request) {
       }
 
       itemsForTotals.push({ variant, quantity: item.quantity });
+      // Classify from the DB product (authoritative) for delivery-mode checks.
+      deliveryItems.push({ productType: dbProduct.productType, name: dbProduct.name });
+    }
+
+    // Validate the delivery selection BEFORE creating a paid Razorpay order, so a
+    // raw/mixed cart can't reach payment without a valid, unexpired slot.
+    const deliveryCheck = validateDeliverySelection({ items: deliveryItems, deliveryDate, deliverySlot });
+    if (!deliveryCheck.valid) {
+      return NextResponse.json({ success: false, message: deliveryCheck.error }, { status: 400 });
     }
 
     // 2. Resolve an active, unexpired coupon (discount math is handled centrally).

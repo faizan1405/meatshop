@@ -8,6 +8,7 @@ import Coupon from '@/models/Coupon';
 import SiteSettings from '@/models/SiteSettings';
 import { variantPrice } from '@/lib/pricing';
 import { calculateCartTotals } from '@/lib/cartTotals';
+import { validateDeliverySelection } from '@/lib/deliverySlots';
 
 export async function POST(request) {
   try {
@@ -30,6 +31,8 @@ export async function POST(request) {
       cartItems,
       shippingAddress,
       couponCode,
+      deliveryDate,
+      deliverySlot,
       isGuest,
       guestInfo,
       userEmail,
@@ -69,6 +72,7 @@ export async function POST(request) {
     // Recalculate everything server-side using MongoDB to prevent client-side tampering
     const orderItems = [];
     const itemsForTotals = [];
+    const deliveryItems = [];
 
     for (const item of cartItems) {
       const dbProduct = await Product.findById(item.product._id);
@@ -88,6 +92,8 @@ export async function POST(request) {
       // variantPrice() is the single source of truth — ignores 0/inverted sale prices.
       const activePrice = variantPrice(variant);
       itemsForTotals.push({ variant, quantity: item.quantity });
+      // Classify from the DB product (authoritative) for delivery-mode checks.
+      deliveryItems.push({ productType: dbProduct.productType, name: dbProduct.name });
 
       orderItems.push({
         product: dbProduct._id,
@@ -97,6 +103,12 @@ export async function POST(request) {
         quantity: item.quantity,
         image: dbProduct.images?.[0] || '',
       });
+    }
+
+    // Re-validate the delivery selection server-side and derive what to store.
+    const delivery = validateDeliverySelection({ items: deliveryItems, deliveryDate, deliverySlot });
+    if (!delivery.valid) {
+      return NextResponse.json({ success: false, message: delivery.error }, { status: 400 });
     }
 
     // Resolve an active, unexpired coupon; discount/delivery/total computed centrally.
@@ -137,6 +149,13 @@ export async function POST(request) {
       discountAmount: serverDiscountAmount,
       totalPrice: serverOrderTotal,
       couponUsed: couponCode || null,
+      // Delivery timing (server-validated).
+      deliveryMode: delivery.mode,
+      deliveryDate: delivery.deliveryDate || null,
+      deliveryDateLabel: delivery.deliveryDateLabel || '',
+      deliverySlot: delivery.deliverySlot || null,
+      deliveryEstimate: delivery.deliveryEstimate || '',
+      deliveryNote: delivery.deliveryNote || '',
       paymentStatus: 'paid', // Mark as paid for testing
       isDemoOrder: true,
       paymentMethod: 'Demo',

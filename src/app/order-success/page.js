@@ -70,6 +70,35 @@ export default async function OrderSuccessPage({ searchParams }) {
                     {order.paymentStatus}
                   </span>
                 </div>
+
+                {/* Delivery timing */}
+                {order.deliveryMode === 'READY_TO_EAT_2_HOURS' ? (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Delivery</span>
+                    <span className={styles.detailValue}>{order.deliveryEstimate || 'Within 2 hours'}</span>
+                  </div>
+                ) : (
+                  <>
+                    {order.deliveryDateLabel && (
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Delivery Date</span>
+                        <span className={styles.detailValue}>{order.deliveryDateLabel}</span>
+                      </div>
+                    )}
+                    {order.deliverySlot?.label && (
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Delivery Slot</span>
+                        <span className={styles.detailValue}>{order.deliverySlot.label}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+                {order.deliveryNote && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Delivery Note</span>
+                    <span className={styles.detailValue} style={{ textAlign: 'right' }}>{order.deliveryNote}</span>
+                  </div>
+                )}
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Total Amount Paid</span>
                   <span className={styles.detailValue} style={{ color: 'var(--primary-gold-dark)', fontSize: '1rem' }}>

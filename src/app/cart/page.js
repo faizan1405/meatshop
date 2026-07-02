@@ -6,6 +6,7 @@ import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
 import DeliveryThresholdBar from '@/components/common/DeliveryThresholdBar';
 import { variantPrice } from '@/lib/pricing';
+import { getCartDeliveryMode, DELIVERY_MODE } from '@/lib/deliverySlots';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
@@ -159,6 +160,13 @@ export default function CartPage() {
 
                   {/* Free-delivery progress — threshold/charge from admin settings. */}
                   <DeliveryThresholdBar subtotal={itemsSubtotal} freeDeliveryThreshold={freeDeliveryThreshold} />
+
+                  {/* Delivery timing hint (raw slot vs ready-to-eat). */}
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', textAlign: 'center', marginTop: '6px' }}>
+                    {getCartDeliveryMode(cartItems).mode === DELIVERY_MODE.READY_TO_EAT_2_HOURS
+                      ? 'Ready-to-eat items delivered within 2 hours.'
+                      : 'Delivery slot will be selected at checkout.'}
+                  </div>
 
                   <Link href="/checkout" className={`${styles.checkoutBtn} btn-gold`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     <span>Proceed to Checkout</span>

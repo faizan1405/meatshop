@@ -74,7 +74,7 @@ export async function resolveCartItems(canonicalItems) {
 
   const ids = [...new Set(normalized.map((i) => i.productId))];
   const products = await Product.find({ _id: { $in: ids }, isActive: true })
-    .populate('category', 'name')
+    .populate('category', 'name slug')
     .lean();
 
   const productMap = new Map(products.map((p) => [p._id.toString(), p]));
@@ -111,7 +111,12 @@ export async function resolveCartItems(canonicalItems) {
         placeholderImage: product.placeholderImage || '',
         priceType: product.priceType,
         purchaseMode: product.purchaseMode,
-        category: product.category ? { name: product.category.name } : null,
+        // productType + category slug kept so the client can classify delivery
+        // type (raw vs ready-to-eat) for a server-synced cart.
+        productType: product.productType,
+        category: product.category
+          ? { name: product.category.name, slug: product.category.slug }
+          : null,
       },
       variant: {
         name: variant.name,

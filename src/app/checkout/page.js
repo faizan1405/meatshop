@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle, Award } from 'lucide-react';
+import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle, Award, Clock } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
 import DeliveryThresholdBar from '@/components/common/DeliveryThresholdBar';
+import DeliverySlotSelector from '@/components/checkout/DeliverySlotSelector';
 import { variantPrice } from '@/lib/pricing';
+import { getCartDeliveryMode, getAvailableRawDeliverySlots, DELIVERY_MODE, READY_TO_EAT_ESTIMATE } from '@/lib/deliverySlots';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
@@ -48,6 +50,52 @@ export default function CheckoutPage() {
   const [guestEmail, setGuestEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // ---- Delivery timing (raw slot vs ready-to-eat) ----
+  const deliveryInfo = useMemo(() => getCartDeliveryMode(cartItems), [cartItems]);
+  const isRawSlotMode = deliveryInfo.mode === DELIVERY_MODE.RAW_SLOT;
+
+  // Available raw-item slots. Derived (not stored) so there is no setState in an
+  // effect. Uses India local time, so "expired today" is correct; recomputed
+  // only when the cart flips delivery mode.
+  const availableDays = useMemo(
+    () => (isRawSlotMode ? getAvailableRawDeliverySlots({ daysAhead: 7 }) : []),
+    [isRawSlotMode]
+  );
+
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  // Date actually in use: the customer's choice, else the first available date.
+  const activeDate = selectedDate || availableDays[0]?.date || '';
+
+  const handleSelectDate = (date) => {
+    setSelectedDate(date);
+    setSelectedSlot(null); // slots differ per day → force a fresh slot choice
+  };
+  const handleSelectSlot = (slot) => {
+    setSelectedDate(slot.date || activeDate); // pin the date the slot belongs to
+    setSelectedSlot({ label: slot.label, startTime: slot.startTime, endTime: slot.endTime });
+    setErrorMessage('');
+  };
+
+  // Normalized delivery payload sent to the order APIs.
+  const buildDeliveryPayload = () => {
+    if (!isRawSlotMode) {
+      return {
+        deliveryMode: DELIVERY_MODE.READY_TO_EAT_2_HOURS,
+        deliveryEstimate: READY_TO_EAT_ESTIMATE,
+        deliveryNote: deliveryInfo.note,
+      };
+    }
+    const day = availableDays.find((d) => d.date === activeDate);
+    return {
+      deliveryMode: DELIVERY_MODE.RAW_SLOT,
+      deliveryDate: activeDate,
+      deliveryDateLabel: day?.dayLabel || '',
+      deliverySlot: selectedSlot,
+      deliveryNote: deliveryInfo.isMixed ? deliveryInfo.note : '',
+    };
+  };
 
   // Configuration check state
   const [config, setConfig] = useState({ 
@@ -150,6 +198,10 @@ export default function CheckoutPage() {
     if (!session && !guestEmail) {
       return 'Please enter your email for guest checkout.';
     }
+    // Raw / mixed carts must have a delivery date + slot chosen.
+    if (isRawSlotMode && (!activeDate || !selectedSlot)) {
+      return 'Please select a delivery date and time slot.';
+    }
     return null;
   };
 
@@ -180,6 +232,7 @@ export default function CheckoutPage() {
           discountAmount,
           deliveryCharge,
           orderTotal,
+          ...buildDeliveryPayload(),
           isGuest: !session,
           guestInfo: !session ? {
             name: addressForm.name,
@@ -224,9 +277,10 @@ export default function CheckoutPage() {
       const res = await fetch('/api/orders/create-razorpay-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          cartItems, 
-          couponCode: coupon?.code || '' 
+        body: JSON.stringify({
+          cartItems,
+          couponCode: coupon?.code || '',
+          ...buildDeliveryPayload(),
         }),
       });
 
@@ -275,6 +329,7 @@ export default function CheckoutPage() {
                 discountAmount,
                 deliveryCharge,
                 orderTotal,
+                ...buildDeliveryPayload(),
                 isGuest: !session,
                 guestInfo: !session ? {
                   name: addressForm.name,
@@ -509,6 +564,34 @@ export default function CheckoutPage() {
                     </form>
                   )}
 
+                </div>
+
+                {/* Delivery timing — raw slot picker or ready-to-eat note */}
+                <div className={styles.card}>
+                  <h2 className={styles.cardTitle}>Delivery Timing</h2>
+
+                  {isRawSlotMode ? (
+                    <>
+                      {deliveryInfo.isMixed && (
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', background: '#fff8e1', color: '#8a6d1b', padding: '10px 12px', borderRadius: '6px', fontSize: '0.8rem', marginBottom: '16px' }}>
+                          <AlertCircle size={15} style={{ flexShrink: 0, marginTop: '1px' }} />
+                          <span>{deliveryInfo.note}</span>
+                        </div>
+                      )}
+                      <DeliverySlotSelector
+                        days={availableDays}
+                        selectedDate={activeDate}
+                        selectedSlot={selectedSlot}
+                        onSelectDate={handleSelectDate}
+                        onSelectSlot={handleSelectSlot}
+                      />
+                    </>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f0faf0', color: '#2e7d32', padding: '14px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600 }}>
+                      <Clock size={18} style={{ flexShrink: 0 }} />
+                      <span>Ready-to-eat items will be delivered within 2 hours.</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
