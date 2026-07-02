@@ -67,7 +67,19 @@ export default function Footer() {
                   style={{ height: '48px', maxWidth: '160px', objectFit: 'contain', marginBottom: '6px' }}
                 />
               ) : (
-                <h2 className={styles.brandText}>PORVILLE</h2>
+                <img
+                  src="/porville-logo.jpg"
+                  alt="Porville — Fresh Cut, Pure Standards"
+                  style={{
+                    width: '112px',
+                    height: '112px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '2px solid var(--primary-gold)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.45)',
+                    marginBottom: '10px',
+                  }}
+                />
               )}
               <p className={styles.tagline}>Fresh Cut Pure Standards</p>
             </div>

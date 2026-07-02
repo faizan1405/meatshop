@@ -69,10 +69,25 @@ export default function Header() {
                     style={{ height: '52px', maxWidth: '170px', objectFit: 'contain' }}
                   />
                 ) : (
-                  <>
-                    <span className={styles.logoText}>PORVILLE</span>
-                    <span className={styles.tagline}>Fresh Cut Pure Standards</span>
-                  </>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <img
+                      src="/porville-logo.jpg"
+                      alt="Porville — Fresh Cut, Pure Standards"
+                      style={{
+                        height: '54px',
+                        width: '54px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '2px solid var(--primary-gold)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                      <span className={styles.logoText}>PORVILLE</span>
+                      <span className={styles.tagline}>Fresh Cut Pure Standards</span>
+                    </span>
+                  </div>
                 )}
               </Link>
 
