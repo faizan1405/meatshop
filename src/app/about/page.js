@@ -10,7 +10,7 @@ export default function AboutPage() {
     <>
       <Header />
       <CartDrawer />
-      <main style={{ backgroundColor: 'var(--bg-cream)', padding: '80px 0', minHeight: 'calc(100vh - var(--header-height))' }}>
+      <main style={{ backgroundColor: 'var(--bg-cream)', padding: 'clamp(32px, 6vw, 80px) 0', minHeight: 'calc(100vh - var(--header-height))' }}>
         <div className="container" style={{ maxWidth: '800px' }}>
           <h1 className="animate-fade-up" style={{ fontFamily: 'var(--font-playfair)', fontSize: '2.5rem', marginBottom: '20px', color: 'var(--text-dark)' }}>
             About Porville

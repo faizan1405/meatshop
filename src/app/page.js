@@ -370,12 +370,12 @@ export default async function Home() {
         {/* 4. Fresh Cut Pure Standards (Branding Line Showcase) */}
         <section className="section-padding" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-light)', borderTop: '2px solid var(--primary-gold)' }}>
           <div className="container">
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '40px' }}>
-              <div className="reveal-on-scroll" style={{ flex: '1 1 450px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(24px, 5vw, 40px)' }}>
+              <div className="reveal-on-scroll" style={{ flex: '1 1 450px', display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 3vw, 20px)' }}>
                 <span style={{ color: 'var(--primary-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: '0.85rem' }}>
                   Our Promise
                 </span>
-                <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: '2.5rem', color: 'var(--primary-gold-light)' }}>
+                <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(1.65rem, 4.5vw, 2.5rem)', color: 'var(--primary-gold-light)' }}>
                   Fresh Cut. Pure Standards.
                 </h2>
                 <p style={{ color: 'var(--text-light-muted)' }}>

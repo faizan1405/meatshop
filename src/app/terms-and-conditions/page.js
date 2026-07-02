@@ -8,8 +8,8 @@ export default function TermsAndConditionsPage() {
     <>
       <Header />
       <CartDrawer />
-      <main style={{ backgroundColor: 'var(--bg-cream)', padding: '60px 0', minHeight: 'calc(100vh - var(--header-height))' }}>
-        <div className="container" style={{ maxWidth: '800px', backgroundColor: 'var(--white)', padding: '40px', borderRadius: '8px', border: '1px solid var(--border-cream)' }}>
+      <main style={{ backgroundColor: 'var(--bg-cream)', padding: 'clamp(28px, 5vw, 60px) 0', minHeight: 'calc(100vh - var(--header-height))' }}>
+        <div className="container" style={{ maxWidth: '800px', backgroundColor: 'var(--white)', padding: 'clamp(20px, 4vw, 40px)', borderRadius: '8px', border: '1px solid var(--border-cream)' }}>
           <h1 style={{ fontFamily: 'var(--font-playfair)', fontSize: '2rem', marginBottom: '20px' }}>Terms & Conditions</h1>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-dark-muted)', marginBottom: '20px' }}>Last Updated: June 2026</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '0.9rem', lineHeight: '1.7' }}>

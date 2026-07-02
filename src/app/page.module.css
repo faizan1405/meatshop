@@ -191,17 +191,31 @@
 
 @media (max-width: 576px) {
   .hero {
-    padding: 40px 0;
+    padding: 28px 0;
+  }
+  .heroGrid {
+    gap: 24px;
+  }
+  .heroContent {
+    gap: 12px;
   }
   .title {
-    font-size: 1.95rem;
+    font-size: 1.75rem;
   }
   .subtitle {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+  }
+  .heroTrust {
+    gap: 8px 16px;
+    margin-top: 8px;
+    padding-top: 14px;
+  }
+  .heroTrust li {
+    font-size: 0.8rem;
   }
   .heroCategories {
-    padding: 16px;
-    gap: 12px;
+    padding: 14px;
+    gap: 10px;
   }
   .heroChip {
     padding: 5px 10px 5px 5px;
@@ -260,6 +274,21 @@
   line-height: 1.6;
 }
 
+/* Mobile: tighter section headings so products appear sooner */
+@media (max-width: 576px) {
+  .sectionTitle {
+    font-size: 1.65rem;
+    margin-bottom: 8px;
+  }
+  .sectionTitle::after {
+    margin: 10px auto 0;
+  }
+  .sectionSubtitle {
+    font-size: 0.88rem;
+    margin: 0 auto 22px;
+  }
+}
+
 /* ============================================
    COMPACT SECTION
    Half-height product rows for the homepage
@@ -292,10 +321,22 @@
 
 @media (max-width: 768px) {
   .compactSection {
-    padding: 28px 0;
+    padding: 24px 0;
   }
   .compactSection .sectionTitle {
     font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .compactSection {
+    padding: 20px 0;
+  }
+  .compactSection .sectionTitle {
+    font-size: 1.4rem;
+  }
+  .compactSection .sectionSubtitle {
+    margin: 0 auto 12px;
   }
 }
 
@@ -458,6 +499,13 @@
   gap: 30px;
 }
 
+@media (max-width: 576px) {
+  .productsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
 /* Features Section */
 .features {
   background-color: var(--bg-dark-sec);
@@ -471,6 +519,25 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 30px;
   text-align: center;
+}
+
+@media (max-width: 576px) {
+  .featuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 12px;
+  }
+  .featureCard {
+    gap: 10px;
+  }
+  .featureIcon {
+    padding: 12px;
+  }
+  .featureTitle {
+    font-size: 1rem;
+  }
+  .featureDesc {
+    font-size: 0.8rem;
+  }
 }
 
 .featureCard {
@@ -523,6 +590,16 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 30px;
+}
+
+@media (max-width: 576px) {
+  .reviewsGrid {
+    gap: 14px;
+  }
+  .reviewCard {
+    padding: 18px;
+    gap: 10px;
+  }
 }
 
 .reviewCard {
@@ -607,4 +684,16 @@
 .ctaDesc {
   color: var(--text-dark-muted);
   font-size: 1rem;
+}
+
+@media (max-width: 576px) {
+  .ctaBox {
+    gap: 14px;
+  }
+  .ctaTitle {
+    font-size: 1.6rem;
+  }
+  .ctaDesc {
+    font-size: 0.9rem;
+  }
 }

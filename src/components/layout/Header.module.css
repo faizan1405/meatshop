@@ -50,6 +50,29 @@
   padding-right: 16px;
 }
 
+/* Logo sizing lives here (not inline) so mobile can shrink it */
+.logoImg {
+  height: 52px;
+  max-width: 170px;
+  object-fit: contain;
+}
+
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoMark {
+  height: 54px;
+  width: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-gold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
 .logoText {
   font-family: var(--font-playfair);
   font-size: 2rem;
@@ -169,12 +192,52 @@
   .nav {
     display: none;
   }
-  
+
   .mobileMenuBtn {
     display: block;
   }
 
   .logoText {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+  }
+
+  .tagline {
+    font-size: 0.5rem;
+  }
+
+  .mainHeader {
+    gap: 10px;
+    padding: 6px 0;
+  }
+
+  .brand {
+    padding-right: 8px;
+  }
+
+  .logoImg {
+    height: 40px;
+    max-width: 130px;
+  }
+
+  .logoGroup {
+    gap: 8px;
+  }
+
+  .logoMark {
+    height: 40px;
+    width: 40px;
+  }
+
+  .actions {
+    gap: 8px;
+  }
+
+  .iconBtn {
+    padding: 8px;
+  }
+
+  .topBar {
+    padding: 3px 0;
+    font-size: 0.7rem;
   }
 }

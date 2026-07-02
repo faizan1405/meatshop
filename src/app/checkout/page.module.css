@@ -125,13 +125,46 @@
 }
 
 @media (max-width: 576px) {
+  .checkoutContainer {
+    padding: 24px 0;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .layout {
+    gap: 16px;
+  }
+
+  .formSection {
+    gap: 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .cardTitle {
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+  }
+
   .formGrid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
   .fullWidth {
     grid-column: span 1;
   }
   .addressGrid {
     grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .emptyState {
+    padding: 48px 16px;
   }
 }

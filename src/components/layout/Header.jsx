@@ -66,22 +66,14 @@ export default function Header() {
                   <img
                     src={logoUrl}
                     alt="Porville Logo"
-                    style={{ height: '52px', maxWidth: '170px', objectFit: 'contain' }}
+                    className={styles.logoImg}
                   />
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div className={styles.logoGroup}>
                     <img
                       src="/porville-logo.jpg"
                       alt="Porville — Fresh Cut, Pure Standards"
-                      style={{
-                        height: '54px',
-                        width: '54px',
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        border: '2px solid var(--primary-gold)',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-                        flexShrink: 0,
-                      }}
+                      className={styles.logoMark}
                     />
                     <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
                       <span className={styles.logoText}>PORVILLE</span>
@@ -179,8 +171,9 @@ export default function Header() {
             zIndex: 99,
             display: 'flex',
             flexDirection: 'column',
-            padding: '40px 20px',
-            gap: '25px',
+            padding: '24px 16px',
+            gap: '16px',
+            overflowY: 'auto',
           }}
         >
           {navLinks.map((link) => (
@@ -188,12 +181,12 @@ export default function Header() {
               key={link.path}
               href={link.path}
               style={{
-                fontSize: '1.2rem',
+                fontSize: '1.05rem',
                 fontWeight: '600',
                 color: pathname === link.path ? 'var(--primary-gold)' : 'var(--text-light-muted)',
                 textTransform: 'uppercase',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
-                paddingBottom: '10px'
+                padding: '10px 0'
               }}
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -207,9 +200,9 @@ export default function Header() {
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              fontSize: '1.1rem',
+              fontSize: '1rem',
               color: 'var(--primary-gold)',
-              marginTop: '20px'
+              marginTop: '12px'
             }}
           >
             <Phone size={18} />

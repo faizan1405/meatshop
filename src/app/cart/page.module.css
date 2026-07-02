@@ -174,8 +174,36 @@
 /* On small phones, let the item row wrap so the qty / price / remove
    controls never overflow or sit on top of each other. */
 @media (max-width: 560px) {
+  .cartContainer {
+    padding: 24px 0;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .cartLayout {
+    gap: 16px;
+  }
+
+  .cartItemsSection {
+    gap: 10px;
+  }
+
   .itemCard {
     flex-wrap: wrap;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .itemImg {
+    width: 68px;
+    height: 68px;
+  }
+
+  .itemName {
+    font-size: 1rem;
   }
 
   .itemControls {
@@ -187,5 +215,16 @@
   .price {
     width: auto;
     text-align: left;
+    font-size: 1rem;
+  }
+
+  .summaryCard {
+    padding: 18px;
+    gap: 14px;
+    position: static;
+  }
+
+  .emptyState {
+    padding: 48px 16px;
   }
 }

@@ -284,3 +284,23 @@
   color: var(--text-dark);
   font-weight: 700;
 }
+
+@media (max-width: 576px) {
+  .header {
+    padding: 14px 16px;
+  }
+
+  .content {
+    padding: 14px 16px;
+  }
+
+  .couponSection {
+    margin-top: 16px;
+    padding: 12px;
+  }
+
+  .footer {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+}

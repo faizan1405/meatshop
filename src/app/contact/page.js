@@ -9,7 +9,7 @@ export default function ContactPage() {
     <>
       <Header />
       <CartDrawer />
-      <main style={{ backgroundColor: 'var(--bg-cream)', padding: '80px 0', minHeight: 'calc(100vh - var(--header-height))' }}>
+      <main style={{ backgroundColor: 'var(--bg-cream)', padding: 'clamp(32px, 6vw, 80px) 0', minHeight: 'calc(100vh - var(--header-height))' }}>
         <div className="container" style={{ maxWidth: '800px' }}>
           <h1 className="animate-fade-up" style={{ fontFamily: 'var(--font-playfair)', fontSize: '2.5rem', marginBottom: '20px', color: 'var(--text-dark)' }}>
             Contact Porville
@@ -47,7 +47,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="reveal-on-scroll" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-light)', padding: '40px', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--primary-gold)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+          <div className="reveal-on-scroll" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-light)', padding: 'clamp(20px, 4vw, 40px)', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--primary-gold)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
             <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: '1.8rem', color: 'var(--primary-gold-light)' }}>
               Instant Chat via WhatsApp
             </h2>

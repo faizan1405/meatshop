@@ -265,3 +265,81 @@
 .card.compact .outOfStockBtn {
   padding: 8px;
 }
+
+/* ============================================
+   MOBILE (2-up grids/carousels)
+   Cards live in 2-column rows on phones, so
+   trim padding and type to keep them readable
+   without ballooning card height.
+   ============================================ */
+@media (max-width: 576px) {
+  .card {
+    border-radius: 10px;
+  }
+
+  .badge {
+    top: 8px;
+    left: 8px;
+    font-size: 0.62rem;
+    padding: 3px 8px;
+  }
+
+  .content {
+    padding: 10px;
+  }
+
+  .categoryName {
+    font-size: 0.65rem;
+    margin-bottom: 4px;
+  }
+
+  .title {
+    font-size: 0.92rem;
+    min-height: 38px;
+    margin-bottom: 6px;
+  }
+
+  .variantArea {
+    min-height: 48px;
+    margin-bottom: 8px;
+  }
+
+  .packPill {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+  }
+
+  .selectDropdown {
+    font-size: 0.78rem;
+    padding: 6px 8px;
+  }
+
+  .priceRow {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .price {
+    font-size: 1rem;
+  }
+
+  .oldPrice {
+    font-size: 0.78rem;
+  }
+
+  /* Keep ~40px tap height with smaller text */
+  .addBtn,
+  .outOfStockBtn {
+    padding: 11px 6px;
+    font-size: 0.72rem;
+    gap: 6px;
+  }
+
+  .card.compact .content {
+    padding: 10px;
+  }
+
+  .card.compact .title {
+    font-size: 0.92rem;
+  }
+}

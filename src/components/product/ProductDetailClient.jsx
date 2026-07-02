@@ -115,7 +115,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
     : '5.0';
 
   return (
-    <div style={{ padding: '40px 0' }}>
+    <div style={{ padding: 'clamp(20px, 4vw, 40px) 0' }}>
       
       {/* 1. Gallery & Info Split */}
       <div className={styles.container}>

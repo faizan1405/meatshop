@@ -42,6 +42,13 @@
   --ease-premium: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+/* Mobile: shorter header so content gets more viewport */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 64px;
+  }
+}
+
 /* Smooth in-page anchor scrolling (e.g. Explore Categories) */
 html {
   scroll-behavior: smooth;
@@ -57,6 +64,9 @@ html {
 
 html, body {
   height: 100%;
+  /* Hard guard against horizontal scroll on small screens.
+     `clip` doesn't create a scroll container, so sticky still works. */
+  overflow-x: clip;
   background-color: var(--bg-cream);
   color: var(--text-dark);
   font-family: var(--font-outfit), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -122,7 +132,24 @@ input:focus, select:focus, textarea:focus {
 
 @media (max-width: 768px) {
   .section-padding {
-    padding: 50px 0;
+    padding: 40px 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding: 0 16px;
+  }
+  .section-padding {
+    padding: 32px 0;
+  }
+  /* Tighter button chrome on phones — same 44px+ tap height,
+     less horizontal bulk so two buttons fit side by side. */
+  .btn-primary,
+  .btn-secondary,
+  .btn-gold {
+    padding: 12px 20px;
+    font-size: 0.85rem;
   }
 }
 

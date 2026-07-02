@@ -337,9 +337,92 @@
 @media (max-width: 992px) {
   .container {
     flex-direction: column;
+    gap: 28px;
+    margin-bottom: 40px;
   }
-  
+
   .reviewsLayout {
     flex-direction: column;
+    gap: 28px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  /* Shorter hero image on phones — product info surfaces sooner */
+  .mainImage {
+    aspect-ratio: 16 / 11;
+    border-radius: var(--border-radius-md);
+  }
+
+  .gallery {
+    gap: 10px;
+  }
+
+  .thumbnail {
+    width: 56px;
+    height: 56px;
+  }
+
+  .info {
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 1.55rem;
+  }
+
+  .priceRow {
+    padding: 10px 0;
+    gap: 8px;
+  }
+
+  .price {
+    font-size: 1.4rem;
+  }
+
+  .oldPrice {
+    font-size: 1rem;
+  }
+
+  .variantPill {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  .purchaseSection {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .addBtn {
+    min-width: 170px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .reviewsContainer {
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+
+  .reviewsLayout {
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .reviewCard {
+    padding: 16px;
+  }
+
+  .reviewForm {
+    padding: 18px;
   }
 }
