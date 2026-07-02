@@ -4,7 +4,8 @@ import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Coupon from '@/models/Coupon';
 import SiteSettings from '@/models/SiteSettings';
-import { computeDeliveryCharge } from '@/lib/delivery';
+import { variantPrice } from '@/lib/pricing';
+import { calculateCartTotals } from '@/lib/cartTotals';
 
 export async function POST(request) {
   try {
@@ -16,8 +17,10 @@ export async function POST(request) {
 
     await connectDB();
 
-    // 1. Calculate subtotal and check for "On call" products
-    let itemsSubtotal = 0;
+    // 1. Validate items and build the priced line list. Price each line via
+    //    variantPrice() (single source of truth) so a 0/inverted sale price can
+    //    never inflate the amount — this is what caused a ₹1 item to charge ₹10.
+    const itemsForTotals = [];
     for (const item of cartItems) {
       const dbProduct = await Product.findById(item.product._id);
       if (!dbProduct) {
@@ -33,38 +36,30 @@ export async function POST(request) {
         return NextResponse.json({ success: false, message: `Variant ${item.variant.name} not found for product ${dbProduct.name}` }, { status: 400 });
       }
 
-      const activePrice = variant.salePrice || variant.price;
-      if (activePrice === undefined || activePrice === null || activePrice <= 0) {
+      if (!(variantPrice(variant) > 0)) {
         return NextResponse.json({ success: false, message: `Product ${dbProduct.name} does not have a valid price.` }, { status: 400 });
       }
 
-      itemsSubtotal += activePrice * item.quantity;
+      itemsForTotals.push({ variant, quantity: item.quantity });
     }
 
-    // 2. Validate coupon and calculate discount amount
-    let discountAmount = 0;
+    // 2. Resolve an active, unexpired coupon (discount math is handled centrally).
+    let activeCoupon = null;
     if (couponCode) {
       const dbCoupon = await Coupon.findOne({ code: couponCode.toUpperCase(), active: true });
       if (dbCoupon && new Date() < new Date(dbCoupon.expiryDate)) {
-        if (itemsSubtotal >= dbCoupon.minOrderValue) {
-          if (dbCoupon.discountType === 'percentage') {
-            discountAmount = (itemsSubtotal * dbCoupon.discountValue) / 100;
-            if (dbCoupon.maxDiscountValue) {
-              discountAmount = Math.min(discountAmount, dbCoupon.maxDiscountValue);
-            }
-          } else if (dbCoupon.discountType === 'flat') {
-            discountAmount = dbCoupon.discountValue;
-          }
-        }
+        activeCoupon = dbCoupon;
       }
     }
 
-    // 3. Get Site Settings for delivery charge (shared rule; same as the cart UI)
+    // 3. Totals via the shared util — same subtotal/discount/delivery rule as the
+    //    cart UI. Delivery is currently disabled for payment testing (fee = 0).
     const settings = await SiteSettings.findOne({});
-    const deliveryCharge = computeDeliveryCharge(itemsSubtotal, settings);
-
-    // 4. Calculate final order total
-    const orderTotal = Math.max(itemsSubtotal - discountAmount + deliveryCharge, 0);
+    const { total: orderTotal } = calculateCartTotals({
+      items: itemsForTotals,
+      settings,
+      coupon: activeCoupon,
+    });
 
     if (orderTotal <= 0) {
       return NextResponse.json({ success: false, message: 'Invalid order total' }, { status: 400 });

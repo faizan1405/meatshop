@@ -8,7 +8,8 @@ import Product from '@/models/Product';
 import Address from '@/models/Address';
 import Coupon from '@/models/Coupon';
 import SiteSettings from '@/models/SiteSettings';
-import { computeDeliveryCharge } from '@/lib/delivery';
+import { variantPrice } from '@/lib/pricing';
+import { calculateCartTotals } from '@/lib/cartTotals';
 
 export async function POST(request) {
   try {
@@ -83,8 +84,8 @@ export async function POST(request) {
     }
 
     // Recalculate everything server-side using MongoDB to prevent client-side tampering
-    let serverItemsSubtotal = 0;
     const orderItems = [];
+    const itemsForTotals = [];
 
     for (const item of cartItems) {
       const dbProduct = await Product.findById(item.product._id);
@@ -101,8 +102,9 @@ export async function POST(request) {
         return NextResponse.json({ success: false, message: `Variant ${item.variant.name} not found for product ${dbProduct.name}` }, { status: 400 });
       }
 
-      const activePrice = variant.salePrice || variant.price;
-      serverItemsSubtotal += activePrice * item.quantity;
+      // variantPrice() is the single source of truth — ignores 0/inverted sale prices.
+      const activePrice = variantPrice(variant);
+      itemsForTotals.push({ variant, quantity: item.quantity });
 
       orderItems.push({
         product: dbProduct._id,
@@ -114,26 +116,23 @@ export async function POST(request) {
       });
     }
 
-    let serverDiscountAmount = 0;
+    // Resolve an active, unexpired coupon; discount/delivery/total computed centrally.
+    let activeCoupon = null;
     if (couponCode) {
       const dbCoupon = await Coupon.findOne({ code: couponCode.toUpperCase(), active: true });
       if (dbCoupon && new Date() < new Date(dbCoupon.expiryDate)) {
-        if (serverItemsSubtotal >= dbCoupon.minOrderValue) {
-          if (dbCoupon.discountType === 'percentage') {
-            serverDiscountAmount = (serverItemsSubtotal * dbCoupon.discountValue) / 100;
-            if (dbCoupon.maxDiscountValue) {
-              serverDiscountAmount = Math.min(serverDiscountAmount, dbCoupon.maxDiscountValue);
-            }
-          } else if (dbCoupon.discountType === 'flat') {
-            serverDiscountAmount = dbCoupon.discountValue;
-          }
-        }
+        activeCoupon = dbCoupon;
       }
     }
 
     const settings = await SiteSettings.findOne({});
-    const serverDeliveryCharge = computeDeliveryCharge(serverItemsSubtotal, settings);
-    const serverOrderTotal = Math.max(serverItemsSubtotal - serverDiscountAmount + serverDeliveryCharge, 0);
+    // Delivery currently disabled for payment testing (fee = 0). Admin settings preserved.
+    const {
+      subtotal: serverItemsSubtotal,
+      discount: serverDiscountAmount,
+      deliveryCharge: serverDeliveryCharge,
+      total: serverOrderTotal,
+    } = calculateCartTotals({ items: itemsForTotals, settings, coupon: activeCoupon });
 
     // SECURITY: bind the captured payment to the server-recomputed total.
     // The HMAC signature only proves the (order_id, payment_id) pair is authentic

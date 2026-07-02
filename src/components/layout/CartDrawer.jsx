@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../common/Providers';
+import { variantPrice } from '@/lib/pricing';
 import styles from './CartDrawer.module.css';
 
 export default function CartDrawer() {
@@ -19,6 +20,7 @@ export default function CartDrawer() {
     discountAmount,
     deliveryCharge,
     orderTotal,
+    deliveryDisabledForTesting,
     isMounted,
   } = useCart();
 
@@ -98,7 +100,7 @@ export default function CartDrawer() {
           ) : (
             <div className={styles.cartList}>
               {cartItems.map((item) => {
-                const itemPrice = item.variant.salePrice || item.variant.price;
+                const itemPrice = variantPrice(item.variant);
                 return (
                   <div key={`${item.product._id}-${item.variant.name}`} className={styles.cartItem}>
                     
@@ -210,18 +212,31 @@ export default function CartDrawer() {
                 <span>-₹{discountAmount}</span>
               </div>
             )}
-            <div className={styles.summaryRow}>
-              <span>Delivery Charges</span>
-              <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
-            </div>
+            {/* Delivery row + threshold note hidden while delivery is disabled
+                for payment testing. Re-enabling delivery restores them. */}
+            {!deliveryDisabledForTesting && (
+              <div className={styles.summaryRow}>
+                <span>Delivery Charges</span>
+                <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
+              </div>
+            )}
             <div className={styles.totalRow}>
               <span>Estimated Total</span>
               <span>₹{orderTotal}</span>
             </div>
 
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', textAlign: 'center', padding: '6px 0 2px' }}>
-              Free delivery on orders above ₹770. Otherwise ₹40 applies.
-            </div>
+            {!deliveryDisabledForTesting && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', textAlign: 'center', padding: '6px 0 2px' }}>
+                Free delivery on orders above ₹770. Otherwise ₹40 applies.
+              </div>
+            )}
+
+            {/* Dev-only notice — never shown to real customers in production. */}
+            {deliveryDisabledForTesting && process.env.NODE_ENV !== 'production' && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', textAlign: 'center', padding: '6px 0 2px' }}>
+                Delivery temporarily disabled for testing.
+              </div>
+            )}
 
             <Link
               href="/checkout"

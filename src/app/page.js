@@ -11,7 +11,6 @@ import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import ProductCard from '@/components/product/ProductCard';
 import ProductCarousel from '@/components/products/ProductCarousel';
-import CategoryCarousel from '@/components/products/CategoryCarousel';
 import styles from './page.module.css';
 
 // Pre-seeded fallback data to prevent build failure if database is empty/not loaded yet.
@@ -201,7 +200,7 @@ export default async function Home() {
           <div className="container">
             <div className={styles.heroGrid}>
               <div className={styles.heroContent}>
-                <span className={styles.tagline}>Sangam Vihar&apos;s Premium Butcher</span>
+                <span className={styles.tagline}>Delhi&rsquo;s Finest Butchers</span>
                 <h1 className={styles.title}>{heroTitle}</h1>
                 <p className={styles.subtitle}>
                   Custom-cut to order, vacuum-sealed and delivered chilled within 2 hours.
@@ -240,7 +239,7 @@ export default async function Home() {
                       </Link>
                     ))}
                   </div>
-                  <Link href="#categories" className={`btn-gold ${styles.heroCategoriesBtn}`}>
+                  <Link href="/shop" className={`btn-gold ${styles.heroCategoriesBtn}`}>
                     Explore Categories
                   </Link>
                 </div>
@@ -325,47 +324,6 @@ export default async function Home() {
           background="var(--bg-cream)"
           compact
         />
-
-        {/* 9. Category Section: Explore Fresh Categories */}
-        <section id="categories" className="section-padding" style={{ backgroundColor: 'var(--bg-cream)', borderBottom: '1px solid var(--border-cream)' }}>
-          <div className="container">
-            <span className={styles.sectionTagline}>Curated Selection</span>
-            <h2 className={styles.sectionTitle}>Explore Fresh Categories</h2>
-            <p className={styles.sectionSubtitle}>
-              Browse through our range of farm-fresh, premium meats and gourmet items. Select a category to see available cuts.
-            </p>
-            <CategoryCarousel autoplayInterval={3500}>
-              {categories.map((cat) => {
-                const count = cat.productCount;
-                const subtitle = count !== undefined ? (count > 0 ? `${count} Fresh Cuts` : 'Premium Cuts') : (cat.subtitle || 'Premium Cuts');
-                
-                // Fallback clean placeholder image if category image is missing
-                const imageSrc = cat.image || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80';
-
-                return (
-                  <Link key={cat.slug} href={`/category/${cat.slug}`} className={styles.categoryCard}>
-                    <div className={styles.categoryImageContainer}>
-                      <img src={imageSrc} alt={cat.name} className={styles.categoryImage} />
-                      <div className={styles.categoryOverlay}>
-                        <span className={styles.shopNowText}>Shop Now</span>
-                      </div>
-                    </div>
-                    <div className={styles.categoryDetails}>
-                      <h3 className={styles.categoryName}>{cat.name}</h3>
-                      <p className={styles.categoryCount}>{subtitle}</p>
-                      <div className={styles.categoryBtn}>
-                        <span>Shop Now</span>
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: '4px' }}>
-                          <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </CategoryCarousel>
-          </div>
-        </section>
 
         {/* 4. Fresh Cut Pure Standards (Branding Line Showcase) */}
         <section className="section-padding" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-light)', borderTop: '2px solid var(--primary-gold)' }}>

@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
+import { variantPrice } from '@/lib/pricing';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
@@ -19,6 +20,7 @@ export default function CartPage() {
     deliveryCharge,
     orderTotal,
     coupon,
+    deliveryDisabledForTesting,
     isMounted,
   } = useCart();
 
@@ -49,7 +51,7 @@ export default function CartPage() {
               {/* Items List */}
               <div className={styles.cartItemsSection}>
                 {cartItems.map((item) => {
-                  const itemPrice = item.variant.salePrice || item.variant.price;
+                  const itemPrice = variantPrice(item.variant);
                   return (
                     <div key={`${item.product._id}-${item.variant.name}`} className={styles.itemCard}>
                       
@@ -140,10 +142,13 @@ export default function CartPage() {
                     </div>
                   )}
 
-                  <div className={styles.row}>
-                    <span>Delivery Charges</span>
-                    <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
-                  </div>
+                  {/* Delivery row hidden while delivery is disabled for testing. */}
+                  {!deliveryDisabledForTesting && (
+                    <div className={styles.row}>
+                      <span>Delivery Charges</span>
+                      <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
+                    </div>
+                  )}
 
                   <div className={styles.totalRow}>
                     <span>Estimated Total</span>
@@ -155,9 +160,18 @@ export default function CartPage() {
                     <ArrowRight size={18} />
                   </Link>
 
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', textAlign: 'center', marginTop: '10px' }}>
-                    Free delivery on orders above ₹770. Otherwise ₹40 applies.
-                  </div>
+                  {!deliveryDisabledForTesting && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', textAlign: 'center', marginTop: '10px' }}>
+                      Free delivery on orders above ₹770. Otherwise ₹40 applies.
+                    </div>
+                  )}
+
+                  {/* Dev-only notice — not shown to real customers in production. */}
+                  {deliveryDisabledForTesting && process.env.NODE_ENV !== 'production' && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)', textAlign: 'center', marginTop: '10px' }}>
+                      Delivery temporarily disabled for testing.
+                    </div>
+                  )}
                 </div>
               </div>
 

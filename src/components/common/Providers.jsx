@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { SessionProvider, useSession } from 'next-auth/react';
-import { computeDeliveryCharge } from '@/lib/delivery';
+import { calculateCartTotals } from '@/lib/cartTotals';
 
 const CartContext = createContext(null);
 
@@ -240,21 +240,20 @@ export function CartProvider({ children }) {
 
   const itemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  const itemsSubtotal = cartItems.reduce((acc, item) => {
-    const price = item.variant.salePrice || item.variant.price;
-    return acc + price * item.quantity;
-  }, 0);
-
-  const discountAmount = coupon
-    ? coupon.discountType === 'percentage'
-      ? Math.min((itemsSubtotal * coupon.discountValue) / 100, coupon.maxDiscountValue || Infinity)
-      : coupon.discountValue
-    : 0;
-
-  // Delivery: shared rule (admin-configured, defaults to free above ₹770 / ₹40).
-  const deliveryCharge = computeDeliveryCharge(itemsSubtotal, deliveryConfig);
-
-  const orderTotal = Math.max(itemsSubtotal - discountAmount + deliveryCharge, 0);
+  // Single source of truth for every total. calculateCartTotals prices each line
+  // via variantPrice() (fixing the old `salePrice || price` bug) and applies the
+  // shared delivery rule — currently bypassed for payment testing.
+  const {
+    subtotal: itemsSubtotal,
+    discount: discountAmount,
+    deliveryCharge,
+    total: orderTotal,
+    deliveryDisabledForTesting,
+  } = calculateCartTotals({
+    items: cartItems,
+    settings: deliveryConfig,
+    coupon,
+  });
 
   return (
     <CartContext.Provider
@@ -273,6 +272,7 @@ export function CartProvider({ children }) {
         discountAmount,
         deliveryCharge,
         orderTotal,
+        deliveryDisabledForTesting,
         isMounted,
       }}
     >

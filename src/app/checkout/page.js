@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle, Award } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
+import { variantPrice } from '@/lib/pricing';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
@@ -21,6 +22,7 @@ export default function CheckoutPage() {
     orderTotal,
     coupon,
     clearCart,
+    deliveryDisabledForTesting,
     isMounted,
   } = useCart();
 
@@ -516,7 +518,7 @@ export default function CheckoutPage() {
                   {/* Small cart items list */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
                     {cartItems.map((item) => {
-                      const itemPrice = item.variant.salePrice || item.variant.price;
+                      const itemPrice = variantPrice(item.variant);
                       return (
                         <div key={`${item.product._id}-${item.variant.name}`} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                           <span>
@@ -540,10 +542,13 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  <div className={styles.row} style={{ fontSize: '0.9rem', marginBottom: '15px' }}>
-                    <span>Delivery Charges</span>
-                    <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
-                  </div>
+                  {/* Delivery row hidden while delivery is disabled for testing. */}
+                  {!deliveryDisabledForTesting && (
+                    <div className={styles.row} style={{ fontSize: '0.9rem', marginBottom: '15px' }}>
+                      <span>Delivery Charges</span>
+                      <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
+                    </div>
+                  )}
 
                   <div className={styles.totalRow} style={{ marginBottom: '20px' }}>
                     <span>Order Total</span>
@@ -599,11 +604,21 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {/* Delivery note */}
-                  <div style={{ marginTop: '12px', padding: '10px 12px', background: '#f0faf0', borderRadius: '6px', fontSize: '0.75rem', color: '#2e7d32', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ShieldCheck size={13} />
-                    <span>Free delivery on orders above ₹770. Otherwise ₹40 delivery charge applies.</span>
-                  </div>
+                  {/* Delivery note — hidden while delivery is disabled for testing. */}
+                  {!deliveryDisabledForTesting && (
+                    <div style={{ marginTop: '12px', padding: '10px 12px', background: '#f0faf0', borderRadius: '6px', fontSize: '0.75rem', color: '#2e7d32', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <ShieldCheck size={13} />
+                      <span>Free delivery on orders above ₹770. Otherwise ₹40 delivery charge applies.</span>
+                    </div>
+                  )}
+
+                  {/* Dev-only notice — not shown to real customers in production. */}
+                  {deliveryDisabledForTesting && process.env.NODE_ENV !== 'production' && (
+                    <div style={{ marginTop: '12px', padding: '10px 12px', background: '#fff8e1', borderRadius: '6px', fontSize: '0.75rem', color: '#8a6d1b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <ShieldCheck size={13} />
+                      <span>Delivery temporarily disabled for testing.</span>
+                    </div>
+                  )}
 
                   {/* FSSAI Trust Badge */}
                   <div style={{ marginTop: '10px', padding: '10px 12px', background: '#f9f9f9', border: '1px solid #e0e0e0', borderRadius: '6px', fontSize: '0.72rem', color: '#555', display: 'flex', alignItems: 'center', gap: '8px' }}>
