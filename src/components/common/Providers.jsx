@@ -45,6 +45,9 @@ export function CartProvider({ children }) {
 
   // 1. Hydrate cart + coupon from localStorage on mount (guest cart & offline cache).
   useEffect(() => {
+    // One-time client mount signal for hydration; must trigger a render (so a ref
+    // won't do). This synchronous set is intentional and runs once.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
     try {
       const savedCart = localStorage.getItem(CART_STORAGE_KEY);
@@ -101,6 +104,8 @@ export function CartProvider({ children }) {
     if (!isMounted) return;
 
     if (status === 'unauthenticated') {
+      // Reset the sync flag on logout so a later login re-syncs the server cart.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setServerSynced(false);
       return;
     }

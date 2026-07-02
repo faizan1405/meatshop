@@ -20,6 +20,8 @@ export default function AdminOrderDetailsPage({ params }) {
 
   useEffect(() => {
     if (orderId) {
+      // Show the loading state while (re)fetching this order on orderId change.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(true);
       fetch(`/api/admin/orders/${orderId}`)
         .then((res) => res.json())
