@@ -204,7 +204,7 @@ export default async function Home() {
                 <h1 className={styles.title}>{heroTitle}</h1>
                 <p className={styles.subtitle}>
                   Custom-cut to order, vacuum-sealed and delivered chilled within 2 hours.
-                  Pasture-raised meats and farm-fresh eggs — never frozen, never pre-packaged.
+                  Pasture-raised meats and farm-fresh eggs — frozen &amp; non-frozen options available, never pre-packaged.
                 </p>
                 <div className={styles.heroBtns}>
                   <Link href="/shop" className="btn-gold">
@@ -363,7 +363,7 @@ export default async function Home() {
                   <Sparkles size={24} />
                 </div>
                 <h3 className={styles.featureTitle}>Fresh Cuts</h3>
-                <p className={styles.featureDesc}>Order placed. Butcher cuts. Delivered fresh. Never frozen or pre-packaged.</p>
+                <p className={styles.featureDesc}>Order placed. Butcher cuts. Delivered fresh. Frozen &amp; non-frozen options available, never pre-packaged.</p>
               </div>
 
               <div className={styles.featureCard}>
