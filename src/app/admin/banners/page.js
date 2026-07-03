@@ -34,6 +34,9 @@ export default function AdminBannersPage() {
   };
 
   useEffect(() => {
+    // Standard load-on-mount: fetchBanners sets a loading flag synchronously.
+    // This is the intended pattern and is safe here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchBanners();
   }, []);
 

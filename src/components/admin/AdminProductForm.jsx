@@ -55,12 +55,19 @@ export default function AdminProductForm({ productId }) {
     on_call: 'Per bird / Per kg',
   }[unitType] || '450gm / 900gm';
 
-  // Auto-generate slug from name
-  useEffect(() => {
-    if (!productId && name) {
-      setSlug(name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'));
+  // Derive a URL slug from a product name. Plain helper (not an effect) so the
+  // slug is generated inside the name input's onChange, preserving the previous
+  // auto-slug behaviour without a setState-in-effect.
+  const slugify = (value) =>
+    value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+
+  const handleNameChange = (value) => {
+    setName(value);
+    // Only auto-fill the slug while creating a new product (never on edit).
+    if (!productId) {
+      setSlug(value ? slugify(value) : '');
     }
-  }, [name, productId]);
+  };
 
   // Fetch Categories and Product Data on mount
   useEffect(() => {
@@ -348,7 +355,7 @@ export default function AdminProductForm({ productId }) {
           <input
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => handleNameChange(e.target.value)}
             placeholder="e.g. Chicken Drumsticks skinless"
             required
           />

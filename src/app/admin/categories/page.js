@@ -21,12 +21,19 @@ export default function AdminCategoriesPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  // Auto slug
-  useEffect(() => {
-    if (!editingId && name) {
-      setSlug(name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'));
+  // Derive a URL slug from a category name. Kept as a plain helper (not an
+  // effect) so slug generation happens in the name input's onChange — this
+  // matches the previous auto-slug behaviour without a setState-in-effect.
+  const slugify = (value) =>
+    value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+
+  const handleNameChange = (value) => {
+    setName(value);
+    // Only auto-fill the slug while creating (never overwrite on edit).
+    if (!editingId) {
+      setSlug(value ? slugify(value) : '');
     }
-  }, [name, editingId]);
+  };
 
   const fetchCategories = () => {
     setIsLoading(true);
@@ -42,6 +49,8 @@ export default function AdminCategoriesPage() {
   };
 
   useEffect(() => {
+    // Load-on-mount: fetchCategories sets a loading flag synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCategories();
   }, []);
 
@@ -172,7 +181,7 @@ export default function AdminCategoriesPage() {
               type="text"
               placeholder="e.g. Quail"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => handleNameChange(e.target.value)}
               required
             />
           </div>

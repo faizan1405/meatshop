@@ -24,11 +24,13 @@ export default function ProductDetailClient({ product, initialReviews }) {
   const [comment, setComment] = useState('');
   const [reviewStatus, setReviewStatus] = useState(null); // 'success', 'error', 'submitting'
 
-  // Hydrate initial states
+  // Hydrate initial states from the product prop (init-from-prop; re-syncs if
+  // the product changes).
   useEffect(() => {
     if (product) {
       if (product.variants?.length > 0) {
         const instock = product.variants.find((v) => v.stockStatus === 'in_stock');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedVariant(instock || product.variants[0]);
       }
       if (product.images?.length > 0) {
@@ -37,9 +39,10 @@ export default function ProductDetailClient({ product, initialReviews }) {
     }
   }, [product]);
 
-  // Sync reviewer name if session changes
+  // Sync reviewer name if session changes (prefill from the logged-in user).
   useEffect(() => {
     if (session?.user?.name) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReviewerName(session.user.name);
     }
   }, [session]);
@@ -322,7 +325,9 @@ export default function ProductDetailClient({ product, initialReviews }) {
                 <div key={index} className={styles.reviewCard}>
                   <div className={styles.reviewHeader}>
                     <h4 className={styles.reviewerName}>{rev.name}</h4>
-                    <span className={styles.reviewDate}>{new Date(rev.createdAt || Date.now()).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    {rev.createdAt && (
+                      <span className={styles.reviewDate}>{new Date(rev.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    )}
                   </div>
                   <div className={styles.stars} style={{ marginBottom: '10px' }}>
                     {[...Array(5)].map((_, i) => (
@@ -334,7 +339,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
                       />
                     ))}
                   </div>
-                  <p style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>"{rev.comment}"</p>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>&ldquo;{rev.comment}&rdquo;</p>
                 </div>
               ))
             )}

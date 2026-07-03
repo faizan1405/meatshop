@@ -36,6 +36,8 @@ export default function AdminCouponsPage() {
   };
 
   useEffect(() => {
+    // Load-on-mount: fetchCoupons sets a loading flag synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCoupons();
   }, []);
 

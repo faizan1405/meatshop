@@ -16,8 +16,10 @@ export default function AdminProductsPage() {
 
   // Fetch products and categories on mount
   useEffect(() => {
+    // Load-on-mount pattern: flip the loading flag before fetching.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
-    
+
     // Fetch products
     fetch('/api/admin/products')
       .then((res) => res.json())

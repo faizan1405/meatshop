@@ -26,6 +26,8 @@ export default function OrdersPage() {
   // Fetch logged in user orders
   useEffect(() => {
     if (session?.user) {
+      // Load-on-mount / on-session-change: flip the loading flag before fetch.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(true);
       fetch('/api/orders')
         .then((res) => res.json())

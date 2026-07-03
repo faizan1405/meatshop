@@ -30,6 +30,8 @@ export default function AdminSettingsPage() {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
+    // Load-on-mount pattern: flip the loading flag before fetching.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
     // scope=admin returns the private FSSAI fields (license name, address,
     // kind of business) needed to populate the admin form. The public site

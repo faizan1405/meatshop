@@ -8,7 +8,7 @@ import {
   ShoppingBag,
   Tag,
   ClipboardList,
-  Image,
+  Image as ImageIcon,
   MessageSquare,
   Settings,
 } from 'lucide-react';
@@ -20,7 +20,7 @@ const menuItems = [
   { name: 'Categories', path: '/admin/categories', icon: <Tag size={18} /> },
   { name: 'Orders', path: '/admin/orders', icon: <ClipboardList size={18} /> },
   { name: 'Coupons', path: '/admin/coupons', icon: <Tag size={18} /> },
-  { name: 'Banners', path: '/admin/banners', icon: <Image size={18} /> },
+  { name: 'Banners', path: '/admin/banners', icon: <ImageIcon size={18} /> },
   { name: 'Reviews', path: '/admin/reviews', icon: <MessageSquare size={18} /> },
   { name: 'Site Settings', path: '/admin/settings', icon: <Settings size={18} /> },
 ];

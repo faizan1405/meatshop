@@ -28,16 +28,18 @@ export default function ShopLoading() {
               <div className={styles.filterBox}>
                 <h3 className={styles.filterTitle}>Categories</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' }}>
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <div key={i} style={{ height: '20px', width: `${Math.random() * 40 + 40}%`, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', animation: 'pulse 1.5s infinite ease-in-out' }}></div>
+                  {/* Static varied widths so the skeleton stays deterministic
+                      during render (Math.random() is impure in render). */}
+                  {[68, 52, 76, 44, 60].map((w, i) => (
+                    <div key={i} style={{ height: '20px', width: `${w}%`, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', animation: 'pulse 1.5s infinite ease-in-out' }}></div>
                   ))}
                 </div>
               </div>
               <div className={styles.filterBox}>
                 <h3 className={styles.filterTitle}>Product Types</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' }}>
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} style={{ height: '20px', width: `${Math.random() * 40 + 40}%`, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', animation: 'pulse 1.5s infinite ease-in-out' }}></div>
+                  {[72, 48, 64, 56].map((w, i) => (
+                    <div key={i} style={{ height: '20px', width: `${w}%`, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', animation: 'pulse 1.5s infinite ease-in-out' }}></div>
                   ))}
                 </div>
               </div>

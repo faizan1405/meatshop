@@ -369,7 +369,7 @@ export default async function Home() {
                       <Star key={i} size={16} fill="var(--primary-gold)" stroke="none" />
                     ))}
                   </div>
-                  <p className={styles.comment}>"{rev.comment}"</p>
+                  <p className={styles.comment}>&ldquo;{rev.comment}&rdquo;</p>
                   <div>
                     <h4 className={styles.reviewer}>{rev.name}</h4>
                     <span className={styles.date}>{rev.date || 'Verified Buyer'}</span>

@@ -11,11 +11,13 @@ export default function ProductCard({ product, compact = false }) {
   const { addToCart } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(null);
 
-  // Set initial selected variant
+  // Set initial selected variant. Syncs whenever the product prop changes, so
+  // this init-from-prop setState is intentional.
   useEffect(() => {
     if (product?.variants?.length > 0) {
       // Prefer in-stock variant if possible
       const instock = product.variants.find((v) => v.stockStatus === 'in_stock');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedVariant(instock || product.variants[0]);
     }
   }, [product]);

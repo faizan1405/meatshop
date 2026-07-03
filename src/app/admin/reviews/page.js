@@ -23,6 +23,8 @@ export default function AdminReviewsPage() {
   };
 
   useEffect(() => {
+    // Load-on-mount: fetchReviews sets a loading flag synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchReviews();
   }, []);
 
@@ -122,7 +124,7 @@ export default function AdminReviewsPage() {
                   </div>
                 </td>
                 <td style={{ maxWidth: '300px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                  "{rev.comment}"
+                  &ldquo;{rev.comment}&rdquo;
                 </td>
                 <td>{new Date(rev.createdAt).toLocaleDateString('en-IN', { dateStyle: 'short' })}</td>
                 <td>

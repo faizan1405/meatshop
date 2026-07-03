@@ -1,16 +1,23 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import ProductCard from '../product/ProductCard';
 import styles from './ProductCarousel.module.css';
 
 export default function ProductCarousel({ products, autoplayInterval = 3000, compact = false }) {
   const carouselRef = useRef(null);
 
-  // Duplicate products if there are few, to ensure it can scroll on large screens
-  const displayProducts = products && products.length > 1 && products.length <= 4
-    ? [...products, ...products.map(p => ({ ...p, _id: (p._id || '') + '-clone', slug: (p.slug || '') + '-clone' }))]
-    : products;
+  // Duplicate products if there are few, to ensure it can scroll on large
+  // screens. Memoised so its reference is stable across renders — this lets it
+  // be an honest dependency of the autoplay effect without re-running it every
+  // render (satisfies react-hooks/exhaustive-deps).
+  const displayProducts = useMemo(
+    () =>
+      products && products.length > 1 && products.length <= 4
+        ? [...products, ...products.map(p => ({ ...p, _id: (p._id || '') + '-clone', slug: (p.slug || '') + '-clone' }))]
+        : products,
+    [products]
+  );
 
   // Autoplay functionality
   useEffect(() => {
@@ -56,7 +63,7 @@ export default function ProductCarousel({ products, autoplayInterval = 3000, com
         container.removeEventListener('touchend', handleMouseLeave);
       }
     };
-  }, [products, autoplayInterval]);
+  }, [displayProducts, autoplayInterval]);
 
   if (!displayProducts || displayProducts.length === 0) return null;
 
