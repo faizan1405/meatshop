@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, ShieldAlert } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
@@ -90,6 +90,15 @@ export default function OrdersPage() {
       <main className={styles.container}>
         <div className="container">
           <h1 className={styles.title}>Track Your Orders</h1>
+
+          {/* Perishable-goods policy reminder */}
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', background: '#fff8e1', border: '1px solid #ffe0a3', color: '#8a6d1b', padding: '12px 14px', borderRadius: 'var(--border-radius-sm)', fontSize: '0.8rem', lineHeight: '1.6', margin: '0 0 24px' }}>
+            <ShieldAlert size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+            <span>
+              Fresh product complaints must be raised within <strong>2 hours of delivery</strong> with valid proof.
+              Please store meat, eggs, and ready-to-eat items properly after delivery.
+            </span>
+          </div>
 
           {/* 1. Logged In Orders History */}
           {session ? (

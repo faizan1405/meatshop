@@ -144,8 +144,6 @@ export default function Footer() {
               <li><Link href="/faq" className={styles.link}>FAQs</Link></li>
               <li><Link href="/contact" className={styles.link}>Contact Us</Link></li>
               <li><Link href="/shop" className={styles.link}>Browse Shop</Link></li>
-              <li><Link href="/privacy-policy" className={styles.link}>Privacy Policy</Link></li>
-              <li><Link href="/terms-and-conditions" className={styles.link}>Terms & Conditions</Link></li>
             </ul>
           </div>
 
@@ -217,11 +215,17 @@ export default function Footer() {
         <div className={styles.bottom}>
           <p>© {currentYear} Porville. All Rights Reserved. Branding: &quot;Fresh Cut Pure Standards&quot;.</p>
           <div className={styles.bottomLinks}>
-            <Link href="/shipping-policy" className={styles.link} style={{ fontSize: '0.75rem' }}>
-              Shipping Policy
+            <Link href="/terms-and-conditions" className={styles.link} style={{ fontSize: '0.75rem' }}>
+              Terms & Conditions
             </Link>
-            <Link href="/refund-policy" className={styles.link} style={{ fontSize: '0.75rem' }}>
-              Refund & Cancellation
+            <Link href="/refund-cancellation-policy" className={styles.link} style={{ fontSize: '0.75rem' }}>
+              Refund & Cancellation Policy
+            </Link>
+            <Link href="/privacy-policy" className={styles.link} style={{ fontSize: '0.75rem' }}>
+              Privacy Policy
+            </Link>
+            <Link href="/shipping-delivery-policy" className={styles.link} style={{ fontSize: '0.75rem' }}>
+              Shipping & Delivery Policy
             </Link>
           </div>
         </div>

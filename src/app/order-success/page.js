@@ -111,6 +111,15 @@ export default async function OrderSuccessPage({ searchParams }) {
                 An order receipt and delivery details have been sent to you. Average delivery time: <strong>2 Hours</strong>.
               </p>
 
+              {/* Perishable-goods policy reminder */}
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', textAlign: 'left', background: '#fff8e1', border: '1px solid #ffe0a3', color: '#8a6d1b', padding: '12px 14px', borderRadius: 'var(--border-radius-sm)', fontSize: '0.78rem', lineHeight: '1.6', margin: '4px 0 18px' }}>
+                <ShieldAlert size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                <span>
+                  Fresh product complaints must be raised within <strong>2 hours of delivery</strong> with valid proof.
+                  Please store meat, eggs, and ready-to-eat items properly after delivery.
+                </span>
+              </div>
+
               <div className={styles.buttons}>
                 <Link href="/orders" className="btn-primary">
                   Track Orders

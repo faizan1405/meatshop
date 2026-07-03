@@ -14,8 +14,8 @@ export default async function sitemap() {
     '/contact',
     '/privacy-policy',
     '/terms-and-conditions',
-    '/shipping-policy',
-    '/refund-policy',
+    '/shipping-delivery-policy',
+    '/refund-cancellation-policy',
   ].map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),

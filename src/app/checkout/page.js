@@ -50,6 +50,8 @@ export default function CheckoutPage() {
   const [guestEmail, setGuestEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  // Required legal consent — Place Order / Pay Now stays disabled until checked.
+  const [agreedToPolicies, setAgreedToPolicies] = useState(false);
 
   // ---- Delivery timing (raw slot vs ready-to-eat) ----
   const deliveryInfo = useMemo(() => getCartDeliveryMode(cartItems), [cartItems]);
@@ -650,6 +652,28 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
+                  {/* Required legal consent. Policy links open in a new tab so
+                      checkout state (cart, address, slot) is never lost. */}
+                  <label
+                    htmlFor="policyConsent"
+                    style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '16px', fontSize: '0.8rem', lineHeight: '1.6', color: 'var(--text-dark)', cursor: 'pointer' }}
+                  >
+                    <input
+                      id="policyConsent"
+                      type="checkbox"
+                      checked={agreedToPolicies}
+                      onChange={(e) => setAgreedToPolicies(e.target.checked)}
+                      style={{ width: '16px', height: '16px', marginTop: '2px', flexShrink: 0, accentColor: 'var(--primary-gold)', cursor: 'pointer' }}
+                    />
+                    <span>
+                      I agree to Porville&apos;s{' '}
+                      <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-gold-dark)', textDecoration: 'underline' }}>Terms &amp; Conditions</a>,{' '}
+                      <a href="/refund-cancellation-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-gold-dark)', textDecoration: 'underline' }}>Refund &amp; Cancellation Policy</a>,{' '}
+                      <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-gold-dark)', textDecoration: 'underline' }}>Privacy Policy</a>, and{' '}
+                      <a href="/shipping-delivery-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-gold-dark)', textDecoration: 'underline' }}>Shipping &amp; Delivery Policy</a>.
+                    </span>
+                  </label>
+
                   {config.isLoading ? (
                     <button className={`${styles.paymentBtn} btn-gold`} disabled>
                       <span>Loading...</span>
@@ -657,10 +681,10 @@ export default function CheckoutPage() {
                   ) : (!config.isRazorpayConfigured && config.isDemoCheckoutEnabled) || (config.isDemoCheckoutEnabled && process.env.NODE_ENV !== 'production') ? (
                     <>
                       <button 
-                        onClick={handleDemoPayment} 
+                        onClick={handleDemoPayment}
                         className={`${styles.paymentBtn}`}
                         style={{ backgroundColor: '#2196F3', color: 'white', border: 'none' }}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !agreedToPolicies}
                       >
                         <ShieldCheck size={18} />
                         <span>{isSubmitting ? 'Processing...' : `Place Demo Order ₹${orderTotal}`}</span>
@@ -671,9 +695,9 @@ export default function CheckoutPage() {
                     </>
                   ) : config.isRazorpayConfigured ? (
                     <button 
-                      onClick={handlePayment} 
+                      onClick={handlePayment}
                       className={`${styles.paymentBtn} btn-gold`}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !agreedToPolicies}
                     >
                       <CreditCard size={18} />
                       <span>{isSubmitting ? 'Processing Payment...' : `Verify & Pay ₹${orderTotal}`}</span>

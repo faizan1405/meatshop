@@ -393,22 +393,6 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 6. Featured Products Section — single admin-controlled "Featured" list
-            (replaces the old duplicate Best Sellers + Featured sections). Mark a
-            product as Featured in the admin panel to surface it here. */}
-        {featuredProducts.length > 0 && (
-          <section className="section-padding" style={{ backgroundColor: 'var(--bg-cream)' }}>
-            <div className="container">
-              <span className={styles.sectionTagline}>Chef&apos;s Picks</span>
-              <h2 className={styles.sectionTitle}>Featured Best Sellers</h2>
-              <p className={styles.sectionSubtitle}>
-                A hand-picked selection of our most-loved cuts — chosen by Porville and cut fresh on order.
-              </p>
-              <ProductCarousel products={featuredProducts} autoplayInterval={3000} />
-            </div>
-          </section>
-        )}
-
         {/* 8. Customer Reviews */}
         <section className="section-padding" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border-cream)' }}>
           <div className="container">
