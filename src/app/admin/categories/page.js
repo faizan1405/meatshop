@@ -13,7 +13,7 @@ export default function AdminCategoriesPage() {
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
-  const [displayOrder, setDisplayOrder] = useState('0');
+  const [displayOrder, setDisplayOrder] = useState('');
   const [isActive, setIsActive] = useState(true);
   
   const [editingId, setEditingId] = useState(null);
@@ -104,7 +104,7 @@ export default function AdminCategoriesPage() {
     setSlug(cat.slug);
     setDescription(cat.description || '');
     setImage(cat.image || '');
-    setDisplayOrder(cat.displayOrder?.toString() || '0');
+    setDisplayOrder(cat.displayOrder?.toString() || '');
     setIsActive(cat.isActive !== false);
     setMessage(null);
   };
@@ -115,7 +115,7 @@ export default function AdminCategoriesPage() {
     setSlug('');
     setDescription('');
     setImage('');
-    setDisplayOrder('0');
+    setDisplayOrder('');
     setIsActive(true);
   };
 
@@ -199,11 +199,13 @@ export default function AdminCategoriesPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Display Order</label>
+            <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Display Position (1 = first)</label>
             <input
               type="number"
+              min="1"
               value={displayOrder}
               onChange={(e) => setDisplayOrder(e.target.value)}
+              placeholder="Leave blank to place last"
             />
           </div>
 

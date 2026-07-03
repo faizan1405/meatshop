@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Review from '@/models/Review';
 import Product from '@/models/Product';
+import { revalidateReviewPages } from '@/lib/adminRevalidate';
 
 export async function GET(request) {
   try {
@@ -56,12 +57,15 @@ export async function POST(request) {
       if (!updated) {
         return NextResponse.json({ success: false, message: 'Review not found' }, { status: 404 });
       }
+      // Approved reviews render on statically cached pages (home + product).
+      revalidateReviewPages();
       return NextResponse.json({ success: true, message: 'Review approved successfully' });
     } else if (action === 'delete') {
       const deleted = await Review.findByIdAndDelete(reviewId);
       if (!deleted) {
         return NextResponse.json({ success: false, message: 'Review not found' }, { status: 404 });
       }
+      revalidateReviewPages();
       return NextResponse.json({ success: true, message: 'Review deleted successfully' });
     }
 

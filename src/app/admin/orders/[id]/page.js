@@ -123,25 +123,30 @@ export default function AdminOrderDetailsPage({ params }) {
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Shipping & Customer Info</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem' }}>
-              <div><strong>Receiver Name:</strong> {order.shippingAddress.name}</div>
-              <div><strong>Phone Number:</strong> {order.shippingAddress.phone}</div>
+              <div><strong>Receiver Name:</strong> {order.shippingAddress?.name || order.guestInfo?.name || '—'}</div>
+              <div><strong>Phone Number:</strong> {order.shippingAddress?.phone || order.guestInfo?.phone || '—'}</div>
               <div>
                 <strong>Street Address:</strong><br />
-                {order.shippingAddress.streetAddress}, {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.postalCode}
+                {order.shippingAddress
+                  ? `${order.shippingAddress.streetAddress}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.postalCode}`
+                  : '—'}
               </div>
               {order.isGuest ? (
                 <div><strong>Checkout Type:</strong> <span style={{ color: '#7e57c2', fontWeight: 700 }}>Guest Checkout</span></div>
               ) : (
                 <div><strong>Checkout Type:</strong> <span style={{ color: '#0288d1', fontWeight: 700 }}>Registered Account</span></div>
               )}
-              {order.isDemoOrder && (
-                <>
-                  <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-cream)' }}>
-                    <strong>Payment Method:</strong> {order.paymentMethod}
-                  </div>
-                  <div><strong>Payment Provider:</strong> {order.paymentProvider}</div>
-                </>
-              )}
+              {/* Payment method/provider shown for ALL orders — previously it
+                  was hidden for real (non-demo) orders, so the admin couldn't
+                  tell how an order was paid. */}
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-cream)' }}>
+                <strong>Payment Method:</strong>{' '}
+                <span style={{ textTransform: 'capitalize' }}>{order.paymentMethod || 'online'}</span>
+              </div>
+              <div>
+                <strong>Payment Provider:</strong>{' '}
+                <span style={{ textTransform: 'capitalize' }}>{order.paymentProvider || 'razorpay'}</span>
+              </div>
             </div>
           </div>
 

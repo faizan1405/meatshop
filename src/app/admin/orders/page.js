@@ -11,14 +11,16 @@ async function getOrders() {
   try {
     await connectDB();
     const orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+    // Guard optional/legacy fields — one malformed order must not blank out
+    // the entire orders list (the catch below would return []).
     return orders.map((order) => ({
       _id: order._id.toString(),
-      createdAt: order.createdAt.toISOString(),
-      orderStatus: order.orderStatus,
-      paymentStatus: order.paymentStatus,
-      totalPrice: order.totalPrice,
-      shippingAddressName: order.shippingAddress.name,
-      shippingAddressPhone: order.shippingAddress.phone,
+      createdAt: order.createdAt ? order.createdAt.toISOString() : null,
+      orderStatus: order.orderStatus || 'pending',
+      paymentStatus: order.paymentStatus || 'pending',
+      totalPrice: order.totalPrice ?? 0,
+      shippingAddressName: order.shippingAddress?.name || order.guestInfo?.name || '—',
+      shippingAddressPhone: order.shippingAddress?.phone || order.guestInfo?.phone || '—',
       isGuest: order.isGuest,
       isDemoOrder: order.isDemoOrder,
     }));
@@ -92,7 +94,7 @@ export default async function AdminOrdersPage() {
                       {order.isGuest ? 'Guest' : 'Customer'}
                     </span>
                   </td>
-                  <td>{new Date(order.createdAt).toLocaleDateString('en-IN', { dateStyle: 'short' })}</td>
+                  <td>{order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { dateStyle: 'short' }) : '—'}</td>
                   <td>
                     <strong style={{ color: order.paymentStatus === 'paid' ? 'var(--success)' : 'var(--error)' }}>
                       {order.paymentStatus.toUpperCase()}

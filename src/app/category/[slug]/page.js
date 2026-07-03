@@ -27,6 +27,11 @@ async function getCategoryData(slug) {
 
     let category = await Category.findOne({ slug }).lean();
 
+    // A category the admin has deactivated must not be browsable publicly.
+    if (category && category.isActive === false) {
+      return null;
+    }
+
     if (!category) {
       // Find in fallbackCategories to avoid 404
       const fbCat = fallbackCategories.find(c => c.slug === slug);
@@ -44,7 +49,8 @@ async function getCategoryData(slug) {
 
     let products = [];
     if (mongoose.Types.ObjectId.isValid(category._id)) {
-      products = await Product.find({ category: category._id })
+      // Only active products — respect the admin "Active on Site" toggle.
+      products = await Product.find({ category: category._id, isActive: { $ne: false } })
         .populate('category')
         .sort({ createdAt: -1 })
         .lean();

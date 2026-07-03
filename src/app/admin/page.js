@@ -17,8 +17,8 @@ async function getDashboardStats() {
     const totalOrders = await Order.countDocuments({});
 
     // 2. Total Revenue (sum of all paid orders)
-    const paidOrders = await Order.find({ paymentStatus: 'paid' });
-    const totalRevenue = paidOrders.reduce((acc, order) => acc + order.totalPrice, 0);
+    const paidOrders = await Order.find({ paymentStatus: 'paid' }).lean();
+    const totalRevenue = paidOrders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
 
     // 3. Total Customers
     const totalCustomers = await User.countDocuments({ role: 'customer' });
@@ -41,11 +41,11 @@ async function getDashboardStats() {
       },
       recentOrders: recentOrders.map((order) => ({
         _id: order._id.toString(),
-        createdAt: order.createdAt.toISOString(),
-        orderStatus: order.orderStatus,
-        paymentStatus: order.paymentStatus,
-        totalPrice: order.totalPrice,
-        shippingAddressName: order.shippingAddress.name,
+        createdAt: order.createdAt ? order.createdAt.toISOString() : null,
+        orderStatus: order.orderStatus || 'pending',
+        paymentStatus: order.paymentStatus || 'pending',
+        totalPrice: order.totalPrice ?? 0,
+        shippingAddressName: order.shippingAddress?.name || order.guestInfo?.name || '—',
       })),
     };
   } catch (error) {
@@ -160,7 +160,7 @@ export default async function AdminDashboardPage() {
                       <strong style={{ fontSize: '0.75rem' }}>{order._id}</strong>
                     </td>
                     <td>{order.shippingAddressName}</td>
-                    <td>{new Date(order.createdAt).toLocaleDateString('en-IN', { dateStyle: 'short' })}</td>
+                    <td>{order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { dateStyle: 'short' }) : '—'}</td>
                     <td>
                       <span 
                         style={{ 

@@ -35,10 +35,12 @@ async function getData() {
     await connectDB();
 
     // Query active categories only
-    let categories = await Category.find({ isActive: { $ne: false } }).sort({ displayOrder: 1 }).lean();
+    let categories = await Category.find({ isActive: { $ne: false } }).sort({ displayOrder: 1, createdAt: 1 }).lean();
 
-    // Query product counts per category
+    // Query product counts per category (active products only, to match
+    // what the customer can actually see).
     const productCounts = await Product.aggregate([
+      { $match: { isActive: { $ne: false } } },
       { $group: { _id: '$category', count: { $sum: 1 } } }
     ]);
     const countMap = {};
@@ -50,7 +52,12 @@ async function getData() {
     
     // Query featured products (support both `featured` and the `isFeatured`
     // alias, since seeded docs set the alias and admin-created docs set `featured`).
-    let featuredProducts = await Product.find({ $or: [{ featured: true }, { isFeatured: true }] })
+    // Exclude inactive products — the admin "Active on Site" toggle must be
+    // respected everywhere on the storefront.
+    let featuredProducts = await Product.find({
+      $or: [{ featured: true }, { isFeatured: true }],
+      isActive: { $ne: false },
+    })
       .populate('category')
       .limit(12)
       .lean();
@@ -77,7 +84,7 @@ async function getData() {
       : [];
 
     // Query active banners
-    let banners = await Banner.find({ active: true }).sort({ displayOrder: 1 }).lean();
+    let banners = await Banner.find({ active: true }).sort({ displayOrder: 1, createdAt: 1 }).lean();
 
     // Query approved reviews
     let reviews = await Review.find({ approved: true }).limit(3).lean();

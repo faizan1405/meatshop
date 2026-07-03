@@ -14,7 +14,8 @@ async function getProductData(slug) {
 
     const product = await Product.findOne({ slug }).populate('category').lean();
 
-    if (!product) {
+    // Deactivated products must not be reachable via direct link either.
+    if (!product || product.isActive === false) {
       return null;
     }
 

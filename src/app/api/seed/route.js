@@ -9,6 +9,7 @@ import SiteSettings from '@/models/SiteSettings';
 import Banner from '@/models/Banner';
 import Coupon from '@/models/Coupon';
 import { seedCategories, seedProducts } from '@/data/seedProducts';
+import { revalidateProductPages } from '@/lib/adminRevalidate';
 
 // Force dynamic so this handler is never statically cached and always reads the
 // incoming secret. (Reading request.headers already opts out of caching.)
@@ -214,6 +215,9 @@ async function handleSeed(request) {
 
   try {
     const result = await runSeed();
+    // Seeding rewrites categories/products/banners that render on statically
+    // cached public pages — refresh them like any other admin mutation.
+    revalidateProductPages();
     return NextResponse.json(result);
   } catch (error) {
     console.error('Seeding error:', error);

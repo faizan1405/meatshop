@@ -20,11 +20,14 @@ async function getShopData(searchParamsResolved) {
     const type = searchParamsResolved.type || '';
     const sort = searchParamsResolved.sort || '';
 
-    // Get all categories for filter list
-    const categories = await Category.find({}).sort({ displayOrder: 1 }).lean();
+    // Get active categories for the filter list (inactive ones are hidden
+    // from the storefront), in the admin-defined display order.
+    const categories = await Category.find({ isActive: { $ne: false } })
+      .sort({ displayOrder: 1, createdAt: 1 })
+      .lean();
 
-    // Build product filters
-    const filter = {};
+    // Build product filters — never list products the admin has deactivated.
+    const filter = { isActive: { $ne: false } };
     
     if (search) {
       filter.$or = [

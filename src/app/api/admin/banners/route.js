@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Banner from '@/models/Banner';
+import { revalidateBannerPages } from '@/lib/adminRevalidate';
 
 export async function GET(request) {
   try {
@@ -14,7 +15,9 @@ export async function GET(request) {
 
     await connectDB();
 
-    const banners = await Banner.find({}).sort({ displayOrder: 1 }).lean();
+    // createdAt tiebreaker keeps the order stable when banners share the
+    // same displayOrder value (the default is 0).
+    const banners = await Banner.find({}).sort({ displayOrder: 1, createdAt: 1 }).lean();
 
     return NextResponse.json({
       success: true,
@@ -43,13 +46,22 @@ export async function POST(request) {
     await connectDB();
 
     if (deleteBanner && bannerId) {
-      await Banner.findByIdAndDelete(bannerId);
+      const deleted = await Banner.findByIdAndDelete(bannerId);
+      if (!deleted) {
+        return NextResponse.json({ success: false, message: 'Banner not found' }, { status: 404 });
+      }
+      revalidateBannerPages();
       return NextResponse.json({ success: true, message: 'Banner deleted successfully' });
     }
 
     if (!title || !image) {
       return NextResponse.json({ success: false, message: 'Title and Image URL are required' }, { status: 400 });
     }
+
+    // Guard against non-numeric input — parseInt('abc') is NaN and would
+    // throw a cast error on save.
+    const parsedOrder = parseInt(displayOrder, 10);
+    const safeOrder = Number.isFinite(parsedOrder) ? parsedOrder : 0;
 
     if (bannerId) {
       // Edit
@@ -60,13 +72,14 @@ export async function POST(request) {
           image,
           link: link || '/shop',
           active: !!active,
-          displayOrder: parseInt(displayOrder || '0', 10),
+          displayOrder: safeOrder,
         },
         { new: true }
       );
       if (!updated) {
         return NextResponse.json({ success: false, message: 'Banner not found' }, { status: 404 });
       }
+      revalidateBannerPages();
       return NextResponse.json({ success: true, message: 'Banner updated successfully' });
     } else {
       // Create
@@ -75,9 +88,10 @@ export async function POST(request) {
         image,
         link: link || '/shop',
         active: !!active,
-        displayOrder: parseInt(displayOrder || '0', 10),
+        displayOrder: safeOrder,
       });
 
+      revalidateBannerPages();
       return NextResponse.json({ success: true, message: 'Banner created successfully' });
     }
   } catch (error) {

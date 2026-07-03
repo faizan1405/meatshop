@@ -70,8 +70,13 @@ export default function AdminProductForm({ productId }) {
       .then((data) => {
         if (data.success) {
           setCategories(data.categories);
-          if (data.categories.length > 0 && !category) {
-            setCategory(data.categories[0]._id);
+          // Only default-select the first category when CREATING a product.
+          // Use the functional form so this can never overwrite the real
+          // category loaded by the parallel product fetch below (the old code
+          // read a stale closure value and could reset the product's category
+          // to the first item in the list).
+          if (!productId && data.categories.length > 0) {
+            setCategory((prev) => prev || data.categories[0]._id);
           }
         }
       })
@@ -92,19 +97,23 @@ export default function AdminProductForm({ productId }) {
             // Derive unit type: prefer stored value, fall back to on_call when
             // the product is phone-order only (legacy docs had no unitType).
             setUnitType(p.unitType || ((p.priceType === 'on_call' || p.purchaseMode === 'on_call') ? 'on_call' : 'pack_weight'));
-            setFeatured(p.featured);
-            setBestSeller(p.bestSeller);
-            setNewArrival(p.newArrival);
+            // Legacy docs may only carry the alias flags (isFeatured /
+            // isBestSeller) — honour both so an edit+save never silently
+            // drops a flag. Guard numeric fields that may be missing on
+            // legacy variants so the form doesn't crash while loading.
+            setFeatured(!!(p.featured || p.isFeatured));
+            setBestSeller(!!(p.bestSeller || p.isBestSeller));
+            setNewArrival(!!p.newArrival);
             setIsActive(p.isActive !== false);
             setSeoTitle(p.seoTitle || '');
             setSeoDescription(p.seoDescription || '');
             setImages(p.images || []);
             setMedia(p.media || []);
-            setVariants(p.variants.map(v => ({
+            setVariants((p.variants || []).map(v => ({
               ...v,
-              price: v.price.toString(),
+              price: (v.price ?? 0).toString(),
               salePrice: v.salePrice ? v.salePrice.toString() : '',
-              stockQty: v.stockQty.toString()
+              stockQty: (v.stockQty ?? 0).toString()
             })));
           }
         })

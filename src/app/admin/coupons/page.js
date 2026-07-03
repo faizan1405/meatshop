@@ -68,7 +68,7 @@ export default function AdminCouponsPage() {
     setMinOrderValue(c.minOrderValue?.toString() || '0');
     setMaxDiscountValue(c.maxDiscountValue?.toString() || '');
     setActive(c.active);
-    setExpiryDate(c.expiryDate.split('T')[0]); // YYYY-MM-DD
+    setExpiryDate(c.expiryDate ? c.expiryDate.split('T')[0] : ''); // YYYY-MM-DD
     setMessage(null);
   };
 
@@ -291,7 +291,11 @@ export default function AdminCouponsPage() {
               </tr>
             </thead>
             <tbody>
-              {coupons.map((c) => (
+              {coupons.map((c) => {
+                // An "active" coupon past its expiry date is not usable —
+                // surface that clearly instead of showing a misleading ACTIVE.
+                const isExpired = c.expiryDate ? new Date(c.expiryDate) < new Date() : false;
+                return (
                 <tr key={c._id}>
                   <td>
                     <strong>{c.code}</strong>
@@ -301,16 +305,16 @@ export default function AdminCouponsPage() {
                     {c.discountType === 'percentage' ? `${c.discountValue}%` : `₹${c.discountValue}`}
                   </td>
                   <td>₹{c.minOrderValue}</td>
-                  <td>{new Date(c.expiryDate).toLocaleDateString('en-IN', { dateStyle: 'short' })}</td>
+                  <td>{c.expiryDate ? new Date(c.expiryDate).toLocaleDateString('en-IN', { dateStyle: 'short' }) : '—'}</td>
                   <td>
-                    <span 
-                      style={{ 
-                        fontWeight: 700, 
-                        color: c.active ? 'var(--success)' : 'var(--error)',
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        color: c.active && !isExpired ? 'var(--success)' : 'var(--error)',
                         fontSize: '0.75rem'
                       }}
                     >
-                      {c.active ? 'ACTIVE' : 'INACTIVE'}
+                      {isExpired ? 'EXPIRED' : c.active ? 'ACTIVE' : 'INACTIVE'}
                     </span>
                   </td>
                   <td>
@@ -334,7 +338,8 @@ export default function AdminCouponsPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         )}

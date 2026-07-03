@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
+import { revalidateProductPages } from '@/lib/adminRevalidate';
 
 export async function GET(request, { params }) {
   try {
@@ -13,6 +15,10 @@ export async function GET(request, { params }) {
     }
 
     const { id: productId } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return NextResponse.json({ success: false, message: 'Invalid product ID' }, { status: 400 });
+    }
 
     await connectDB();
 
@@ -46,6 +52,11 @@ export async function POST(request, { params }) {
     }
 
     const { id: productId } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return NextResponse.json({ success: false, message: 'Invalid product ID' }, { status: 400 });
+    }
+
     const body = await request.json();
 
     const {
@@ -86,8 +97,10 @@ export async function POST(request, { params }) {
 
     await connectDB();
 
-    // Verify slug uniqueness (excluding current product)
-    const existing = await Product.findOne({ slug, _id: { $ne: productId } });
+    // Verify slug uniqueness (excluding current product) against the
+    // FORMATTED slug — the value actually saved.
+    const formattedSlug = slug.toLowerCase().trim().replace(/\s+/g, '-');
+    const existing = await Product.findOne({ slug: formattedSlug, _id: { $ne: productId } });
     if (existing) {
       return NextResponse.json({ success: false, message: 'Product slug already exists' }, { status: 400 });
     }
@@ -96,14 +109,20 @@ export async function POST(request, { params }) {
       productId,
       {
         name,
-        slug: slug.toLowerCase().replace(/\s+/g, '-'),
+        slug: formattedSlug,
         category,
         description,
         variants,
         images: images || [],
         media: media || [],
+        // findByIdAndUpdate skips the pre('save') hook that syncs the legacy
+        // alias fields, so set both spellings explicitly. Without this,
+        // un-featuring a seeded product never took effect on the homepage
+        // (which also matches isFeatured/isBestSeller).
         featured: !!featured,
+        isFeatured: !!featured,
         bestSeller: !!bestSeller,
+        isBestSeller: !!bestSeller,
         newArrival: !!newArrival,
         isActive: isActive !== undefined ? !!isActive : true,
         productType: productType || 'fresh meat',
@@ -120,12 +139,17 @@ export async function POST(request, { params }) {
       return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
     }
 
+    revalidateProductPages();
+
     return NextResponse.json({
       success: true,
       message: 'Product updated successfully',
     });
   } catch (error) {
     console.error('Error updating product:', error);
+    if (error?.code === 11000) {
+      return NextResponse.json({ success: false, message: 'Product slug already exists' }, { status: 400 });
+    }
     return NextResponse.json({ success: false, message: error.message || 'Server error updating product' }, { status: 500 });
   }
 }
@@ -140,6 +164,10 @@ export async function DELETE(request, { params }) {
 
     const { id: productId } = await params;
 
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return NextResponse.json({ success: false, message: 'Invalid product ID' }, { status: 400 });
+    }
+
     await connectDB();
 
     const deleted = await Product.findByIdAndDelete(productId);
@@ -147,6 +175,8 @@ export async function DELETE(request, { params }) {
     if (!deleted) {
       return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
     }
+
+    revalidateProductPages();
 
     return NextResponse.json({
       success: true,
