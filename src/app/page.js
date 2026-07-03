@@ -68,18 +68,16 @@ async function getData() {
       .limit(12)
       .lean();
 
-    // Query products for the Chicken / Mutton / Quail / Ready-to-Eat / Eggs
-    // (and Duck) homepage rows. Match the loaded categories by slug OR name,
-    // case-insensitively, so DB variations ('chicken' vs 'Chicken') resolve
-    // safely. Then fetch active products for those category ids in one go and
-    // split per slug below.
-    const targetSlugs = ['chicken', 'mutton', 'quail', 'ready-to-eat', 'eggs', 'duck'];
-    const targetCatIds = categories
-      .filter((c) => targetSlugs.includes((c.slug || '').toLowerCase()) || targetSlugs.includes((c.name || '').toLowerCase()))
-      .map((c) => c._id);
-    let categoryProducts = targetCatIds.length
-      ? await Product.find({ category: { $in: targetCatIds }, isActive: { $ne: false } })
+    // Homepage category rows are fully admin-driven: one row PER active
+    // category (in displayOrder), never a hardcoded slug list. Fetch every
+    // active product once (with its category) and group them by category id
+    // below, so a new/renamed/reordered/deactivated category is reflected
+    // automatically without touching this file.
+    const activeCategoryIds = categories.map((c) => c._id);
+    let categoryProducts = activeCategoryIds.length
+      ? await Product.find({ category: { $in: activeCategoryIds }, isActive: { $ne: false } })
           .populate('category')
+          .sort({ createdAt: -1 })
           .lean()
       : [];
 
@@ -104,23 +102,33 @@ async function getData() {
     }));
 
     const categoryProductsStr = stringify(categoryProducts);
-    // Normalise slug/name to a lowercase hyphenated key so 'Ready To Eat',
-    // 'ready to eat' and 'ready-to-eat' all resolve to the same section.
-    const norm = (s) => (s || '').toString().trim().toLowerCase().replace(/\s+/g, '-');
-    const bySlug = (slug) => categoryProductsStr.filter(
-      (p) => norm(p.category?.slug) === slug || norm(p.category?.name) === slug
-    );
+    // Group active products under their category id.
+    const productsByCategory = {};
+    categoryProductsStr.forEach((p) => {
+      const catId = p.category?._id;
+      if (!catId) return;
+      (productsByCategory[catId] ||= []).push(p);
+    });
+
+    // Build one homepage section per active category, in displayOrder. Match
+    // by category REFERENCE (id), not by hardcoded slug/name. Categories with
+    // no active products are dropped here so no blank row renders (they still
+    // show in Explore Categories, which iterates `categories` separately).
+    const categorySections = stringifiedCategories
+      .map((cat) => ({
+        _id: cat._id,
+        name: cat.name,
+        slug: cat.slug,
+        description: cat.description || '',
+        products: productsByCategory[cat._id] || [],
+      }))
+      .filter((section) => section.products.length > 0);
 
     return {
       categories: stringifiedCategories.length ? stringifiedCategories : fallbackCategories,
       featuredProducts: stringify(featuredProducts),
       bestSellerProducts: stringify(bestSellerProducts),
-      chickenProducts: bySlug('chicken'),
-      muttonProducts: bySlug('mutton'),
-      quailProducts: bySlug('quail'),
-      readyToEatProducts: bySlug('ready-to-eat'),
-      eggsProducts: bySlug('eggs'),
-      duckProducts: bySlug('duck'),
+      categorySections,
       banners: stringify(banners),
       reviews: reviews.length ? stringify(reviews) : fallbackReviews,
     };
@@ -133,12 +141,7 @@ async function getData() {
       categories: fallbackCategories,
       featuredProducts: [],
       bestSellerProducts: [],
-      chickenProducts: [],
-      muttonProducts: [],
-      quailProducts: [],
-      readyToEatProducts: [],
-      eggsProducts: [],
-      duckProducts: [],
+      categorySections: [],
       banners: [],
       reviews: fallbackReviews,
     };
@@ -176,18 +179,18 @@ export default async function Home() {
     categories,
     featuredProducts,
     bestSellerProducts,
-    chickenProducts,
-    muttonProducts,
-    quailProducts,
-    readyToEatProducts,
-    eggsProducts,
-    duckProducts,
+    categorySections,
     banners,
     reviews,
   } = await getData();
 
   // Best Sellers row: prefer admin-flagged best sellers, fall back to featured.
   const bestSellers = bestSellerProducts?.length ? bestSellerProducts : featuredProducts;
+
+  // Alternate section backgrounds so consecutive dynamic category rows keep the
+  // existing cream/white rhythm (Best Sellers is cream, so the first dynamic
+  // row starts white).
+  const sectionBackgrounds = ['var(--white)', 'var(--bg-cream)'];
 
   const heroTitle = banners?.[0]?.title || 'Premium Fresh Meat & Cuts';
 
@@ -266,71 +269,22 @@ export default async function Home() {
           compact
         />
 
-        {/* 3. Fresh Chicken */}
-        <ProductSection
-          tagline="Farm Fresh"
-          title="Fresh Chicken"
-          subtitle="Tender, antibiotic-free chicken — custom-cut on order."
-          products={chickenProducts}
-          viewAllLink="/category/chicken"
-          background="var(--white)"
-          compact
-        />
-
-        {/* 4. Fresh Mutton */}
-        <ProductSection
-          tagline="Farm Fresh"
-          title="Fresh Mutton"
-          subtitle="Juicy, tender curry cuts from healthy, pasture-raised goats."
-          products={muttonProducts}
-          viewAllLink="/category/mutton"
-          background="var(--bg-cream)"
-          compact
-        />
-
-        {/* 5. Fresh Quail */}
-        <ProductSection
-          tagline="Farm Fresh"
-          title="Fresh Quail"
-          subtitle="Pasture-raised batair — clean, tender and full of flavor."
-          products={quailProducts}
-          viewAllLink="/category/quail"
-          background="var(--white)"
-          compact
-        />
-
-        {/* 6. Fresh Duck — sits between Quail and Ready to Eat */}
-        <ProductSection
-          tagline="Farm Fresh"
-          title="Fresh Duck"
-          subtitle="Rich, dressed duck sourced from healthy pasture-raised birds."
-          products={duckProducts}
-          viewAllLink="/category/duck"
-          background="var(--bg-cream)"
-          compact
-        />
-
-        {/* 7. Ready to Eat */}
-        <ProductSection
-          tagline="Heat & Serve"
-          title="Ready to Eat"
-          subtitle="Smoked, cooked and marinated favourites — ready in minutes."
-          products={readyToEatProducts}
-          viewAllLink="/category/ready-to-eat"
-          background="var(--white)"
-          compact
-        />
-
-        {/* 8. Farm-Fresh Eggs */}
-        <ProductSection
-          tagline="Farm Fresh"
-          title="Eggs"
-          subtitle="Farm-fresh organic eggs, gathered daily."
-          products={eggsProducts}
-          viewAllLink="/category/eggs"
-          background="var(--bg-cream)"
-          compact
-        />
+        {/* 3. Dynamic category rows — one per ACTIVE admin category (in
+             displayOrder), rendered only when it has active products. New,
+             renamed, reordered, deactivated or deleted categories reflect here
+             automatically with no code change. */}
+        {categorySections.map((section, index) => (
+          <ProductSection
+            key={section._id}
+            tagline="Farm Fresh"
+            title={section.name}
+            subtitle={section.description || `Premium ${section.name.toLowerCase()} — cut fresh on order.`}
+            products={section.products}
+            viewAllLink={`/category/${section.slug}`}
+            background={sectionBackgrounds[index % sectionBackgrounds.length]}
+            compact
+          />
+        ))}
 
         {/* 4. Fresh Cut Pure Standards (Branding Line Showcase) */}
         <section className="section-padding" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-light)', borderTop: '2px solid var(--primary-gold)' }}>
