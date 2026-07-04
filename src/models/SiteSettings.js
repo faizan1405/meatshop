@@ -12,7 +12,11 @@ const SiteSettingsSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      default: 'D-1b/1028, Sangam Vihar-110080',
+      default: 'D-1b/1028, Delhi - 110001',
+    },
+    businessLocation: {
+      type: String,
+      default: 'Delhi',
     },
     deliveryNote: {
       type: String,
@@ -52,7 +56,7 @@ const SiteSettingsSchema = new mongoose.Schema(
     },
     fssaiAddress: {
       type: String,
-      default: 'Sangam Vihar, New Delhi, TIGRI, SAKET, South, Delhi, 110080',
+      default: 'Delhi - 110001',
     },
     fssaiKindOfBusiness: {
       type: String,

@@ -513,7 +513,7 @@ export default function CheckoutPage() {
                         <input
                           type="text"
                           name="streetAddress"
-                          placeholder="D-1b/1028, Sangam Vihar"
+                          placeholder="e.g. D-1b/1028, Connaught Place"
                           value={addressForm.streetAddress}
                           onChange={handleInputChange}
                           required
@@ -547,7 +547,7 @@ export default function CheckoutPage() {
                         <input
                           type="text"
                           name="postalCode"
-                          placeholder="110080"
+                          placeholder="110001"
                           value={addressForm.postalCode}
                           onChange={handleInputChange}
                           required

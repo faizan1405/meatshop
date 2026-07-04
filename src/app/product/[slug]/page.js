@@ -85,7 +85,7 @@ export async function generateMetadata({ params }) {
 
     const price = product.variants?.[0]?.salePrice || product.variants?.[0]?.price || '';
     const seoTitle = product.seoTitle || `${product.name} Fresh Delivery | Porville`;
-    const seoDesc = product.seoDescription || `Buy fresh ${product.name} starting at ₹${price} in Sangam Vihar. Fresh Cut Pure Standards.`;
+    const seoDesc = product.seoDescription || `Buy fresh ${product.name} starting at ₹${price} in Delhi. Fresh Cut Pure Standards.`;
 
     return {
       title: seoTitle,

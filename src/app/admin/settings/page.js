@@ -8,6 +8,7 @@ export default function AdminSettingsPage() {
   const [contactNumber, setContactNumber] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
+  const [businessLocation, setBusinessLocation] = useState('');
   const [deliveryNote, setDeliveryNote] = useState('');
   const [deliveryCharge, setDeliveryCharge] = useState('');
   const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState('');
@@ -44,6 +45,7 @@ export default function AdminSettingsPage() {
           setContactNumber(s.contactNumber || '');
           setEmail(s.email || '');
           setAddress(s.address || '');
+          setBusinessLocation(s.businessLocation || '');
           setDeliveryNote(s.deliveryNote || '');
           setDeliveryCharge(s.deliveryCharge?.toString() || '');
           setFreeDeliveryThreshold(s.freeDeliveryThreshold?.toString() || '');
@@ -111,6 +113,7 @@ export default function AdminSettingsPage() {
           contactNumber,
           email,
           address,
+          businessLocation,
           deliveryNote,
           deliveryCharge,
           freeDeliveryThreshold,
@@ -208,9 +211,15 @@ export default function AdminSettingsPage() {
           <label>Contact Email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="porville1986@gmail.com" required />
         </div>
-        <div className={styles.formGroup}>
-          <label>Warehouse / Outlet Address</label>
-          <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="D-1b/1028, Sangam Vihar-110080" required />
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '15px' }}>
+          <div className={styles.formGroup}>
+            <label>Warehouse / Outlet Address</label>
+            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="D-1b/1028, Delhi-110001" required />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Business Location (City / Region)</label>
+            <input type="text" value={businessLocation} onChange={(e) => setBusinessLocation(e.target.value)} placeholder="Delhi" required />
+          </div>
         </div>
       </div>
 
@@ -257,7 +266,7 @@ export default function AdminSettingsPage() {
         </div>
         <div className={styles.formGroup}>
           <label>Registered Address</label>
-          <input type="text" value={fssaiAddress} onChange={(e) => setFssaiAddress(e.target.value)} placeholder="Sangam Vihar, New Delhi..." />
+          <input type="text" value={fssaiAddress} onChange={(e) => setFssaiAddress(e.target.value)} placeholder="Delhi, India..." />
         </div>
         <div className={styles.formGroup}>
           <label>Kind of Business</label>

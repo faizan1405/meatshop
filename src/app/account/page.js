@@ -327,7 +327,7 @@ export default function AccountPage() {
                         <input
                           type="text"
                           name="postalCode"
-                          placeholder="110080"
+                          placeholder="110001"
                           value={addressForm.postalCode}
                           onChange={handleInputChange}
                           required

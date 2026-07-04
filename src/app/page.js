@@ -25,7 +25,7 @@ const fallbackCategories = [
 ];
 
 const fallbackReviews = [
-  { name: 'Amit Sharma', rating: 5, comment: 'Hands down the best quality chicken in Sangam Vihar. Super clean packaging and delivered chilled!', date: 'June 20, 2026' },
+  { name: 'Amit Sharma', rating: 5, comment: 'Hands down the best quality chicken in Delhi. Super clean packaging and delivered chilled!', date: 'June 20, 2026' },
   { name: 'Priya Verma', rating: 5, comment: 'The mutton curry cut was incredibly tender. Sourced well, pure standards indeed. Will order again.', date: 'June 18, 2026' },
   { name: 'John Doe', rating: 5, comment: 'Tried their Smoked Chicken Salami and it is fantastic. Super fast 2-hour delivery.', date: 'June 12, 2026' },
 ];
@@ -348,7 +348,7 @@ export default async function Home() {
                   <Truck size={24} />
                 </div>
                 <h3 className={styles.featureTitle}>Fast Delivery</h3>
-                <p className={styles.featureDesc}>Express shipping within 2 hours across Sangam Vihar and neighboring sectors.</p>
+                <p className={styles.featureDesc}>Express shipping within 2 hours across Delhi.</p>
               </div>
             </div>
           </div>

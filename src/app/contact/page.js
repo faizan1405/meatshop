@@ -41,8 +41,7 @@ export default function ContactPage() {
               <MapPin size={24} style={{ color: 'var(--primary-gold)' }} />
               <h3 style={{ fontFamily: 'var(--font-playfair)', fontSize: '1.2rem' }}>Main Hub Address</h3>
               <span style={{ fontWeight: 600, color: 'var(--text-dark)' }}>
-                D-1b/1028, Sangam Vihar<br />
-                New Delhi - 110080
+                D-1b/1028, Delhi - 110001
               </span>
             </div>
           </div>
@@ -74,5 +73,5 @@ export default function ContactPage() {
 
 export const metadata = {
   title: "Contact Us | Porville",
-  description: "Get in touch with Porville support team. Dial 9217577006 or visit our Sangam Vihar hub for premium cuts.",
+  description: "Get in touch with Porville support team. Dial 9217577006 or visit our Delhi hub for premium cuts.",
 };

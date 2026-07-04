@@ -22,10 +22,22 @@ export const metadata = {
   },
   description: "Porville offers premium, fresh, and hygienic cuts of Chicken, Mutton, Quail, Duck, and Farm Fresh Eggs. FSSAI registered. Order online for 2-hour express delivery.",
   metadataBase: new URL("https://porville.com"),
-  keywords: ["fresh meat", "chicken online", "mutton delivery", "porville", "hygienic meat", "sangam vihar meat shop", "FSSAI registered meat shop"],
+  keywords: ["fresh meat", "chicken online", "mutton delivery", "porville", "hygienic meat", "delhi meat shop", "FSSAI registered meat shop"],
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: '/favicon.ico' },
+      {
+        url: '/icon.png',
+        type: 'image/png',
+        sizes: '512x512',
+      },
+    ],
+    apple: [
+      {
+        url: '/apple-icon.png',
+        type: 'image/png',
+      },
+    ],
   },
 };
 

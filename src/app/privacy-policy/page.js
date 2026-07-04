@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
         items={[
           <>Email: <a href="mailto:porville1986@gmail.com" style={{ color: 'var(--primary-gold-dark)' }}>porville1986@gmail.com</a></>,
           <>Phone: <a href="tel:9217577006" style={{ color: 'var(--primary-gold-dark)' }}>9217577006</a></>,
-          'Address: D-1b/1028, Sangam Vihar, New Delhi - 110080',
+          'Address: D-1b/1028, Delhi - 110001',
         ]}
       />
     </PolicyLayout>

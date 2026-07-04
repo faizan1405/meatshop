@@ -302,7 +302,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
           <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8rem', color: 'var(--text-dark-muted)' }}>
             <div>Availability: <strong style={{ color: isOutOfStock ? 'var(--error)' : 'var(--success)' }}>{isOutOfStock ? 'Out of stock' : 'In Stock'}</strong></div>
             <div>Processing: <strong>Freshly sliced, vacuum packed immediately</strong></div>
-            <div>Delivery Note: <strong>Chilled home delivery in 2 hours across Sangam Vihar</strong></div>
+            <div>Delivery Note: <strong>Chilled home delivery in 2 hours across Delhi</strong></div>
           </div>
         </div>
 

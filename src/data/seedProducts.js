@@ -76,7 +76,7 @@ export const seedProducts = [
     newArrival: false,
     productType: 'fresh meat',
     seoTitle: 'Fresh Chicken Feet (Regular) Online | Porville',
-    seoDescription: 'Cleaned regular chicken feet online from Porville. Perfect for collagen-rich broths. Fast delivery in Sangam Vihar.',
+    seoDescription: 'Cleaned regular chicken feet online from Porville. Perfect for collagen-rich broths. Fast delivery in Delhi.',
   },
   {
     name: 'Chicken Feet (Premium)',

@@ -173,7 +173,7 @@ export default function Footer() {
                 <MapPin size={16} />
                 <div>
                   <strong>Address:</strong><br />
-                  {settings?.address || 'D-1b/1028, Sangam Vihar, New Delhi - 110080'}
+                  {settings?.address || 'D-1b/1028, Delhi - 110001'}
                 </div>
               </li>
             </ul>
