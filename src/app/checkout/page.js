@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle, Award, Clock } from 'lucide-react';
+import { ShieldCheck, CreditCard, ShoppingBag, PlusCircle, AlertCircle, Award, Clock, Banknote } from 'lucide-react';
 import { useCart } from '@/components/common/Providers';
 import DeliveryThresholdBar from '@/components/common/DeliveryThresholdBar';
 import DeliverySlotSelector from '@/components/checkout/DeliverySlotSelector';
@@ -52,6 +52,20 @@ export default function CheckoutPage() {
   const [errorMessage, setErrorMessage] = useState('');
   // Required legal consent — Place Order / Pay Now stays disabled until checked.
   const [agreedToPolicies, setAgreedToPolicies] = useState(false);
+
+  // Selected payment method: 'online' (Razorpay) or 'cod' (Cash on Delivery).
+  const [paymentMethod, setPaymentMethod] = useState('online');
+  // Synchronous re-submit guard. `isSubmitting` (state) disables the button, but
+  // two clicks fired before the re-render could both pass the state check — this
+  // ref flips immediately so only the first COD submit ever proceeds.
+  const codSubmitRef = useRef(false);
+  // Stable idempotency key for this checkout attempt. Sent to the server so a
+  // retried/duplicated COD submission collapses into a single order.
+  const [codIdempotencyKey] = useState(() =>
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `cod_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  );
 
   // ---- Delivery timing (raw slot vs ready-to-eat) ----
   const deliveryInfo = useMemo(() => getCartDeliveryMode(cartItems), [cartItems]);
@@ -386,6 +400,65 @@ export default function CheckoutPage() {
     }
   };
 
+  // Place a Cash on Delivery order. No Razorpay order is created and no payment
+  // modal opens — the order is written directly server-side (totals recomputed
+  // there), then the cart is cleared ONLY after a confirmed success.
+  const handleCodOrder = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    const validationErr = validateForm();
+    if (validationErr) {
+      setErrorMessage(validationErr);
+      return;
+    }
+
+    // Duplicate-submit guard: ignore repeat clicks while a request is in flight.
+    if (codSubmitRef.current || isSubmitting) return;
+    codSubmitRef.current = true;
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('/api/orders/create-cod-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentMethod: 'cod',
+          idempotencyKey: codIdempotencyKey,
+          cartItems,
+          shippingAddress: addressForm,
+          couponCode: coupon?.code || '',
+          ...buildDeliveryPayload(),
+          isGuest: !session,
+          guestInfo: !session ? {
+            name: addressForm.name,
+            email: guestEmail,
+            phone: addressForm.phone,
+          } : null,
+          userEmail: session?.user?.email || null,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Clear the cart ONLY after the COD order is confirmed created.
+        clearCart();
+        router.push(`/order-success?orderId=${data.orderId}`);
+      } else {
+        // Keep the cart intact so the customer can retry.
+        setErrorMessage(data.message || 'Could not place your Cash on Delivery order. Please try again.');
+        setIsSubmitting(false);
+        codSubmitRef.current = false;
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('An error occurred while placing your Cash on Delivery order. Please try again.');
+      setIsSubmitting(false);
+      codSubmitRef.current = false;
+    }
+  };
+
   return (
     <>
       <Header />
@@ -645,6 +718,43 @@ export default function CheckoutPage() {
                   {/* Free-delivery progress — threshold/charge from admin settings. */}
                   <DeliveryThresholdBar subtotal={itemsSubtotal} freeDeliveryThreshold={freeDeliveryThreshold} style={{ marginBottom: '18px' }} />
 
+                  {/* Payment method selector — choose online (Razorpay) or Cash on Delivery. */}
+                  <div className={styles.paymentMethods}>
+                    <h3 className={styles.paymentMethodsTitle}>Payment Method</h3>
+
+                    <label className={`${styles.paymentOption} ${paymentMethod === 'online' ? styles.paymentOptionActive : ''}`}>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="online"
+                        checked={paymentMethod === 'online'}
+                        onChange={() => { setPaymentMethod('online'); setErrorMessage(''); }}
+                        className={styles.paymentRadio}
+                      />
+                      <CreditCard size={20} className={styles.paymentOptionIcon} />
+                      <span className={styles.paymentOptionText}>
+                        <strong>Pay Online</strong>
+                        <small>UPI, Cards, Net Banking &amp; other Razorpay methods</small>
+                      </span>
+                    </label>
+
+                    <label className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cod"
+                        checked={paymentMethod === 'cod'}
+                        onChange={() => { setPaymentMethod('cod'); setErrorMessage(''); }}
+                        className={styles.paymentRadio}
+                      />
+                      <Banknote size={20} className={styles.paymentOptionIcon} />
+                      <span className={styles.paymentOptionText}>
+                        <strong>Cash on Delivery</strong>
+                        <small>Pay when your order is delivered</small>
+                      </span>
+                    </label>
+                  </div>
+
                   {errorMessage && (
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', color: 'var(--error)', backgroundColor: '#ffebee', padding: '12px', borderRadius: 'var(--border-radius-sm)', marginBottom: '15px', fontSize: '0.85rem' }}>
                       <AlertCircle size={18} style={{ flexShrink: 0 }} />
@@ -674,13 +784,29 @@ export default function CheckoutPage() {
                     </span>
                   </label>
 
-                  {config.isLoading ? (
+                  {paymentMethod === 'cod' ? (
+                    <>
+                      {/* Cash on Delivery — creates the order directly, no Razorpay. */}
+                      <button
+                        onClick={handleCodOrder}
+                        className={`${styles.paymentBtn} btn-gold`}
+                        disabled={isSubmitting || !agreedToPolicies}
+                      >
+                        <Banknote size={18} />
+                        <span>{isSubmitting ? 'Placing Order...' : 'Place Order – Cash on Delivery'}</span>
+                      </button>
+                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', color: 'var(--text-dark-muted)', fontSize: '0.72rem', marginTop: '15px', textAlign: 'center' }}>
+                        <Banknote size={14} style={{ color: 'var(--success)', flexShrink: 0 }} />
+                        <span>Pay ₹{orderTotal} in cash when your order is delivered.</span>
+                      </div>
+                    </>
+                  ) : config.isLoading ? (
                     <button className={`${styles.paymentBtn} btn-gold`} disabled>
                       <span>Loading...</span>
                     </button>
                   ) : (!config.isRazorpayConfigured && config.isDemoCheckoutEnabled) || (config.isDemoCheckoutEnabled && process.env.NODE_ENV !== 'production') ? (
                     <>
-                      <button 
+                      <button
                         onClick={handleDemoPayment}
                         className={`${styles.paymentBtn}`}
                         style={{ backgroundColor: '#2196F3', color: 'white', border: 'none' }}
@@ -694,7 +820,7 @@ export default function CheckoutPage() {
                       </div>
                     </>
                   ) : config.isRazorpayConfigured ? (
-                    <button 
+                    <button
                       onClick={handlePayment}
                       className={`${styles.paymentBtn} btn-gold`}
                       disabled={isSubmitting || !agreedToPolicies}
@@ -709,7 +835,7 @@ export default function CheckoutPage() {
                     </button>
                   )}
 
-                  {!((!config.isRazorpayConfigured && config.isDemoCheckoutEnabled) || (config.isDemoCheckoutEnabled && process.env.NODE_ENV !== 'production')) && (
+                  {paymentMethod === 'online' && !((!config.isRazorpayConfigured && config.isDemoCheckoutEnabled) || (config.isDemoCheckoutEnabled && process.env.NODE_ENV !== 'production')) && (
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', color: 'var(--text-dark-muted)', fontSize: '0.7rem', marginTop: '15px' }}>
                       <ShieldCheck size={14} style={{ color: 'var(--success)' }} />
                       <span>Secure Payment processed via Razorpay</span>

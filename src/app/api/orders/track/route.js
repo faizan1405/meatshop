@@ -35,6 +35,7 @@ export async function GET(request) {
         createdAt: order.createdAt.toISOString(),
         orderStatus: order.orderStatus,
         paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod || 'online',
         totalPrice: order.totalPrice,
         items: order.items.map(item => ({ ...item, _id: item._id.toString(), product: item.product.toString() })),
         shippingAddress: order.shippingAddress,

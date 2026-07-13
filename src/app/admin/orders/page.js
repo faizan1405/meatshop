@@ -18,6 +18,7 @@ async function getOrders() {
       createdAt: order.createdAt ? order.createdAt.toISOString() : null,
       orderStatus: order.orderStatus || 'pending',
       paymentStatus: order.paymentStatus || 'pending',
+      paymentMethod: order.paymentMethod || 'online',
       totalPrice: order.totalPrice ?? 0,
       shippingAddressName: order.shippingAddress?.name || order.guestInfo?.name || '—',
       shippingAddressPhone: order.shippingAddress?.phone || order.guestInfo?.phone || '—',
@@ -85,6 +86,9 @@ export default async function AdminOrdersPage() {
                     <strong style={{ fontSize: '0.75rem', display: 'block' }}>{order._id}</strong>
                     {order.isDemoOrder && (
                       <span style={{ fontSize: '0.65rem', backgroundColor: '#e3f2fd', color: '#1565c0', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-block', marginTop: '4px' }}>Demo</span>
+                    )}
+                    {order.paymentMethod === 'cod' && (
+                      <span style={{ fontSize: '0.65rem', backgroundColor: '#fff3e0', color: '#e65100', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-block', marginTop: '4px' }}>COD</span>
                     )}
                   </td>
                   <td>{order.shippingAddressName}</td>

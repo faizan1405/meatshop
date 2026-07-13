@@ -84,6 +84,13 @@ export default function OrdersPage() {
     }
   };
 
+  // Customer-facing label for how the order is/was paid.
+  const formatPaymentMethod = (method) => {
+    if (method === 'cod') return 'Cash on Delivery';
+    if (method === 'Demo') return 'Demo';
+    return 'Online (Razorpay)';
+  };
+
   return (
     <>
       <Header />
@@ -136,9 +143,15 @@ export default function OrdersPage() {
                         </div>
                         <div className={styles.orderMeta}>
                           <span>PAYMENT STATUS:</span>
-                          <span style={{ fontWeight: 700, color: 'var(--success)', textTransform: 'uppercase', fontSize: '0.8rem' }}>
+                          <span style={{ fontWeight: 700, color: order.paymentStatus === 'paid' ? 'var(--success)' : '#b26a00', textTransform: 'uppercase', fontSize: '0.8rem' }}>
                             {order.paymentStatus}
                           </span>
+                        </div>
+                        <div className={styles.orderMeta}>
+                          <span>PAYMENT METHOD:</span>
+                          <strong className={styles.orderMetaValue} style={{ fontSize: '0.8rem' }}>
+                            {formatPaymentMethod(order.paymentMethod)}
+                          </strong>
                         </div>
                       </div>
 
@@ -237,6 +250,12 @@ export default function OrdersPage() {
                       <span className={styles.statusPill} style={{ backgroundColor: getStatusColor(trackedOrder.orderStatus).bg, color: getStatusColor(trackedOrder.orderStatus).text, alignSelf: 'flex-start', marginTop: '3px' }}>
                         {trackedOrder.orderStatus.replace(/_/g, ' ')}
                       </span>
+                    </div>
+                    <div className={styles.orderMeta}>
+                      <span>PAYMENT METHOD:</span>
+                      <strong className={styles.orderMetaValue} style={{ fontSize: '0.8rem' }}>
+                        {formatPaymentMethod(trackedOrder.paymentMethod)}
+                      </strong>
                     </div>
                   </div>
 

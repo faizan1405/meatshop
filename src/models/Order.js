@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 
+// Customer-selectable payment methods at checkout. Validated on the server for
+// every order-creation request — the browser is never trusted to pick anything
+// outside this set. 'razorpay' = existing online flow, 'cod' = Cash on Delivery.
+export const PAYMENT_METHODS = ['razorpay', 'cod'];
+
 const OrderItemSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
@@ -131,11 +136,25 @@ const OrderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
+      // Superset enum: 'razorpay' and 'cod' are the customer-selectable methods
+      // (see PAYMENT_METHODS). 'online' (the legacy default recorded for verified
+      // Razorpay orders) and 'Demo' (dev-only demo checkout) are kept so existing
+      // and demo orders remain valid — update validators only run on changed
+      // paths, so the admin status update is unaffected.
+      enum: ['online', 'razorpay', 'cod', 'Demo'],
       default: 'online',
     },
     paymentProvider: {
       type: String,
       default: 'razorpay',
+    },
+    // Idempotency guard against duplicate orders from rapid/repeated submits or
+    // network retries. Sparse + unique so only orders that set it are indexed;
+    // online/demo orders that never set it are completely unaffected.
+    idempotencyKey: {
+      type: String,
+      default: undefined,
+      index: { unique: true, sparse: true },
     },
     orderStatus: {
       type: String,

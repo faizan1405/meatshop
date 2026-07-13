@@ -44,7 +44,9 @@ export default async function OrderSuccessPage({ searchParams }) {
               </div>
               <h1 className={styles.title}>Order Confirmed!</h1>
               <p className={styles.message}>
-                Thank you for shopping with Porville. Your payment has been verified, and your order has been placed successfully. Our master butchers are preparing your fresh cuts.
+                {order.paymentMethod === 'cod'
+                  ? 'Thank you for shopping with Porville. Your Cash on Delivery order has been placed successfully. Please keep the exact amount ready — you can pay in cash when your fresh cuts are delivered.'
+                  : 'Thank you for shopping with Porville. Your payment has been verified, and your order has been placed successfully. Our master butchers are preparing your fresh cuts.'}
               </p>
 
               {/* Order summary table */}
@@ -62,11 +64,13 @@ export default async function OrderSuccessPage({ searchParams }) {
                 </div>
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Payment Method</span>
-                  <span className={styles.detailValue}>Razorpay NetBanking/Card</span>
+                  <span className={styles.detailValue}>
+                    {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Razorpay NetBanking/Card'}
+                  </span>
                 </div>
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Payment Status</span>
-                  <span className={styles.detailValue} style={{ color: 'var(--success)', textTransform: 'uppercase' }}>
+                  <span className={styles.detailValue} style={{ color: order.paymentStatus === 'paid' ? 'var(--success)' : '#b26a00', textTransform: 'uppercase' }}>
                     {order.paymentStatus}
                   </span>
                 </div>
@@ -100,7 +104,9 @@ export default async function OrderSuccessPage({ searchParams }) {
                   </div>
                 )}
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Total Amount Paid</span>
+                  <span className={styles.detailLabel}>
+                    {order.paymentMethod === 'cod' ? 'Amount to Pay on Delivery' : 'Total Amount Paid'}
+                  </span>
                   <span className={styles.detailValue} style={{ color: 'var(--primary-gold-dark)', fontSize: '1rem' }}>
                     ₹{order.totalPrice}
                   </span>

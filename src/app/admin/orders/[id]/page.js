@@ -141,7 +141,9 @@ export default function AdminOrderDetailsPage({ params }) {
                   tell how an order was paid. */}
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-cream)' }}>
                 <strong>Payment Method:</strong>{' '}
-                <span style={{ textTransform: 'capitalize' }}>{order.paymentMethod || 'online'}</span>
+                <span style={{ textTransform: order.paymentMethod === 'cod' ? 'none' : 'capitalize' }}>
+                  {order.paymentMethod === 'cod' ? 'Cash on Delivery' : (order.paymentMethod || 'online')}
+                </span>
               </div>
               <div>
                 <strong>Payment Provider:</strong>{' '}
