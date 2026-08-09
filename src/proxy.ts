@@ -10,14 +10,22 @@ export async function proxy(request: NextRequest) {
   }
 
   // Protect all other /admin paths
-  const token = await getToken({
-    req: request,
-    secret:
-      process.env.NEXTAUTH_SECRET ||
-      (process.env.NODE_ENV !== 'production'
-        ? 'dev-only-insecure-secret-do-not-use-in-prod'
-        : undefined),
-  });
+  let token;
+  try {
+    token = await getToken({
+      req: request,
+      secret:
+        process.env.NEXTAUTH_SECRET ||
+        (process.env.NODE_ENV !== 'production'
+          ? 'dev-only-insecure-secret-do-not-use-in-prod'
+          : undefined),
+    });
+  } catch {
+    // Token decoding failed (e.g. secret mismatch after domain change,
+    // or NEXTAUTH_SECRET missing in production). Treat as unauthenticated
+    // so the user gets redirected to the login page instead of a 404.
+    token = null;
+  }
 
   if (!token || token.role !== 'admin') {
     const loginUrl = new URL('/admin/login', request.url);
