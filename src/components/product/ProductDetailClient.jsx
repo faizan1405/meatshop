@@ -140,6 +140,11 @@ export default function ProductDetailClient({ product, initialReviews }) {
               <img
                 src={activeImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=800&q=80'}
                 alt={product.name}
+                onError={(e) => {
+                  if (e.target.src !== 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=800&q=80') {
+                    e.target.src = 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=800&q=80';
+                  }
+                }}
               />
             )}
           </div>
@@ -153,7 +158,15 @@ export default function ProductDetailClient({ product, initialReviews }) {
                   onClick={() => { setActiveImage(img); setActiveMediaType('image'); }}
                   className={`${styles.thumbnail} ${activeMediaType === 'image' && activeImage === img ? styles.thumbnailActive : ''}`}
                 >
-                  <img src={img} alt={`thumbnail-${idx}`} />
+                  <img
+                    src={img}
+                    alt={`thumbnail-${idx}`}
+                    onError={(e) => {
+                      if (e.target.src !== 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=200&q=80') {
+                        e.target.src = 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=200&q=80';
+                      }
+                    }}
+                  />
                 </button>
               ))}
               {product.media?.filter((m) => m.type === 'video').map((m, idx) => (

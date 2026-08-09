@@ -86,11 +86,16 @@ export default function ProductCard({ product, compact = false }) {
       
       {/* Product Image Wrapper */}
       <Link href={`/product/${product.slug}`} className={styles.imageWrapper}>
-        <img 
-          src={product.images?.[0] || product.placeholderImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80'} 
+        <img
+          src={product.images?.[0] || product.placeholderImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80'}
           alt={product.name}
           className={styles.image}
           loading="lazy"
+          onError={(e) => {
+            if (e.target.src !== 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80') {
+              e.target.src = 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80';
+            }
+          }}
         />
       </Link>
 

@@ -21,7 +21,7 @@ export const metadata = {
     template: "%s | Porville",
   },
   description: "Porville offers premium, fresh, and hygienic cuts of Chicken, Mutton, Quail, Duck, and Farm Fresh Eggs. FSSAI registered. Order online for 2-hour express delivery.",
-  metadataBase: new URL("https://porville.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://meatshop-three.vercel.app'),
   keywords: ["fresh meat", "chicken online", "mutton delivery", "porville", "hygienic meat", "delhi meat shop", "FSSAI registered meat shop"],
   icons: {
     icon: [

@@ -3,7 +3,7 @@ import Category from '@/models/Category';
 import Product from '@/models/Product';
 
 export default async function sitemap() {
-  const baseUrl = 'https://porville.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://meatshop-three.vercel.app';
 
   // Static URLs
   const staticPaths = [

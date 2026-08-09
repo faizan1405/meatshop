@@ -148,11 +148,16 @@ export default function GlobalProductSlideshow() {
             products.map((product) => (
               <div key={product._id || product.slug} className={styles.card}>
                 <Link href={`/product/${product.slug}`} className={styles.imageWrapper} tabIndex="-1">
-                  <img 
-                    src={product.images?.[0] || product.placeholderImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80'} 
+                  <img
+                    src={product.images?.[0] || product.placeholderImage || 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80'}
                     alt={product.name}
                     className={styles.image}
                     loading="lazy"
+                    onError={(e) => {
+                      if (e.target.src !== 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80') {
+                        e.target.src = 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80';
+                      }
+                    }}
                   />
                 </Link>
                 <div className={styles.content}>
