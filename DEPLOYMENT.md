@@ -9,7 +9,7 @@ Add **all** of these in Vercel → Project → Settings → Environment Variable
 |---|---|---|
 | `MONGODB_URI` | No | MongoDB Atlas connection string |
 | `NEXTAUTH_SECRET` | No | Signs session JWTs (`openssl rand -base64 32`) |
-| `NEXTAUTH_URL` | No | Full deployment URL, e.g. `https://porville.com` |
+| `NEXTAUTH_URL` | No | Full deployment URL — **must be `https://www.porville.com`** |
 | `GOOGLE_CLIENT_ID` | No | Google OAuth client |
 | `GOOGLE_CLIENT_SECRET` | No | Google OAuth secret |
 | `RAZORPAY_KEY_ID` | No | Razorpay server key |
@@ -28,7 +28,7 @@ In Google Cloud Console → Credentials → your OAuth client, add the **Authori
 redirect URI**:
 
 ```
-https://<your-domain>/api/auth/callback/google
+https://www.porville.com/api/auth/callback/google
 ```
 
 Also keep `http://localhost:3000/api/auth/callback/google` for local dev.
