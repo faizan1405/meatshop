@@ -2,6 +2,7 @@ import { Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/common/Providers";
 import FloatingChatbot from "@/components/common/FloatingChatbot";
+import MetaPixel from "@/components/common/MetaPixel";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -48,6 +49,12 @@ export default function RootLayout({ children }) {
       className={`${outfit.variable} ${playfair.variable}`}
     >
       <body>
+        <MetaPixel />
+        <noscript>
+          <img height="1" width="1" style={{display:'none'}} alt=""
+            src="https://www.facebook.com/tr?id=1277240787865091&ev=PageView&noscript=1"
+          />
+        </noscript>
         <Providers>
           {children}
           <FloatingChatbot />
