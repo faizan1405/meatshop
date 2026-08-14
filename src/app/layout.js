@@ -52,7 +52,7 @@ export default function RootLayout({ children }) {
         <MetaPixel />
         <noscript>
           <img height="1" width="1" style={{display:'none'}} alt=""
-            src="https://www.facebook.com/tr?id=1277240787865091&ev=PageView&noscript=1"
+            src="https://www.facebook.com/tr?id=3965647473744341&ev=PageView&noscript=1"
           />
         </noscript>
         <Providers>
